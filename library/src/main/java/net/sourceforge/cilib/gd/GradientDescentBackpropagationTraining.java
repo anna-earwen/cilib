@@ -67,7 +67,9 @@ public class GradientDescentBackpropagationTraining extends AbstractAlgorithm im
             problem.operateOnData(); // do the necessary (eg, slide the window!)
             NeuralNetwork neuralNetwork = problem.getNeuralNetwork();
             StandardPatternDataTable trainingSet = problem.getTrainingSet();
-            problem.getShuffler().operate(trainingSet);
+            if(problem.isShuffle()) {
+                problem.getShuffler().operate(trainingSet);
+            }
             bpVisitor.setLearningRate(this.learningRate.getParameter());
             bpVisitor.setMomentum(this.momentum.getParameter());
 
@@ -82,7 +84,6 @@ public class GradientDescentBackpropagationTraining extends AbstractAlgorithm im
                 for (Numeric real : error) {
                     errorTraining += real.doubleValue()*real.doubleValue();
                 }
-
                 // backpropagate
                 bpVisitor.setPreviousPattern(pattern);
                 bpVisitor.setPreviousWeightUpdates(previousWeightChanges);
