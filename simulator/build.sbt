@@ -2,17 +2,13 @@ import AssemblyKeys._
 
 assemblySettings
 
-// name := "simulator"
-
-version := "0.7.5"
+name := "cilib-simulator"
 
 description := "Simulator environment fo running experiments using the CIlib library"
 
 scalacOptions += "-deprecation"
 
 parallelExecution in Test := false
-
-scalaVersion := "2.9.2"
 
 mainClass := Some("net.sourceforge.cilib.simulator.Main")
 
@@ -23,10 +19,12 @@ libraryDependencies ++= Seq(
     "org.hamcrest" % "hamcrest-all" % "1.1" % "test"
 )
 
+autoScalaLibrary := false
+
 // Handle the scala compiler dependency
-libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) =>
-    deps :+ ("org.scala-lang" % "scala-compiler" % sv)
-}
+//libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) =>
+//    deps :+ ("org.scala-lang" % "scala-compiler" % sv)
+//}
 
 resourceDirectory in Test <<= baseDirectory { _ / "simulator" }
 

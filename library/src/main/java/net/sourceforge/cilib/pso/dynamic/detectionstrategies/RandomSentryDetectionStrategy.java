@@ -10,41 +10,35 @@ package net.sourceforge.cilib.pso.dynamic.detectionstrategies;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-
 import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
 import net.sourceforge.cilib.entity.Entity;
-import net.sourceforge.cilib.entity.Particle;
 import net.sourceforge.cilib.entity.Topology;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
+import net.sourceforge.cilib.math.random.generator.Rand;
 import net.sourceforge.cilib.pso.dynamic.DynamicParticle;
+import net.sourceforge.cilib.pso.particle.Particle;
 
-/**
- */
 public class RandomSentryDetectionStrategy<E extends PopulationBasedAlgorithm> extends
         EnvironmentChangeDetectionStrategy<E> {
     private static final long serialVersionUID = 6254159986113630555L;
 
     private int sentries;
     private double theta;
-    private RandomProvider randomiser;
     private int[] sentryIDs;
-    private boolean initialized = false;
+    private boolean initialised = false;
     ArrayList<Particle> sentryList;
 
     public RandomSentryDetectionStrategy() {
         sentries = 1;
         theta = 0.001;
-        randomiser = new MersenneTwister();
     }
 
-    public void Initialize(E algorithm){
+    public void Initialise(E algorithm){
         sentryIDs = new int[sentries];
         int populationSize = algorithm.getTopology().size();
 
         //randomly select the sentries among the particles
         for(int i=0; i<sentries; i++){
-            sentryIDs[i] = Math.abs(randomiser.nextInt()%populationSize);
+            sentryIDs[i] = Math.abs(Rand.nextInt()%populationSize);
             for(int j=0;j<i;j++){//doesn't pick the same entity twice
                 if(sentryIDs[j]==sentryIDs[i]){
                     --i;
@@ -67,13 +61,12 @@ public class RandomSentryDetectionStrategy<E extends PopulationBasedAlgorithm> e
             }//if
         }//while
 
-        this.initialized = true;
+        this.initialised = true;
     }
 
     public RandomSentryDetectionStrategy(RandomSentryDetectionStrategy<E> copy) {
         this.sentries = copy.sentries;
         this.theta = copy.theta;
-        this.randomiser = copy.randomiser;
     }
 
     public RandomSentryDetectionStrategy<E> getClone() {
@@ -88,8 +81,8 @@ public class RandomSentryDetectionStrategy<E extends PopulationBasedAlgorithm> e
      * @return true if any changes are detected, false otherwise
      */
     public boolean detect(E algorithm) {
-        if(initialized == false){
-            this.Initialize(algorithm);
+        if(initialised == false){
+            this.Initialise(algorithm);
         }
         boolean envChangeOccured = false;
 
@@ -103,20 +96,6 @@ public class RandomSentryDetectionStrategy<E extends PopulationBasedAlgorithm> e
             }
         }
         return envChangeOccured;
-    }
-
-    /**
-     * @return the randomiser
-     */
-    public RandomProvider getRandomiser() {
-        return randomiser;
-    }
-
-    /**
-     * @param randomiser the randomiser to set
-     */
-    public void setRandomiser(RandomProvider randomiser) {
-        this.randomiser = randomiser;
     }
 
     /**

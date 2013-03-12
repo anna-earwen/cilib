@@ -6,19 +6,16 @@
  */
 package net.sourceforge.cilib.pso.dynamic.responsestrategies;
 
-import java.io.Serializable;
-import java.util.Iterator;
-
 import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
 import net.sourceforge.cilib.entity.Entity;
-import net.sourceforge.cilib.entity.Particle;
 import net.sourceforge.cilib.entity.Topology;
+import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.util.Cloneable;
 
 /**
  * TODO: Complete this Javadoc.
  */
-public abstract class EnvironmentChangeResponseStrategy<E extends PopulationBasedAlgorithm> implements Cloneable, Serializable {
+public abstract class EnvironmentChangeResponseStrategy<E extends PopulationBasedAlgorithm> implements Cloneable {
     protected boolean hasMemory = true;
 
     public EnvironmentChangeResponseStrategy() {
@@ -48,7 +45,9 @@ public abstract class EnvironmentChangeResponseStrategy<E extends PopulationBase
      */
     public void respond(E algorithm) {
         performReaction(algorithm);
-        if(hasMemory) updateNeighbourhoodBestEntities(algorithm.getTopology());
+        if(hasMemory) {
+            updateNeighbourhoodBestEntities((Topology<Particle>) algorithm.getTopology());
+        }
     }
 
     /**
@@ -64,13 +63,10 @@ public abstract class EnvironmentChangeResponseStrategy<E extends PopulationBase
      *
      * @param topology a topology of {@link Particle particles} :-(
      */
-    protected void updateNeighbourhoodBestEntities(Topology<? extends Entity> topology) {
-        for (Iterator<? extends Entity> outside = topology.iterator(); outside.hasNext(); ) {
-            Particle current = (Particle) outside.next();
+    protected <P extends Particle> void updateNeighbourhoodBestEntities(Topology<P> topology) {
+        for (P current : topology) {
             current.calculateFitness();
-
-            for (Iterator<? extends Entity> inside = topology.neighbourhood(outside); inside.hasNext(); ) {
-                Particle other = (Particle) inside.next();
+            for (P other : topology.neighbourhood(current)) {
                 if (current.getSocialFitness().compareTo(other.getNeighbourhoodBest().getSocialFitness()) > 0) {
                     other.setNeighbourhoodBest(current);
                 }

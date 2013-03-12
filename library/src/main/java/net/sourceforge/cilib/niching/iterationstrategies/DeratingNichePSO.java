@@ -15,6 +15,7 @@ import net.sourceforge.cilib.algorithm.population.AbstractIterationStrategy;
 import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
 import net.sourceforge.cilib.niching.NichingAlgorithm;
 import static net.sourceforge.cilib.niching.NichingFunctions.*;
+import net.sourceforge.cilib.niching.NichingFunctions.NichingFunction;
 import net.sourceforge.cilib.niching.NichingSwarms;
 import static net.sourceforge.cilib.niching.NichingSwarms.*;
 import net.sourceforge.cilib.problem.DeratingOptimisationProblem;
@@ -57,7 +58,7 @@ public class DeratingNichePSO extends AbstractIterationStrategy<NichingAlgorithm
         problem.addSolutions(subswarms.map(Solutions.getPosition().o(Algorithms.<PopulationBasedAlgorithm>getBestSolution())).toCollection());
         alg.setPopulations(Lists.newLinkedList(subswarms.toCollection()));
         alg.getMainSwarm().setOptimisationProblem(problem);
-        // dont need to set the main swarm because it gets reinitialised
+        // don't need to set the main swarm because it gets reinitialised
     }
 
     /**

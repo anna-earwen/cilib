@@ -6,12 +6,10 @@
  */
 package net.sourceforge.cilib.type.types;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
+import net.sourceforge.cilib.math.random.generator.Rand;
 
 /**
- * Implemetantation of the <tt>Bit</tt> object. The <tt>Bit</tt> object is the
+ * Implementation of the <tt>Bit</tt> object. The <tt>Bit</tt> object is the
  * <tt>Type</tt> system equivalent of a bit.
  *
  */
@@ -80,7 +78,7 @@ public class Bit implements Numeric {
     }
 
     /**
-     * Return the state of the curent <tt>Bit</tt> object.
+     * Return the state of the current <tt>Bit</tt> object.
      *
      * @return The state of the current <tt>Bit</tt> object.
      */
@@ -134,15 +132,14 @@ public class Bit implements Numeric {
      * Randomly choose a new valid for the <code>Bit</code> object.
      */
     @Override
-    public void randomize(RandomProvider random) {
-        checkNotNull(random);
-        this.state = random.nextBoolean();
+    public void randomise() {
+        this.state = Rand.nextBoolean();
     }
 
     /**
      * Return the <tt>String</tt> representation of this object's value.
      *
-     * @return The <tt>String</tt> represtnation of this object's value.
+     * @return The <tt>String</tt> representation of this object's value.
      */
     @Override
     public String toString() {

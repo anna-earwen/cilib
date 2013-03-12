@@ -7,6 +7,7 @@
 
 package net.sourceforge.cilib.functions.continuous.unconstrained;
 
+import com.google.common.base.Preconditions;
 import net.sourceforge.cilib.functions.ContinuousFunction;
 import net.sourceforge.cilib.type.types.container.Vector;
 
@@ -25,10 +26,10 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * <li> Three local minima at 5, 12.5, 22.5</li>
  * </ul>
  * </p>
- * 
+ *
  * <p>Characteristics:
  * <ul>
- * <li>One-dimensional only</li>
+ * <li>Only defined for 1 dimension</li>
  * <li>Multimodal</li>
  * <li>Separable</li>
  * <li>Two global minima, one at each boundary, and three local minima that may trap algorithms</li>
@@ -39,14 +40,16 @@ import net.sourceforge.cilib.type.types.container.Vector;
  *
  */
 public class FiveUnevenPeakTrap implements ContinuousFunction {
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Double apply(Vector input) {
+        Preconditions.checkArgument(input.size() == 1, "FiveUnevenPeakTrap function is only defined for 1 dimension");
+
         double x = input.doubleValueOf(0);
-        
+
         if (x < 0)
             return -200.0;
         else if (x < 2.5)

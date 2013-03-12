@@ -10,8 +10,7 @@ import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.cilib.entity.Entity;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
+import net.sourceforge.cilib.math.random.generator.Rand;
 import net.sourceforge.cilib.problem.Problem;
 import net.sourceforge.cilib.pso.dynamic.ChargedParticle;
 
@@ -19,12 +18,12 @@ import net.sourceforge.cilib.pso.dynamic.ChargedParticle;
  * Create a collection of {@linkplain net.sourceforge.cilib.entity.Entity entities}
  * by cloning the given prototype {@link net.sourceforge.cilib.entity.Entity}.
  * The Entity have to be ChargedParticle and their charged are set during the
- * initialization process.
+ * initialisation process.
  *
  * @param <E> The {@code Entity} type.
  */
 public class ChargedPopulationInitialisationStrategy<E extends Entity>
-        implements PopulationInitialisationStrategy<E> {
+    implements PopulationInitialisationStrategy<E> {
 
     private ChargedParticle prototypeEntity;
     private int entityNumber;
@@ -38,18 +37,22 @@ public class ChargedPopulationInitialisationStrategy<E extends Entity>
         entityNumber = 20;
         prototypeEntity = null; // This has to be manually set as Individuals are used in PSO etc...
         chargedRatio = 0.5;    // one half of the swarm is charged => Atomic swarm
-        chargeMagnitude = 16; // the obscure value 16 comes from the article where the chraged PSO was analysed for the 1st time by its creators
+        chargeMagnitude = 16; // the obscure value 16 comes from the article where the charged PSO was analysed for the 1st time by its creators
     }
 
     /**
      * Copy constructor. Create a copy of the given instance.
+     * <p/>
      * @param copy The instance to copy.
      */
     public ChargedPopulationInitialisationStrategy(ChargedPopulationInitialisationStrategy<E> copy) {
         this.entityNumber = copy.entityNumber;
-        this.prototypeEntity = copy.prototypeEntity.getClone();
         this.chargedRatio = copy.chargedRatio;
         this.chargeMagnitude = copy.chargeMagnitude;
+        
+        if (prototypeEntity != null) {
+            this.prototypeEntity = copy.prototypeEntity.getClone();
+        }
     }
 
     /**
@@ -57,29 +60,28 @@ public class ChargedPopulationInitialisationStrategy<E extends Entity>
      */
     @Override
     public ChargedPopulationInitialisationStrategy<E> getClone() {
-        return new ChargedPopulationInitialisationStrategy<E>(this);
+        return new ChargedPopulationInitialisationStrategy(this);
     }
 
     /**
-     * Perform the required initialization, using the provided <tt>Topology</tt> and
+     * Perform the required initialisation, using the provided <tt>Topology</tt> and
      * <tt>Problem</tt>.
-     * @param problem The <tt>Problem</tt> to use in the initialization of the topology.
+     * @param problem The <tt>Problem</tt> to use in the initialisation of the topology.
      * @return An {@code Iterable<E>} of cloned instances.
-     * @throws InitialisationException if the initialization cannot take place.
+     * @throws InitialisationException if the initialisation cannot take place.
      */
     @Override
     public Iterable<E> initialise(Problem problem) {
         Preconditions.checkNotNull(problem, "No problem has been specified");
-        Preconditions.checkNotNull(prototypeEntity, "No prototype Entity object has been defined for the clone operation in the entity constrution process.");
+        Preconditions.checkNotNull(prototypeEntity, "No prototype Entity object has been defined for the clone operation in the entity construction process.");
 
         List<E> clones = new ArrayList<E>();
-        RandomProvider r = new MersenneTwister();
         int chargedCounter = 0;
         int neutralCounter = 0;
 
         for (int i = 0; i < entityNumber; ++i) {
             E entity = (E) prototypeEntity.getClone();
-            double rand = r.nextDouble();
+            double rand = Rand.nextDouble();
 
             // makes sure the charged particles are randomly positioned across the topology
             if (chargedCounter < Math.floor(entityNumber * chargedRatio) && rand < chargedRatio) {

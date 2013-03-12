@@ -6,17 +6,20 @@
  */
 package net.sourceforge.cilib.math;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import fj.F;
+import static fj.data.List.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
+import net.sourceforge.cilib.math.random.generator.Rand;
+import net.sourceforge.cilib.type.types.container.Vector;
+import net.sourceforge.cilib.util.functions.Numerics;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * This class provides helper functions in addtion to the standard <code>java.lang.Math</code>
+ * This class provides helper functions in addition to the standard <code>java.lang.Math</code>
  * class.
  *
  * These utility functions further are necessary for the various distributions and selections
@@ -65,7 +68,7 @@ public final class Maths {
 
     /**
      * Return the combination of <code>n</code> and <code>r</code>.
-     * @param n The total elements from which the combination is perfromed.
+     * @param n The total elements from which the combination is performed.
      * @param r The {@code r}-combinations (of size {@code r}) to select.
      * @return The combination of <code>n</code> and <code>r</code>.
      */
@@ -76,7 +79,7 @@ public final class Maths {
     }
 
     /**
-     * This is a convienience method providing an alias to <code>combination</code>.
+     * This is a convenience method providing an alias to <code>combination</code>.
      * @param n The number of elements available for selection.
      * @param r The {@code r}-combinations (of size {@code r}) to select.
      * @return The value of the operation "<code>n</code> choose <code>x</code>".
@@ -103,7 +106,7 @@ public final class Maths {
             private List<T> internalList = new ArrayList<T>(input); // Keep our own copy
             private int n = input.size();
             private int m = number;
-            private int[] index = initialize();
+            private int[] index = initialise();
             private boolean hasMore = true;
 
             @Override
@@ -131,7 +134,7 @@ public final class Maths {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
 
-            private int[] initialize() {
+            private int[] initialise() {
                 if (!(this.n >= m && m >= 0)) {
                     throw new IllegalStateException("Permutation error! n >= m");
                 }
@@ -203,14 +206,12 @@ public final class Maths {
     /**
      * Determine if a "flip" would occur given the provided probability value.
      * @param probability The provided probability value. This value must be in [0,1]
-     * @param randomProvider The {@link RandomProvider} to provide random numbers.
-     * @return 1 - if a "flip" occured, 0 otherwise.
+     * @return 1 - if a "flip" occurred, 0 otherwise.
      */
-    public static int flip(double probability, RandomProvider randomProvider) {
+    public static int flip(double probability) {
         checkArgument(probability >= 0 && probability <= 1, "Illegal input: valid range is [0,1]");
-        checkNotNull(randomProvider, "Random number generator cannot be null.");
 
-        if (randomProvider.nextDouble() <= probability) {
+        if (Rand.nextDouble() <= probability) {
             return 1;
         }
 
@@ -226,6 +227,32 @@ public final class Maths {
      */
     public static double log(double base, double value) {
         return Math.log(value) / Math.log(base);
+    }
+
+    private static fj.data.List<Vector> combinations(final fj.data.List<Vector> input, final int i) {
+        if (i == input.length()) {
+            return list(Vector.of());
+        }
+
+        final fj.data.List<Vector> recursive = combinations(input, i + 1);
+        final Vector current = input.index(i);
+
+        return fj.data.List.join(iterableList(current).map(Numerics.doubleValue())
+            .map(new F<Double, fj.data.List<Vector>>() {
+                @Override
+                public fj.data.List<Vector> f(final Double a) {
+                    return recursive.map(new F<Vector, Vector>() {
+                        @Override
+                        public Vector f(Vector b) {
+                            return Vector.newBuilder().copyOf(b).add(a).build();
+                        }
+                    });
+                }
+            }));
+    }
+
+    public static fj.data.List<Vector> combinations(final fj.data.List<Vector> input) {
+        return combinations(input, 0);
     }
 
 }

@@ -28,14 +28,14 @@ public class DunnValidityIndex extends ValidityIndex{
     public DunnValidityIndex() {
         super();
     }
-    
+
     /*
      * Copy Constructor for DunnValidityIndex
      */
     public DunnValidityIndex(DunnValidityIndex copy) {
         super(copy);
     }
-    
+
     /*
      * Clone method for DunnValidityIndex
      * @return new instance of HalkidiVazirgiannisValidityIndex
@@ -44,36 +44,40 @@ public class DunnValidityIndex extends ValidityIndex{
     public DunnValidityIndex getClone() {
         return new DunnValidityIndex(this);
     }
-    
+
     /*
      * Calculates and returns the Dunn Validity Index
      * @param algorithm The algorithm for which the validity index is being calculated
-     * @return result The result of the calculateion of the validity index
+     * @return result The result of the calculation of the validity index
      */
     @Override
     public Real getValue(Algorithm algorithm) {
         CentroidHolder holder = (CentroidHolder) algorithm.getBestSolution().getPosition();
         double minimum = Double.POSITIVE_INFINITY;
+        CentroidHolder holder2;
+        double min;
+        double result;
+
         for(ClusterCentroid centroid1 : holder) {
-            CentroidHolder holder2 = holder.getClone();
+            holder2 = holder.getClone();
             holder2.remove(centroid1);
-            double min = Double.POSITIVE_INFINITY;
+            min = Double.POSITIVE_INFINITY;
             for(ClusterCentroid centroid2 : holder2) {
-                double result = getMinimumIntraclusterDistance(centroid1, centroid2) / (double) getMaximumInterclusterDistance(centroid1);
+                result = getMinimumIntraclusterDistance(centroid1, centroid2) / (double) getMaximumInterclusterDistance(centroid1);
                 if(result < min) {
                     min = result;
                 }
             }
-            
+
             if(min < minimum) {
                 minimum = min;
             }
         }
-        
+
         return Real.valueOf(minimum);
-        
+
     }
-    
+
     /*
      * Calculates the smallest distance between two clusters
      * @param cluster1 One of the clusters to be compared
@@ -91,25 +95,26 @@ public class DunnValidityIndex extends ValidityIndex{
         }
         return minimumDistance;
     }
-    
+
     /*
      * Calculates the maximum distance between patterns within a cluster\
      * @param centroid The cluster to be checked
      */
     protected double getMaximumInterclusterDistance(ClusterCentroid centroid) {
         double maximumDistance = 0;
-        
+        ArrayList<Vector> patterns2;
+
         for(Vector pattern : centroid.getDataItems()) {
-            ArrayList<Vector> patterns2 = (ArrayList<Vector>) centroid.getDataItems().clone();
+            patterns2 = (ArrayList<Vector>) centroid.getDataItems().clone();
             patterns2.remove(pattern);
-            
+
             for(Vector pattern2 : patterns2) {
                 if(distanceMeasure.distance(pattern, pattern2) > maximumDistance) {
                     maximumDistance = distanceMeasure.distance(pattern, pattern2);
                 }
             }
         }
-        
+
         return maximumDistance + Double.MIN_VALUE;
     }
 }

@@ -7,8 +7,7 @@
 package net.sourceforge.cilib.functions.continuous.unconstrained;
 
 import net.sourceforge.cilib.functions.ContinuousFunction;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
+import net.sourceforge.cilib.math.random.generator.Rand;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
@@ -35,15 +34,13 @@ public class SchwefelProblem2_13 implements ContinuousFunction {
     private double[] m_A;
     private double[] m_B;
     
-    private boolean initialized;
+    private boolean initialised;
     
     public SchwefelProblem2_13() {
-        this.initialized = false;
+        this.initialised = false;
     }
     
     public void setMatrices(int dimensions) {
-        RandomProvider random = new MersenneTwister();
-        
         optimum = new double[dimensions];
         m_a = new double[dimensions][dimensions];
         m_b = new double[dimensions][dimensions];
@@ -53,11 +50,11 @@ public class SchwefelProblem2_13 implements ContinuousFunction {
 
         for (int i = 0; i < dimensions; i++) {
             for (int j = 0; j < dimensions; j++) {
-                m_a[i][j] = random.nextInt(201) - 100;
-                m_b[i][j] = random.nextInt(201) - 100;
+                m_a[i][j] = Rand.nextInt(201) - 100;
+                m_b[i][j] = Rand.nextInt(201) - 100;
             }
             
-            optimum[i] = random.nextDouble() * 2 * Math.PI - Math.PI;
+            optimum[i] = Rand.nextDouble() * 2 * Math.PI - Math.PI;
         }
 
         for (int i = 0; i < dimensions; i++) {
@@ -73,9 +70,9 @@ public class SchwefelProblem2_13 implements ContinuousFunction {
      */
     @Override
     public Double apply(Vector input) {
-        if(!initialized) {
+        if(!initialised) {
             setMatrices(input.size());
-            initialized = true;
+            initialised = true;
         }
         
         double sum = 0.0;

@@ -9,14 +9,9 @@ package net.sourceforge.cilib.math.random;
 import static com.google.common.base.Preconditions.checkArgument;
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
 import net.sourceforge.cilib.controlparameter.ControlParameter;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
+import net.sourceforge.cilib.math.random.generator.Rand;
 
-/**
- */
 public class GaussianDistribution implements ProbabilityDistributionFunction {
-
-    private RandomProvider provider;
     private ControlParameter mean;
     private ControlParameter deviation;
 
@@ -24,13 +19,6 @@ public class GaussianDistribution implements ProbabilityDistributionFunction {
      * Default constructor.
      */
     public GaussianDistribution() {
-        provider = new MersenneTwister();
-        mean = ConstantControlParameter.of(0.0);
-        deviation = ConstantControlParameter.of(1.0);
-    }
-
-    public GaussianDistribution(long seed) {
-        provider = new MersenneTwister(seed);
         mean = ConstantControlParameter.of(0.0);
         deviation = ConstantControlParameter.of(1.0);
     }
@@ -78,8 +66,8 @@ public class GaussianDistribution implements ProbabilityDistributionFunction {
         gaussian() requires uniforms > 0, but nextDouble() delivers >= 0.
          */
         do {
-            u = provider.nextDouble();
-            v = provider.nextDouble();
+            u = Rand.nextDouble();
+            v = Rand.nextDouble();
 
             if (u <= 0.0 || v <= 0.0) {
                 u = 1.0;
@@ -102,16 +90,6 @@ public class GaussianDistribution implements ProbabilityDistributionFunction {
 
         /*  Return ratio of P's coordinates as the normal deviate */
         return (locationScale[0] + locationScale[1] * v / u);
-    }
-
-    @Override
-    public RandomProvider getRandomProvider() {
-        return provider;
-    }
-
-    @Override
-    public void setRandomProvider(RandomProvider provider) {
-        this.provider = provider;
     }
 
     public void setDeviation(ControlParameter deviation) {

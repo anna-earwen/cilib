@@ -6,10 +6,10 @@
  */
 package net.sourceforge.cilib.io;
 
-import net.sourceforge.cilib.io.exception.CIlibIOException;
-import net.sourceforge.cilib.io.transform.DataOperator;
 import java.util.LinkedList;
 import java.util.List;
+import net.sourceforge.cilib.io.exception.CIlibIOException;
+import net.sourceforge.cilib.io.transform.DataOperator;
 
 /**
  * A class that builds a new instance of a DataTable object. By changing the type
@@ -35,7 +35,7 @@ public class DataTableBuilder {
     /**
      * Default constructor. Initialises dataTable to a new TextDataTable and
      * dataReader to be a new TextDataReader.
-     * @param reader 
+     * @param reader
      */
     public DataTableBuilder(DataReader reader) {
         dataReader = reader;
@@ -46,7 +46,7 @@ public class DataTableBuilder {
     /**
      * This method reads all rows from the {@link #dataReader DataReader} object and
      * adds them into the {@link #dataTable DataTable} object. If the default
-     * behaviour is not sufficient or desired, method should be overriden.
+     * behaviour is not sufficient or desired, method should be overridden.
      * @return the constructed datatable.
      * @throws CIlibIOException wraps another Exception that might occur during IO
      */

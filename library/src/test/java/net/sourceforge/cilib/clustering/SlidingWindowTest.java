@@ -7,38 +7,15 @@
 package net.sourceforge.cilib.clustering;
 
 import junit.framework.Assert;
-import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.io.DataTableBuilder;
 import net.sourceforge.cilib.io.DelimitedTextFileReader;
 import net.sourceforge.cilib.io.pattern.StandardPattern;
 import net.sourceforge.cilib.io.transform.PatternConversionOperator;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import net.sourceforge.cilib.type.types.container.Vector;
 import org.junit.Test;
 
 public class SlidingWindowTest {
     
-    public SlidingWindowTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
-
     /**
      * Test of slideWindow method, of class SlidingWindow.
      */
@@ -48,7 +25,7 @@ public class SlidingWindowTest {
         window.setSourceURL("library/src/test/resources/datasets/iris2.arff");
         window.setWindowSize(1);
         window.setSlideFrequency(1);
-        window.initializeWindow();
+        window.initialiseWindow();
         
         Vector beforeSlide =  ((StandardPattern) window.getCurrentDataset().getRow(0)).getVector();
         Vector expectedBeforeSlide = Vector.of(1.0,1.0,1.0,2.0);
@@ -64,14 +41,14 @@ public class SlidingWindowTest {
     }
 
     /**
-     * Test of initializeWindow method, of class SlidingWindow.
+     * Test of initialiseWindow method, of class SlidingWindow.
      */
     @Test
-    public void testInitializeWindow() {
+    public void testInitialiseWindow() {
         SlidingWindow window = new SlidingWindow();
         window.setSourceURL("library/src/test/resources/datasets/iris2.arff");
         window.setWindowSize(2);
-        window.initializeWindow();
+        window.initialiseWindow();
         
         int totalPatternsInWindow = window.getCurrentDataset().size();
         Vector firstValue =  ((StandardPattern) window.getCurrentDataset().getRow(0)).getVector();
@@ -132,7 +109,8 @@ public class SlidingWindowTest {
     public void testGetSourceURL() {
         SlidingWindow window = new SlidingWindow();
         window.setSourceURL("library/src/test/resources/datasets");
-        Assert.assertTrue(window.getSourceURL().contains("library/src/test/resources/datasets"));
+        Assert.assertTrue(window.getSourceURL().contains("library/src/test/resources/datasets") || 
+                window.getSourceURL().contains("library\\src\\test\\resources\\datasets"));
     }
 
     /**
@@ -142,7 +120,8 @@ public class SlidingWindowTest {
     public void testSetSourceURL() {
         SlidingWindow window = new SlidingWindow();
         window.setSourceURL("library/src/test/resources/datasets");
-        Assert.assertTrue(window.getSourceURL().contains("library/src/test/resources/datasets"));
+        Assert.assertTrue(window.getSourceURL().contains("library/src/test/resources/datasets") || 
+                window.getSourceURL().contains("library\\src\\test\\resources\\datasets"));
     }
 
     /**
@@ -175,7 +154,7 @@ public class SlidingWindowTest {
         SlidingWindow window = new SlidingWindow();
         window.setSourceURL("library/src/test/resources/datasets/iris2.arff");
         window.setWindowSize(1);
-        window.initializeWindow();
+        window.initialiseWindow();
         
         int totalPatterns = window.getCurrentDataset().size();
         Vector result =  ((StandardPattern) window.getCurrentDataset().getRow(0)).getVector();
@@ -193,7 +172,7 @@ public class SlidingWindowTest {
         SlidingWindow window = new SlidingWindow();
         window.setSourceURL("library/src/test/resources/datasets/iris2.arff");
         window.setWindowSize(1);
-        window.initializeWindow();
+        window.initialiseWindow();
         
         int totalPatterns = window.getCurrentDataset().size();
         Vector result =  ((StandardPattern) window.getCurrentDataset().getRow(0)).getVector();

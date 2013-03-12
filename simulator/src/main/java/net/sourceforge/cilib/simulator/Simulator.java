@@ -8,8 +8,10 @@ package net.sourceforge.cilib.simulator;
 
 import com.google.common.collect.Lists;
 import java.io.File;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -18,10 +20,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.algorithm.ProgressEvent;
 import net.sourceforge.cilib.algorithm.ProgressListener;
+import net.sourceforge.cilib.math.random.generator.seeder.SeedSelectionStrategy;
+import net.sourceforge.cilib.math.random.generator.seeder.Seeder;
 import net.sourceforge.cilib.problem.Problem;
 
 /**
@@ -38,20 +41,21 @@ import net.sourceforge.cilib.problem.Problem;
  * <p>
  * The primary purpose of running simulations is to measure the performance of the given algorithm
  * on a given problem. For that reason, a simulation accepts a measurement suite which it uses to
- * record the performace.
+ * record the performance.
  * </p>
  */
 public class Simulator {
 
     private static final long serialVersionUID = 8987667794610802908L;
     private final Simulation[] simulations;
-    private final List<ProgressListener> progressListeners;
-    private final HashMap<Simulation, Double> progress;
+    private final CopyOnWriteArrayList<ProgressListener> progressListeners;
+    private final Map<Simulation, Double> progress;
     private final XMLObjectFactory algorithmFactory;
     private final XMLObjectFactory problemFactory;
     private final XMLObjectFactory measurementFactory;
     private final MeasurementCombiner combiner;
     private final int samples;
+    private final SeedSelectionStrategy seeder;
 
     /**
      * Creates a new instance of Simulator given an algorithm factory, a problem factory and a
@@ -61,32 +65,36 @@ public class Simulator {
      * @param problemFactory The problem factory.
      * @param measurementFactory The measurement suite.
      */
-    public Simulator(XMLObjectFactory algorithmFactory, XMLObjectFactory problemFactory, XMLObjectFactory measurementFactory, MeasurementCombiner combiner, int samples) {
+    public Simulator(XMLObjectFactory algorithmFactory,
+            XMLObjectFactory problemFactory,
+            XMLObjectFactory measurementFactory,
+            MeasurementCombiner combiner, int samples, SeedSelectionStrategy seeder) {
         this.algorithmFactory = algorithmFactory;
         this.problemFactory = problemFactory;
         this.measurementFactory = measurementFactory;
         this.combiner = combiner;
         this.samples = samples;
-        this.progressListeners = Lists.newArrayList();
-        this.progress = new HashMap<Simulation, Double>();
+        this.progressListeners = new CopyOnWriteArrayList<ProgressListener>();
+        this.progress = new ConcurrentHashMap<Simulation, Double>();
         this.simulations = new Simulation[samples];
+        this.seeder = seeder;
     }
 
     /**
-     * Perform the initialization of the {@code Simulator} by creating the required
+     * Perform the initialisation of the {@code Simulator} by creating the required
      * {@code Simulation} instances and executing the threads.
      */
     public void init() {
+        Seeder.setSeederStrategy(seeder);
         for (int i = 0; i < samples; ++i) {
             simulations[i] = createSimulation();
-            simulations[i].init(); // Prepare the simulation for execution
             progress.put(simulations[i], 0.0);
         }
     }
-    
+
     public Simulation createSimulation() {
-        return new Simulation(this, (Algorithm) algorithmFactory.newObject(), 
-                (Problem) problemFactory.newObject(), 
+        return new Simulation(this, (Algorithm) algorithmFactory.newObject(),
+                (Problem) problemFactory.newObject(),
                 (MeasurementSuite) measurementFactory.newObject());
     }
 
@@ -110,6 +118,7 @@ public class Simulator {
         } catch (InterruptedException ex) {
             Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ExecutionException ex) {
+            executor.shutdownNow(); // Shutdown now - time to explode
             throw new RuntimeException(ex);
         }
 
@@ -151,7 +160,7 @@ public class Simulator {
         progressListeners.remove(listener);
     }
 
-    private synchronized void notifyProgress() {
+    private void notifyProgress() {
         double ave = 0;
         for (Double tmp : progress.values()) {
             ave += tmp.doubleValue();

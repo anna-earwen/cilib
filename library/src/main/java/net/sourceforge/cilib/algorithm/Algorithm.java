@@ -35,13 +35,13 @@ public interface Algorithm extends Runnable, Cloneable {
 
     /**
      * Obtain the collection of best solutions. This result does not actually make sense in normal
-     * {@code PopulationBasedAlgorithm}s, but rather in a MultiObjective optimization.
+     * {@code PopulationBasedAlgorithm}s, but rather in a MultiObjective optimisation.
      * @return An {@code Iterable} containing the solutions.
      */
     Iterable<OptimisationSolution> getSolutions();
 
     /**
-     * Returns the number of iterations that have been performed by the algorihtm.
+     * Returns the number of iterations that have been performed by the algorithm.
      * @return The number of iterations.
      *
      * Not Needed>??>????????????

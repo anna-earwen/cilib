@@ -9,13 +9,11 @@ package net.sourceforge.cilib.coevolution.cooperative.problemdistribution;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
-
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.CooperativeCoevolutionAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.problem.CooperativeCoevolutionProblemAdapter;
 import net.sourceforge.cilib.coevolution.cooperative.problem.RandomDimensionAllocation;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
 import net.sourceforge.cilib.problem.Problem;
 import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.util.selection.Samples;
@@ -36,7 +34,7 @@ public class RandomGroupingDistributionStrategy implements
 
     /**
      * Splits up the given {@link OptimisationProblem} into sub-problems, where each sub problem contains a portion of the problem, of non-uniform length, which consists of random dimensions of the problem vector, and assigns them to all the participating {@link Algorithm}s.
-     * This implementation assigns a portion of length dimensionality/number of populations + 1 to dimensionality % number of populations of the participating poopulations.
+     * This implementation assigns a portion of length dimensionality/number of populations + 1 to dimensionality % number of populations of the participating populations.
      * The order in which the algorithms are assigned is generated randomly.
      * @param populations The list of participating {@linkplain PopulationBasedAlgorithm}s.
      * @param problem The problem that needs to be re-distributed.
@@ -49,7 +47,6 @@ public class RandomGroupingDistributionStrategy implements
         Preconditions.checkArgument(populations.size() >= 2,
                 "There should at least be two Cooperating populations in a Cooperative Algorithm");
 
-        MersenneTwister random = new MersenneTwister();
         List<Integer> dimensions = new ArrayList<Integer>();
         for (int i = 0; i < problem.getDomain().getDimension(); ++i) {
             dimensions.add(i);
@@ -64,7 +61,7 @@ public class RandomGroupingDistributionStrategy implements
                 actualDimension++;
             }
             List<Integer> selectedDimensions = Selection.copyOf(dimensions)
-                    .orderBy(new RandomArrangement(random))
+                    .orderBy(new RandomArrangement())
                     .select(Samples.first(actualDimension));
             for (Integer d : selectedDimensions) {
                 indexList.add(d);

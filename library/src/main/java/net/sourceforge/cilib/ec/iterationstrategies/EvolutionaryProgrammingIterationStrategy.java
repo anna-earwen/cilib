@@ -16,17 +16,14 @@ import net.sourceforge.cilib.ec.Individual;
 import net.sourceforge.cilib.entity.Topology;
 import net.sourceforge.cilib.entity.operators.mutation.GaussianMutationStrategy;
 import net.sourceforge.cilib.entity.operators.mutation.MutationStrategy;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
 import net.sourceforge.cilib.util.selection.Samples;
 import net.sourceforge.cilib.util.selection.Selection;
 import net.sourceforge.cilib.util.selection.arrangement.RandomArrangement;
 
-/**
- *
- */
 public class EvolutionaryProgrammingIterationStrategy extends AbstractIterationStrategy<EC> {
 
     private static final long serialVersionUID = 4966470754016818350L;
+
     private MutationStrategy mutationStrategy;
 
     public EvolutionaryProgrammingIterationStrategy() {
@@ -44,8 +41,8 @@ public class EvolutionaryProgrammingIterationStrategy extends AbstractIterationS
 
     @Override
     public void performIteration(EC algorithm) {
-        Topology<Individual> topology = (Topology<Individual>) algorithm.getTopology();
-        List<Individual> offspring = new ArrayList<Individual>();
+        Topology<Individual> topology = algorithm.getTopology();
+        List<Individual> offspring = new ArrayList();
 
         for (Individual individual : topology) {
             offspring.add(individual.getClone()); // Create an offspring by cloning the parent.
@@ -60,9 +57,9 @@ public class EvolutionaryProgrammingIterationStrategy extends AbstractIterationS
 
         topology.addAll(offspring);
 
-        List<Individual> newPopulation = new ArrayList<Individual>(algorithm.getInitialisationStrategy().getEntityNumber());
+        List<Individual> newPopulation = new ArrayList(algorithm.getInitialisationStrategy().getEntityNumber());
 
-        List<IndividualScore> scores = new ArrayList<IndividualScore>();
+        List<IndividualScore> scores = new ArrayList();
         for (int i = 0; i < topology.size(); i++) {
             Individual current = topology.get(i);
             int score = getScore(current, topology);
@@ -89,7 +86,7 @@ public class EvolutionaryProgrammingIterationStrategy extends AbstractIterationS
     private int getScore(Individual current, Topology<Individual> topology) {
         int score = 0;
         List<Individual> selection = Selection.copyOf(topology)
-                .orderBy(new RandomArrangement(new MersenneTwister()))
+                .orderBy(new RandomArrangement())
                 .select(Samples.first(10).unique());
 
         for (Individual i : selection) {

@@ -59,7 +59,7 @@ public class MeasurementSuite {
     }
 
     /**
-     * Sets the resolution of the results. The resolution determines how offen
+     * Sets the resolution of the results. The resolution determines how often
      * results are logged to file. If the resolution is 10 then results are
      * logged every 10 iterations.
      *

@@ -9,27 +9,23 @@ package net.sourceforge.cilib.util.selection.recipes;
 import com.google.common.collect.Lists;
 import java.util.List;
 import net.sourceforge.cilib.ec.Individual;
-import net.sourceforge.cilib.entity.Entity;
 import net.sourceforge.cilib.entity.EntityType;
 import net.sourceforge.cilib.entity.Topology;
 import net.sourceforge.cilib.entity.topologies.GBestTopology;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
 import net.sourceforge.cilib.problem.solution.InferiorFitness;
 import net.sourceforge.cilib.problem.solution.MaximisationFitness;
 import net.sourceforge.cilib.problem.solution.MinimisationFitness;
 import net.sourceforge.cilib.util.selection.weighting.EntityWeighting;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.Matchers.hasItem;
-
 /**
  * <p>
- * Tests to test the behavior of RouletteWheelSelection, in both the minimization
- * and maximization cases.
+ * Tests to test the behavior of RouletteWheelSelection, in both the minimisation
+ * and maximisation cases.
  * </p>
  */
 public class RouletteWheelSelectorTest {
@@ -61,7 +57,7 @@ public class RouletteWheelSelectorTest {
     }
 
     @Test
-    public void minimizationSelection() {
+    public void minimisationSelection() {
         Topology<Individual> topology = createDummyTopology();
         topology.get(0).getProperties().put(EntityType.FITNESS, new MinimisationFitness(10000.0));
         topology.get(1).getProperties().put(EntityType.FITNESS, new MinimisationFitness(10000.0));
@@ -77,7 +73,7 @@ public class RouletteWheelSelectorTest {
     }
 
     @Test
-    public void maximizationSelection() {
+    public void maximisationSelection() {
         Topology<Individual> topology = createDummyTopology();
         topology.get(0).getProperties().put(EntityType.FITNESS, new MaximisationFitness(0.5));
         topology.get(1).getProperties().put(EntityType.FITNESS, new MaximisationFitness(90000.0)); // Should be the best entity

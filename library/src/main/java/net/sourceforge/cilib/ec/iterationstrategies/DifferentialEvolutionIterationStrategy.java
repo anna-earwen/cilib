@@ -6,15 +6,15 @@
  */
 package net.sourceforge.cilib.ec.iterationstrategies;
 
-import net.sourceforge.cilib.entity.operators.creation.CreationStrategy;
-import net.sourceforge.cilib.entity.operators.creation.RandCreationStrategy;
+import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.List;
-
 import net.sourceforge.cilib.algorithm.population.AbstractIterationStrategy;
 import net.sourceforge.cilib.ec.EC;
-import net.sourceforge.cilib.entity.Entity;
+import net.sourceforge.cilib.ec.Individual;
 import net.sourceforge.cilib.entity.Topology;
+import net.sourceforge.cilib.entity.operators.creation.CreationStrategy;
+import net.sourceforge.cilib.entity.operators.creation.RandCreationStrategy;
 import net.sourceforge.cilib.entity.operators.crossover.CrossoverStrategy;
 import net.sourceforge.cilib.entity.operators.crossover.de.DifferentialEvolutionBinomialCrossover;
 import net.sourceforge.cilib.util.selection.recipes.RandomSelector;
@@ -22,14 +22,14 @@ import net.sourceforge.cilib.util.selection.recipes.Selector;
 
 /**
  * Evolutionary Strategy to implement the Differential Evolutionary Algorithm.
- *
  */
 public class DifferentialEvolutionIterationStrategy extends AbstractIterationStrategy<EC> {
 
     private static final long serialVersionUID = 8019668923312811974L;
-    private Selector targetVectorSelectionStrategy; // x
-    private CreationStrategy trialVectorCreationStrategy; // y
-    private CrossoverStrategy crossoverStrategy; // z
+
+    protected Selector<Individual> targetVectorSelectionStrategy; // x
+    protected CreationStrategy trialVectorCreationStrategy; // y
+    protected CrossoverStrategy crossoverStrategy; // z
 
     /**
      * Create an instance of the {@linkplain DifferentialEvolutionIterationStrategy}.
@@ -64,31 +64,36 @@ public class DifferentialEvolutionIterationStrategy extends AbstractIterationStr
      */
     @Override
     public void performIteration(EC ec) {
-        @SuppressWarnings("unchecked")
-        Topology<Entity> topology = (Topology<Entity>) ec.getTopology();
+        List<Individual> newTopology = Lists.newArrayList();
+        Topology<Individual> topology = ec.getTopology();
 
         for (int i = 0; i < topology.size(); i++) {
-            Entity current = topology.get(i);
-            current.calculateFitness();
+            Individual current = topology.get(i);
 
             // Create the trial vector by applying mutation
-            Entity targetEntity = (Entity) targetVectorSelectionStrategy.on(topology).exclude(current).select();
+            Individual targetEntity = targetVectorSelectionStrategy.on(topology).exclude(current).select();
 
             // Create the trial vector / entity
-            Entity trialEntity = trialVectorCreationStrategy.create(targetEntity, current, topology);
+            Individual trialEntity = trialVectorCreationStrategy.create(targetEntity, current, topology);
 
             // Create the offspring by applying cross-over
-            List<Entity> offspring = (List<Entity>) this.crossoverStrategy.crossover(Arrays.asList(current, trialEntity)); // Order is VERY important here!!
+            List<Individual> offspring = crossoverStrategy.crossover(Arrays.asList(current, trialEntity)); // Order is VERY important here!!
 
             // Replace the parent (current) if the offspring is better
-            Entity offspringEntity = offspring.get(0);
+            Individual offspringEntity = offspring.get(0);
             boundaryConstraint.enforce(offspringEntity);
             offspringEntity.calculateFitness();
 
             if (offspringEntity.getFitness().compareTo(current.getFitness()) > 0) { // the trial vector is better than the parent
-                topology.set(i, offspringEntity); // Replace the parent with the offspring individual
+                newTopology.add(offspringEntity); // Replace the parent with the offspring individual
+            } else {
+                newTopology.add(current);
             }
         }
+
+        // Replace the current topology with the new topology
+        topology.clear();
+        topology.addAll(newTopology);
     }
 
     /**

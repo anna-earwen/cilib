@@ -6,43 +6,17 @@
  */
 package net.sourceforge.cilib.type.types.container;
 
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
 import org.junit.Assert;
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class CentroidHolderTest {
     
-    public CentroidHolderTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
-
     /**
      * Test of size method, of class CentroidHolder.
      */
     @Test
     public void testSize() {
-        Vector input = Vector.of(1,2,3,4);
         CentroidHolder instance = new CentroidHolder();
         instance.add(ClusterCentroid.of(1,2,3,4)) ;
         Assert.assertEquals(instance.size(), 1);
@@ -141,11 +115,10 @@ public class CentroidHolderTest {
     }
 
     /**
-     * Test of randomize method, of class CentroidHolder.
+     * Test of randomise method, of class CentroidHolder.
      */
     @Test
     public void testRandomize() {
-        RandomProvider random = new MersenneTwister();
         CentroidHolder instance = new CentroidHolder();
         CentroidHolder centroids = new CentroidHolder();
         ClusterCentroid c1 = ClusterCentroid.of(5,8,9,3);
@@ -153,7 +126,7 @@ public class CentroidHolderTest {
         centroids.add(c1);
         centroids.add(c2);
         instance.addAll(centroids);
-        instance.randomize(random);
+        instance.randomise();
         
         Assert.assertFalse(instance.get(0).containsAll(Vector.of(5,8,9,3)));
         Assert.assertFalse(instance.get(1).containsAll(Vector.of(2,8,0,5)));

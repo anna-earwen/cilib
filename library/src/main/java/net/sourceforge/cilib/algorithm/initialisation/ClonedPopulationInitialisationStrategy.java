@@ -38,7 +38,10 @@ public class ClonedPopulationInitialisationStrategy<E extends Entity> implements
      */
     public ClonedPopulationInitialisationStrategy(ClonedPopulationInitialisationStrategy copy) {
         this.entityNumber = copy.entityNumber;
-        this.prototypeEntity = copy.prototypeEntity.getClone();
+
+        if (copy.prototypeEntity != null) {
+            this.prototypeEntity = copy.prototypeEntity.getClone();
+        }
     }
 
     /**
@@ -50,16 +53,16 @@ public class ClonedPopulationInitialisationStrategy<E extends Entity> implements
     }
 
     /**
-     * Perform the required initialization, using the provided <tt>Topology</tt> and
+     * Perform the required initialisation, using the provided <tt>Topology</tt> and
      * <tt>Problem</tt>.
-     * @param problem The <tt>Problem</tt> to use in the initialization of the topology.
+     * @param problem The <tt>Problem</tt> to use in the initialisation of the topology.
      * @return An {@code Iterable<E>} of cloned instances.
-     * @throws InitialisationException if the initialization cannot take place.
+     * @throws InitialisationException if the initialisation cannot take place.
      */
     @Override
     public Iterable<E> initialise(Problem problem) {
         Preconditions.checkNotNull(problem, "No problem has been specified");
-        Preconditions.checkNotNull(prototypeEntity, "No prototype Entity object has been defined for the clone operation in the entity constrution process.");
+        Preconditions.checkNotNull(prototypeEntity, "No prototype Entity object has been defined for the clone operation in the entity construction process.");
 
         List<E> clones = new ArrayList<E>();
 

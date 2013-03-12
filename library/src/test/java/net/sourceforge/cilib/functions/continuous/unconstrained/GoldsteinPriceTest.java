@@ -7,11 +7,9 @@
 package net.sourceforge.cilib.functions.continuous.unconstrained;
 
 import net.sourceforge.cilib.functions.ContinuousFunction;
-import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.math.Maths;
-
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,15 +26,23 @@ public class GoldsteinPriceTest {
     }
 
     /**
-     * Test of evaluate method.
+     * Test of evaluate method, of class {@link GoldsteinPrice}.
      */
     @Test
     public void testEvaluate() {
         Vector x = Vector.of(0,-1);
-        Assert.assertEquals(3.0, function.apply(x), Maths.EPSILON);
+        assertEquals(3.0, function.apply(x), Maths.EPSILON);
 
         x.setReal(0, 2.0);
         x.setReal(1, 2.0);
-        Assert.assertEquals(76728.0, function.apply(x), Maths.EPSILON);
+        assertEquals(76728.0, function.apply(x), Maths.EPSILON);
+    }
+
+    /**
+     * Test argument with invalid dimension.
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void testInvalidEvaluate() {
+        function.apply(Vector.of(1.0, 2.0, 3.0));
     }
 }

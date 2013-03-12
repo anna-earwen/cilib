@@ -10,6 +10,7 @@ import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.sourceforge.cilib.controlparameter.ControlParameter;
 import net.sourceforge.cilib.entity.Entity;
 import net.sourceforge.cilib.math.random.ProbabilityDistributionFunction;
 import net.sourceforge.cilib.math.random.UniformDistribution;
@@ -39,7 +40,7 @@ public class TwoPointCrossoverStrategy implements DiscreteCrossoverStrategy {
     public <E extends Entity> List<E> crossover(List<E> parentCollection) {
         Preconditions.checkArgument(parentCollection.size() == 2, "TwoPointCrossoverStrategy requires 2 parents.");
 
-        // Select the pivot points where crossover will occour
+        // Select the pivot points where crossover will occur
         int maxLength = Math.min(parentCollection.get(0).getDimension(), parentCollection.get(1).getDimension());
         int p1 = Double.valueOf(random.getRandomNumber(0, maxLength + 1)).intValue();
         int p2 = Double.valueOf(random.getRandomNumber(0, maxLength + 1)).intValue();
@@ -95,5 +96,13 @@ public class TwoPointCrossoverStrategy implements DiscreteCrossoverStrategy {
     @Override
     public List<Integer> getCrossoverPoints() {
         return crossoverPoints;
+    }
+
+    public void setCrossoverPointProbability(double crossoverPointProbability) {
+        throw new UnsupportedOperationException("Not applicable.");
+    }
+
+    public ControlParameter getCrossoverPointProbability() {
+        throw new UnsupportedOperationException("Not applicable");
     }
 }

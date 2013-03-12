@@ -14,8 +14,8 @@ import net.sourceforge.cilib.entity.visitor.ChargedTopologyVisitorDecorator;
 import net.sourceforge.cilib.entity.visitor.TopologyVisitor;
 import net.sourceforge.cilib.pso.PSO;
 import net.sourceforge.cilib.type.types.container.Vector;
-import net.sourceforge.cilib.util.DistanceMeasure;
-import net.sourceforge.cilib.util.EuclideanDistanceMeasure;
+import net.sourceforge.cilib.util.distancemeasure.DistanceMeasure;
+import net.sourceforge.cilib.util.distancemeasure.EuclideanDistanceMeasure;
 
 /**
  * Implementation of the self-adapting multi-swarm algorithm as described in
@@ -129,7 +129,7 @@ public class SelfAdaptingMultiSwarmIterationStrategy extends AbstractIterationSt
             currentAlgorithm.performIteration();
         }
 
-        //check if swarms are withing exclusionRadius and counts converged swarms
+        //check if swarms are within exclusionRadius and counts converged swarms
         for (ListIterator it = ca.getPopulations().listIterator(); it.hasNext();) {
             PopulationBasedAlgorithm currentAlgorithm = (PopulationBasedAlgorithm) it.next();
             for (ListIterator other = ca.getPopulations().listIterator(); other.hasNext();) {

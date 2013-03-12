@@ -7,8 +7,6 @@
 package net.sourceforge.cilib.problem.boundaryconstraint;
 
 import net.sourceforge.cilib.entity.Entity;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
 import net.sourceforge.cilib.type.types.Numeric;
 import net.sourceforge.cilib.type.types.Type;
 import net.sourceforge.cilib.type.types.Types;
@@ -17,18 +15,12 @@ import net.sourceforge.cilib.type.types.container.Vector;
 /**
  * Reinitialise each element within the provided {@code Type} element if
  * it is no longer within the valid search space. Each element violating the
- * condition will be reinitilaised witin the domain of the problem (search space).
+ * condition will be reinitialised within the domain of the problem (search space).
  *
  * @see Types#isInsideBounds(net.sourceforge.cilib.type.types.Type)
  */
 public class PerElementReinitialisation extends ReinitialisationBoundary {
     private static final long serialVersionUID = 7080824227269710787L;
-
-    private RandomProvider random;
-
-    public PerElementReinitialisation() {
-        this.random = new MersenneTwister();
-    }
 
     /**
      * {@inheritDoc}
@@ -61,7 +53,7 @@ public class PerElementReinitialisation extends ReinitialisationBoundary {
 
     private void enforce(Numeric numeric) {
         if (!Types.isInsideBounds(numeric)) {
-            numeric.randomize(random);
+            numeric.randomise();
         }
     }
 }

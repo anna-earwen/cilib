@@ -7,14 +7,13 @@
 package net.sourceforge.cilib.pso.crossover.operations;
 
 import net.sourceforge.cilib.controlparameter.ControlParameter;
-import net.sourceforge.cilib.entity.Particle;
 import net.sourceforge.cilib.entity.Topology;
 import net.sourceforge.cilib.entity.operators.crossover.CrossoverStrategy;
-import net.sourceforge.cilib.math.random.UniformDistribution;
 import net.sourceforge.cilib.pso.PSO;
 import net.sourceforge.cilib.pso.crossover.CrossoverReplaceFunction;
 import net.sourceforge.cilib.pso.crossover.parentupdate.ParentReplacementStrategy;
 import net.sourceforge.cilib.pso.guideprovider.GuideProvider;
+import net.sourceforge.cilib.pso.particle.Particle;
 
 public class DiscreteCrossoverOperation extends PSOCrossoverOperation {
 
@@ -26,12 +25,11 @@ public class DiscreteCrossoverOperation extends PSOCrossoverOperation {
 
     @Override
     public Topology<Particle> f(PSO pso) {
-        Topology<Particle> newTopology = pso.getTopology();
-        UniformDistribution uniform = new UniformDistribution();
+        Topology<Particle> newTopology = pso.getTopology().getClone();
+        newTopology.clear();
 
-        for (Particle p : newTopology) {
-            Particle newParticle = function.f(p);
-            newTopology.set(newTopology.indexOf(p), newParticle);
+        for (Particle p : pso.getTopology()) {
+            newTopology.add(function.f(p));
         }
 
         return newTopology;

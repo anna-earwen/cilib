@@ -8,7 +8,6 @@ package net.sourceforge.cilib.moo.iterationstrategies;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.sourceforge.cilib.algorithm.AbstractAlgorithm;
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.algorithm.population.IterationStrategy;
@@ -16,9 +15,10 @@ import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
 import net.sourceforge.cilib.entity.Entity;
 import net.sourceforge.cilib.entity.Topology;
 import net.sourceforge.cilib.moo.archive.Archive;
-import net.sourceforge.cilib.problem.solution.OptimisationSolution;
 import net.sourceforge.cilib.problem.boundaryconstraint.BoundaryConstraint;
+import net.sourceforge.cilib.problem.solution.OptimisationSolution;
 import net.sourceforge.cilib.type.types.Type;
+import net.sourceforge.cilib.type.types.Types;
 
 /**
  * <p>
@@ -60,9 +60,11 @@ public class ArchivingIterationStrategy<E extends PopulationBasedAlgorithm> impl
         Algorithm topLevelAlgorithm = AbstractAlgorithm.getAlgorithmList().get(0);
         List<OptimisationSolution> optimisationSolutions = new ArrayList<OptimisationSolution>();
         for (Entity entity : population) {
-            Type solution = entity.getCandidateSolution().getClone();
-            optimisationSolutions.add(new OptimisationSolution(solution,
+            if(Types.isInsideBounds(entity.getCandidateSolution())){
+                Type solution = entity.getCandidateSolution().getClone();
+                optimisationSolutions.add(new OptimisationSolution(solution,
                     topLevelAlgorithm.getOptimisationProblem().getFitness(solution)));
+            }
         }
         Archive.Provider.get().addAll(optimisationSolutions);
     }

@@ -7,25 +7,25 @@
 package net.sourceforge.cilib.type.types.container;
 
 import com.google.common.base.Predicate;
+import fj.F;
+import fj.F2;
 import static java.lang.Math.sqrt;
 import java.util.Arrays;
+import net.sourceforge.cilib.type.types.Bit;
+import net.sourceforge.cilib.type.types.Bounds;
+import net.sourceforge.cilib.type.types.Numeric;
+import net.sourceforge.cilib.type.types.Real;
+import net.sourceforge.cilib.math.random.generator.Rand;
+import org.junit.AfterClass;
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
-import net.sourceforge.cilib.type.types.Bit;
-import net.sourceforge.cilib.type.types.Bounds;
-import net.sourceforge.cilib.type.types.Numeric;
-import net.sourceforge.cilib.type.types.Real;
-
-import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-/**
- */
 public class VectorTest {
 
     private static Vector vector;
@@ -124,7 +124,7 @@ public class VectorTest {
     public void testSetReal() {
         Vector m = Vector.of(0);
         assertEquals(0.0, m.doubleValueOf(0), 0.0);
-        
+
         m.setReal(0, 10.0);
         assertEquals(10.0, m.doubleValueOf(0), 0.0);
     }
@@ -164,7 +164,7 @@ public class VectorTest {
     }
 
     @Test
-    public void randomize() {
+    public void randomise() {
         Vector target = Vector.newBuilder().add(Real.valueOf(1.0)).add(Real.valueOf(2.0)).add(Real.valueOf(3.0)).buildRandom();
 
         assertFalse(target.doubleValueOf(0) == 1.0);
@@ -313,6 +313,15 @@ public class VectorTest {
     }
 
     @Test
+    public void rangeBuilder() {
+        Vector expected = Vector.newBuilder().add(0).add(1).add(2).build();
+        Vector result = Vector.newBuilder().range(0, 3, 1).build();
+
+        assertEquals(3, result.size());
+        assertEquals(result, expected);
+    }
+
+    @Test
     public void copyOf() {
         final Vector initial = Vector.of(1.0, 1.0, 1.0);
 
@@ -350,10 +359,9 @@ public class VectorTest {
     @Test
     public void foreach() {
         final Vector expected = Vector.of(2.0, 2.0, 2.0);
-        Vector result = Vector.of(1.0, 1.0, 1.0).map(new Vector.Function<Numeric, Numeric>() {
-
+        Vector result = Vector.of(1.0, 1.0, 1.0).map(new F<Numeric, Numeric>() {
             @Override
-            public Numeric apply(Numeric x) {
+            public Numeric f(Numeric x) {
                 return Real.valueOf(x.doubleValue() * 2, x.getBounds());
             }
         });
@@ -362,10 +370,9 @@ public class VectorTest {
 
     @Test
     public void foldLeft() {
-        double result = Vector.of(1.0, 2.0, 3.0).foldLeft(4, new Vector.Function<Numeric, Double>() {
-
+        double result = Vector.of(1.0, 2.0, 3.0).foldLeft(4, new F<Numeric, Double>() {
             @Override
-            public Double apply(Numeric x) {
+            public Double f(Numeric x) {
                 return x.doubleValue();
             }
         });
@@ -375,34 +382,33 @@ public class VectorTest {
 
     @Test
     public void reduceLeft() {
-        double result = Vector.of(1.0, 1.0, 1.0, 1.0).reduceLeft(new Vector.BinaryFunction<Double, Double, Number>() {
-
+        double result = Vector.of(1.0, 1.0, 1.0, 1.0).reduceLeft(new F2<Double, Double, Number>() {
             @Override
-            public Double apply(Double x, Double y) {
+            public Double f(Double x, Double y) {
                 return x.doubleValue() + y.doubleValue();
             }
         }).doubleValue();
 
         Assert.assertEquals(4.0, result, 0.0001);
     }
-    
+
     @Test
     public void testIsZero() {
         Vector zero = Vector.of(0.0, 0.0, 0.0, 0.0, 0.0);
         Vector notZero = Vector.of(0.0, 0.0, 1.0, 0.0, 0.0);
-        
+
         assertFalse(notZero.isZero());
         assertTrue(zero.isZero());
     }
-    
+
     @Test
     public void testProject() {
         Vector u = Vector.of(2.0, 1.0);
         Vector v = Vector.of(-3.0, 4.0);
-        
+
         assertEquals(u.project(v), Vector.of(6.0 / 25.0, -8.0 / 25.0));
     }
-    
+
     @Test
     public void testOrthogonalize() {
         Vector v1 = Vector.of(3.0, 1.0);
@@ -411,5 +417,12 @@ public class VectorTest {
 
         assertEquals(ortho.doubleValueOf(0), 1.0, 0.0);
         assertEquals(ortho.doubleValueOf(1), -1.0, 0.0);
+    }
+
+    @Test
+    public void testPermute() {
+        Vector v1 = Vector.of(1.0, 2.0, 3.0, 4.0);
+        Rand.setSeed(1);
+        assertEquals(v1.permute(), Vector.of(2.0, 4.0, 3.0, 1.0));
     }
 }

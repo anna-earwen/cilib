@@ -7,18 +7,20 @@
 package net.sourceforge.cilib.type.types.container;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.UnmodifiableIterator;
-
+import fj.F;
+import fj.F2;
 import fj.P;
 import fj.P1;
 import java.util.*;
-import net.sourceforge.cilib.container.visitor.Visitor;
+import net.sourceforge.cilib.util.Visitor;
 import net.sourceforge.cilib.math.VectorMath;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
+import net.sourceforge.cilib.math.random.generator.Rand;
 import net.sourceforge.cilib.type.types.*;
+import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
  * Mathematical vector implementation. This class represents a vector within
@@ -41,7 +43,7 @@ import net.sourceforge.cilib.type.types.*;
  * <p><strong>Note: Many methods have been deprecated from previous versions
  * of this class.</strong> The applied deprecations have been made to enable a
  * clearer API of usage for the user. All constructors have been deprecated in
- * favor of static factory methods.
+ * favour of static factory methods.
  *
  * <p><strong>Please take note of all deprecations, it influences the usage
  * quite substantially. All deprecations will be removed in a subsequent
@@ -223,7 +225,7 @@ public class Vector implements StructuredType<Numeric>,
 
     /**
      * Obtain an array representing this {@code Vector}.
-     * @return An array of the elemetns within this {@code Vector}.
+     * @return An array of the elements within this {@code Vector}.
      */
     @Override
     public Object[] toArray() {
@@ -247,7 +249,7 @@ public class Vector implements StructuredType<Numeric>,
 
     /**
      * Add the {@code element} to the end of the current {@code Vector}.
-     * @param element The instace to add to the current {@code Vector}.
+     * @param element The instance to add to the current {@code Vector}.
      * @return {@code true} if successful, {@false otherwise}.
      * @deprecated Use the {@code Vector.Builder} instead.
      */
@@ -266,7 +268,7 @@ public class Vector implements StructuredType<Numeric>,
      * {@code Vector}.
      * @param c The structure containing the elements to add.
      * @return {@code true} if successful, {@code false} otherwise.
-     * @deprecated This method has been deprecated in favor of using the
+     * @deprecated This method has been deprecated in favour of using the
      *             {@link Vector.Builder} instead.
      */
     @Deprecated
@@ -286,7 +288,7 @@ public class Vector implements StructuredType<Numeric>,
 
     /**
      * Add the {@code element} to the indicated index of the current {@code Vector}.
-     * @param element The instace to add to the current {@code Vector}.
+     * @param element The instance to add to the current {@code Vector}.
 	 * @param index The index where the new {@code element} must be added.
      * @return {@code true} if successful, {@false otherwise}.
      * @deprecated Use the {@code Vector.Builder} instead.
@@ -314,7 +316,7 @@ public class Vector implements StructuredType<Numeric>,
     /**
      * Returns {@code true} if the specified {@code element} is contained
      * within the current {@code Vector}.
-     * @param o wlemet whose presence in the {@code Vector} is to be tested.
+     * @param o element whose presence in the {@code Vector} is to be tested.
      * @return {@code true} if {@code element} is contained in the {@code Vector}.
      * @throws NullPointerException if the specified element is null and this
      *         list does not permit null elements. (optional).
@@ -367,8 +369,8 @@ public class Vector implements StructuredType<Numeric>,
     }
 
     /**
-     * Remove the first occurance of the provided object.
-     * @param o The object instace to remove.
+     * Remove the first occurrence of the provided object.
+     * @param o The object instance to remove.
      * @return {@code true} if successful, {@code false} otherwise.
      * @deprecated This method has been deprecated. Rather recreate the {@code Vector}
      *             without this element using the {@link Vector.Builder} interface.
@@ -401,7 +403,7 @@ public class Vector implements StructuredType<Numeric>,
      * Remove all the objects contained within {@code structure}.
      * @param c The structure containing objects to remove.
      * @return {@code true} if successful, {@code false} otherwise.
-     * @deprecated This method has been deprecated in favor of recreating
+     * @deprecated This method has been deprecated in favour of recreating
      *             the {@code Vector} instance.
      * @throws UnsupportedOperationException if invoked.
      */
@@ -495,10 +497,9 @@ public class Vector implements StructuredType<Numeric>,
      */
     @Override
     public final double norm() {
-        return Math.sqrt(foldLeft(0, new Function<Numeric, Double>() {
-
+        return Math.sqrt(foldLeft(0, new F<Numeric, Double>() {
             @Override
-            public Double apply(Numeric x) {
+            public Double f(Numeric x) {
                 return x.doubleValue() * x.doubleValue();
             }
         }));
@@ -522,7 +523,7 @@ public class Vector implements StructuredType<Numeric>,
         Vector local = copyOf(this);
         double value = local.norm();
 
-        // If the norm() of the vector is 0.0, then we are takling about the "normal vector"
+        // If the norm() of the vector is 0.0, then we are talking about the "normal vector"
         // (\vector{0}) and as a result the normal vector is it's own normal.
         return (Double.compare(value, 0.0) != 0) ? local.divide(value) : local;
     }
@@ -609,14 +610,14 @@ public class Vector implements StructuredType<Numeric>,
 
     /**
      * Randomize all the elements contained within the {@code Vector}.
-     * @param random The {@code Random} to use to randomize the {@code Vector}.
+     * @param random The {@code Random} to use to randomise the {@code Vector}.
      * @deprecated Use {@link Vector.Builder#buildRandom()} instead.
      */
     @Deprecated
     @Override
-    public void randomize(RandomProvider random) {
+    public void randomise() {
         for (int i = 0; i < components.length; i++) {
-            this.components[i].randomize(random);
+            this.components[i].randomise();
         }
     }
 
@@ -817,10 +818,10 @@ public class Vector implements StructuredType<Numeric>,
      * @param function provided to perform a transform on each element.
      * @return A new {@code Vector} containing the transformed elements.
      */
-    public Vector map(Function<Numeric, Numeric> function) {
+    public Vector map(F<Numeric, Numeric> function) {
         Numeric[] result = new Numeric[components.length];
         for (int i = 0, n = components.length; i < n; i++) {
-            result[i] = function.apply(components[i]);
+            result[i] = function.f(components[i]);
         }
         return new Vector(result);
     }
@@ -850,21 +851,21 @@ public class Vector implements StructuredType<Numeric>,
      * @param function to be used in the folding operations.
      * @return a scalar vale which is the result of the fold.
      */
-    public double foldLeft(double initial, Function<Numeric, Double> function) {
+    public double foldLeft(double initial, F<Numeric, Double> function) {
         double acc = initial;
         for (int i = 0, n = components.length; i < n; i++) {
-            acc += function.apply(components[i]);
+            acc += function.f(components[i]);
         }
         return acc;
     }
 
     /**
      * Reduce a collection of elements to a single scalar value, based on the
-     * given function (which is used to perfrom the reduction).
-     * @param function provided to perfrom the reduction.
+     * given function (which is used to perform the reduction).
+     * @param function provided to perform the reduction.
      * @return scalar value of the reduction operation.
      */
-    public Number reduceLeft(BinaryFunction<Double, Double, Number> function) {
+    public Number reduceLeft(F2<Double, Double, Number> function) {
         if (isEmpty()) {
             throw new UnsupportedOperationException("empty.reduceLeft");
         }
@@ -876,20 +877,27 @@ public class Vector implements StructuredType<Numeric>,
                 acc = n.doubleValue();
                 first = false;
             } else {
-                acc = function.apply(acc.doubleValue(), n.doubleValue());
+                acc = function.f(acc.doubleValue(), n.doubleValue());
             }
         }
         return acc;
     }
+    /**
+     * Permute the elements of the {@code Vector} instance to create
+     * a new {@code Vector}.
+     * @return A permuted {@code Vector} instance.
+     */
+    public Vector permute() {
+        Vector.Builder builder = Vector.newBuilder();
+        Vector current = this.copyOf(this);
 
-    public interface Function<F, T> {
+        while(current.size() > 0) {
+            int index = Rand.nextInt(current.size());
+            builder.add(current.get(index));
+            current.remove(index);
+        }
 
-        T apply(F x);
-    }
-
-    public interface BinaryFunction<A, B, C> {
-
-        C apply(A a, B b);
+        return builder.build();
     }
 
     /**
@@ -902,7 +910,7 @@ public class Vector implements StructuredType<Numeric>,
 
     /**
      * A builder for creating {@code Vector} instances. It is especially
-     * useful for creating contsant instances that do not change:
+     * useful for creating constant instances that do not change:
      * <p>
      * Example:
      * <pre>{@code
@@ -927,7 +935,7 @@ public class Vector implements StructuredType<Numeric>,
 
         public Builder repeat(int n, Numeric numeric) {
             for (int i = 0; i < n; i++) {
-                elements.add(numeric);
+                elements.add(numeric.getClone());
             }
             return this;
         }
@@ -983,6 +991,26 @@ public class Vector implements StructuredType<Numeric>,
         }
 
         /**
+         * Add a range of {@code int}s to the {@code Builder}. The {@code int}s
+         * are wrapped within {@link Int} instances.
+         * @param start the start of the range.
+         * @param end the end of the range, exclusive
+         * @param step the amount that is added to each value in the range
+         * @return The current {@code Builder} for chaining operations.
+         */
+        public Builder range(int start, int end, int step) {
+            checkArgument(start < end, "Range start index must be less than the end index");
+            checkArgument(step > 0, "Range step must positive");
+
+            int index = start;
+            while (index < end) {
+                elements.add(Int.valueOf(index));
+                index += step;
+            }
+            return this;
+        }
+
+        /**
          * Add a {@code double} to the {@code Builder}, given the required
          * {@code Bounds}. The {@code double} is wrapped within a {@link Real}
          * instance, together with the given {@code Bounds}.
@@ -1011,7 +1039,7 @@ public class Vector implements StructuredType<Numeric>,
         /**
          * Add all elements provided by {@code iterable} to the current
          * {@code Builder}.
-         * @param iterable the given elemetns.
+         * @param iterable the given elements.
          * @return The current {@code Builder} for chaining operations.
          */
         public Builder copyOf(Iterable<? extends Numeric> iterable) {
@@ -1036,7 +1064,7 @@ public class Vector implements StructuredType<Numeric>,
 
         /**
          * Construct a {@code Vector} from the built up elements within the
-         * {@code Builder}. All elements are randomized upon {@code Vector}
+         * {@code Builder}. All elements are randomised upon {@code Vector}
          * construction.
          * @return a new {@code Vector} instance created from the
          *         {@code Builder}.
@@ -1046,11 +1074,10 @@ public class Vector implements StructuredType<Numeric>,
                 return Vector.of();
             }
 
-            MersenneTwister random = new MersenneTwister(); // needs to come out, must be passed in
             Numeric[] numerics = new Numeric[elements.size()];
             int index = 0;
             for (Numeric element : elements) {
-                element.randomize(random);
+                element.randomise();
                 numerics[index++] = element;
             }
             return new Vector(numerics);

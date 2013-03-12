@@ -7,11 +7,10 @@
 package net.sourceforge.cilib.coevolution.cooperative;
 
 import net.sourceforge.cilib.coevolution.cooperative.problem.DimensionAllocation;
-import net.sourceforge.cilib.entity.CandidateSolution;
 import net.sourceforge.cilib.entity.Entity;
+import net.sourceforge.cilib.problem.Problem;
 import net.sourceforge.cilib.problem.solution.Fitness;
 import net.sourceforge.cilib.problem.solution.InferiorFitness;
-import net.sourceforge.cilib.problem.Problem;
 import net.sourceforge.cilib.type.types.Blackboard;
 import net.sourceforge.cilib.type.types.Numeric;
 import net.sourceforge.cilib.type.types.Type;
@@ -122,26 +121,27 @@ public class ContextEntity implements Entity {
     }
 
     /**
-     * Appen the given {@linkplain Type} to the current context {@linkplain Vector}
+     * Append the given {@linkplain Type} to the current context {@linkplain Vector}
      * @param value The value to append, it can either be a {@linkplain Numeric} type, or a {@linkplain Vector} of values.
      */
     public void append(Type value) {
-        if(value instanceof Vector)
+        if(value instanceof Vector) {
             context = Vector.newBuilder().copyOf(context).copyOf((Vector) value.getClone()).build();
-        else
+        } else {
             context = Vector.newBuilder().copyOf(context).add((Numeric) value.getClone()).build();
+        }
     }
 
     /**
-     * Append the {@linkplain CandidateSolution} of the given {@linkplain Entity} to the current context {@linkplain Vector}
-     * @param entity The entity who's {@linkplain CandidateSolution} should be appended.
+     * Append the candidate solution of the given {@linkplain Entity} to the current context {@linkplain Vector}
+     * @param entity The entity who's candidate solution should be appended.
      */
     public void append(Entity entity) {
         append(entity.getCandidateSolution());
     }
 
     /**
-     * Copy the given solution {@linkplain Vector} into a specified position into this context entitie's context {@linkplain Vector}.
+     * Copy the given solution {@linkplain Vector} into a specified position into this context entity's context {@linkplain Vector}.
      * The given {@linkplain DimensionAllocation} dictates which dimensions the given {@linkplain Vector} should be copied into.
      * @param solution The {@linkplain Vector} to copy from.
      * @param allocation The {@linkplain DimensionAllocation} which describes which dimensions to copy the solution into.
@@ -164,7 +164,7 @@ public class ContextEntity implements Entity {
     }
 
     /**
-     * Set the conext vector to the given {@linkplain StructuredType}. The type has to be
+     * Set the context vector to the given {@linkplain StructuredType}. The type has to be
      * of type {@linkplain Vector}.
      */
     @Override

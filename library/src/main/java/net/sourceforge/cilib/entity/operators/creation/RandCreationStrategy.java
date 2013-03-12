@@ -9,13 +9,10 @@ package net.sourceforge.cilib.entity.operators.creation;
 import fj.P1;
 import java.util.Iterator;
 import java.util.List;
-
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
-import net.sourceforge.cilib.controlparameter.ControlParameter;
+import net.sourceforge.cilib.controlparameter.SettableControlParameter;
 import net.sourceforge.cilib.entity.Entity;
 import net.sourceforge.cilib.entity.Topology;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
 import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.util.selection.Samples;
 import net.sourceforge.cilib.util.selection.Selection;
@@ -24,8 +21,8 @@ import net.sourceforge.cilib.util.selection.arrangement.RandomArrangement;
 public class RandCreationStrategy implements CreationStrategy {
 
     private static final long serialVersionUID = 930740770470361009L;
-    protected ControlParameter scaleParameter;
-    protected ControlParameter numberOfDifferenceVectors;
+    protected SettableControlParameter scaleParameter;
+    protected SettableControlParameter numberOfDifferenceVectors;
 
     /**
      * Create a new instance of {@code CurrentToRandCreationStrategy}.
@@ -57,12 +54,11 @@ public class RandCreationStrategy implements CreationStrategy {
      * {@inheritDoc}
      */
     @Override
-    public Entity create(Entity targetEntity, Entity current, Topology<? extends Entity> topology) {
-        RandomProvider random = new MersenneTwister();
+    public <T extends Entity> T create(T targetEntity, T current, Topology<T> topology) {
         int number = Double.valueOf(this.numberOfDifferenceVectors.getParameter()).intValue();
-        List<Entity> participants = (List<Entity>) Selection.copyOf(topology)
+        List<T> participants = Selection.copyOf(topology)
                 .exclude(targetEntity, current)
-                .orderBy(new RandomArrangement(random))
+                .orderBy(new RandomArrangement())
                 .select(Samples.first(number).unique());
         Vector differenceVector = determineDistanceVector(participants);
 
@@ -74,7 +70,7 @@ public class RandCreationStrategy implements CreationStrategy {
             }
         }));
 
-        Entity trialEntity = current.getClone();
+        T trialEntity = (T) current.getClone();
         trialEntity.setCandidateSolution(trialVector);
 
         return trialEntity;
@@ -88,9 +84,9 @@ public class RandCreationStrategy implements CreationStrategy {
      *        reduce the diversity of the population as not all entities will be considered.
      * @return A {@linkplain Vector} representing the resultant of all calculated difference vectors.
      */
-    protected Vector determineDistanceVector(List<Entity> participants) {
+    protected <T extends Entity> Vector determineDistanceVector(List<T> participants) {
         Vector distanceVector = Vector.fill(0.0, participants.get(0).getCandidateSolution().size());
-        Iterator<Entity> iterator = participants.iterator();
+        Iterator<T> iterator = participants.iterator();
 
         while (iterator.hasNext()) {
             Vector first = (Vector) iterator.next().getCandidateSolution();
@@ -105,9 +101,9 @@ public class RandCreationStrategy implements CreationStrategy {
 
     /**
      * Get the number of difference vectors to create.
-     * @return The {@code ControlParameter} describing the numberof difference vectors.
+     * @return The {@code ControlParameter} describing the number of difference vectors.
      */
-    public ControlParameter getNumberOfDifferenceVectors() {
+    public SettableControlParameter getNumberOfDifferenceVectors() {
         return numberOfDifferenceVectors;
     }
 
@@ -115,7 +111,7 @@ public class RandCreationStrategy implements CreationStrategy {
      * Set the number of difference vectors to create.
      * @param numberOfDifferenceVectors The value to set.
      */
-    public void setNumberOfDifferenceVectors(ControlParameter numberOfDifferenceVectors) {
+    public void setNumberOfDifferenceVectors(SettableControlParameter numberOfDifferenceVectors) {
         this.numberOfDifferenceVectors = numberOfDifferenceVectors;
     }
 
@@ -123,7 +119,7 @@ public class RandCreationStrategy implements CreationStrategy {
      * Get the current scale parameter, used within the creation.
      * @return The {@code ControlParameter} representing the scale parameter.
      */
-    public ControlParameter getScaleParameter() {
+    public SettableControlParameter getScaleParameter() {
         return scaleParameter;
     }
 
@@ -131,7 +127,12 @@ public class RandCreationStrategy implements CreationStrategy {
      * Set the scale parameter for the creation strategy.
      * @param scaleParameter The value to set.
      */
-    public void setScaleParameter(ControlParameter scaleParameter) {
+    public void setScaleParameter(SettableControlParameter scaleParameter) {
         this.scaleParameter = scaleParameter;
     }
+    
+    public void setScaleParameter(double scaleParameterValue) {
+        this.scaleParameter.setParameter(scaleParameterValue);
+    }
+
 }

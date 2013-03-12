@@ -39,7 +39,7 @@ public final class DomainParser {
      * @return A {@code TypeList} is returned by default, but if the type is defined
      *         to consist of {@code Numeric} types, a {@code Vector} instance is returned.
      */
-    public static <E extends StructuredType<? extends Type>> E parse(String domain) {
+    public synchronized static <E extends StructuredType<? extends Type>> E parse(String domain) {
         final ReportingParseRunner<String> expander = new ReportingParseRunner<String>(EXPANDING_PARSER.Expansion());
         final ParsingResult<String> d = expander.run(domain.replaceAll(" ", ""));
 
@@ -61,7 +61,7 @@ public final class DomainParser {
                 strBuilder.append(e.getInputBuffer().extract(e.getStartIndex(), e.getEndIndex()));
             }
             throw new RuntimeException("Error in parsing domain: " + expanded +
-                    ". Ensure that the domain is a valid domain string and contains no whitespace.\nError occured near: " + strBuilder.toString());
+                    ". Ensure that the domain is a valid domain string and contains no whitespace.\nError occurred near: " + strBuilder.toString());
         }
 
         List<Type> l = Lists.newArrayList(result.valueStack);

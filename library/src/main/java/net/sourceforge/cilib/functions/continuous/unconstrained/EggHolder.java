@@ -6,6 +6,7 @@
  */
 package net.sourceforge.cilib.functions.continuous.unconstrained;
 
+import com.google.common.base.Preconditions;
 import net.sourceforge.cilib.functions.ContinuousFunction;
 import net.sourceforge.cilib.type.types.container.Vector;
 
@@ -17,7 +18,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * Swarm Methods</i>, Technical Report, North-Eastern Hill University,
  * India, 2006</p>
  *
- * <p>Note: n <= 2</p>
+ * <p>Note: n >= 2</p>
  *
  * <p>Minimum:
  * <ul>
@@ -29,8 +30,9 @@ import net.sourceforge.cilib.type.types.container.Vector;
  *
  * <p>Characteristics:
  * <ul>
+ * <li>Only defined for 2+ dimensions</li>
  * <li>Multimodal</li>
- * <li>Non-seperable</li>
+ * <li>Non-separable</li>
  * <li>Not regular</li>
  * </ul>
  * </p>
@@ -44,6 +46,8 @@ public class EggHolder implements ContinuousFunction {
 
     @Override
     public Double apply(Vector input) {
+        Preconditions.checkArgument(input.size() >= 2, "EggHolder function is only defined for 2 or more dimensions");
+
         double sum = 0.0;
         for (int i = 0; i < input.size() - 1; i++) {
             sum += (-1*(input.doubleValueOf(i+1) + 47)

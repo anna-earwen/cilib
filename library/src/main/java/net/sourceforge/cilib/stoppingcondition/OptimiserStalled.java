@@ -9,8 +9,8 @@ package net.sourceforge.cilib.stoppingcondition;
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.problem.solution.OptimisationSolution;
 import net.sourceforge.cilib.type.types.container.Vector;
-import net.sourceforge.cilib.util.DistanceMeasure;
-import net.sourceforge.cilib.util.ManhattanDistanceMeasure;
+import net.sourceforge.cilib.util.distancemeasure.DistanceMeasure;
+import net.sourceforge.cilib.util.distancemeasure.ManhattanDistanceMeasure;
 
 /**
  * used to check if optimisation algorithm has stalled. still a very crude implementation. if the
@@ -47,7 +47,7 @@ public class OptimiserStalled implements StoppingCondition<Algorithm> {
     }
 
     /**
-     * sets the maximum consecutive evalutions that an algorithm can improve less then the minimum.
+     * sets the maximum consecutive evaluations that an algorithm can improve less then the minimum.
      * percentage. this value relates to evaluations and not iterations.
      * @param count The value to set.
      */

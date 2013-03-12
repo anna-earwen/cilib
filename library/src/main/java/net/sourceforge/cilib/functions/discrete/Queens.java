@@ -98,9 +98,9 @@ public class Queens implements DiscreteFunction {
     }
 
     /**
-     * Initialize the current game state with the provided {@code Vector}.
-     * @param board The board to initialize.
-     * @param x The {@code Vector} to base the initialization on.
+     * Initialise the current game state with the provided {@code Vector}.
+     * @param board The board to initialise.
+     * @param x The {@code Vector} to base the initialisation on.
      */
     private void initialiseBoard(boolean[][] board, Vector x) {
         int counter = 0;
@@ -131,7 +131,7 @@ public class Queens implements DiscreteFunction {
 
     /**
      * Determine if the current {@code row} and {@code col} values are within
-     * the biounds of the chess board.
+     * the bounds of the chess board.
      * @param row The row value in the range: {@code [0..boardSize-1]}
      * @param col The column value in the range:  {@code [0..boardSize-1]}
      * @return {@code true} if the position is inside the board, {@code false} otherwise.

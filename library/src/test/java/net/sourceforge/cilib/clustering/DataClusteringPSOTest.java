@@ -7,60 +7,37 @@
 package net.sourceforge.cilib.clustering;
 
 import junit.framework.Assert;
-import net.sourceforge.cilib.algorithm.initialisation.DataDependantPopulationInitializationStrategy;
+import net.sourceforge.cilib.algorithm.initialisation.DataDependantPopulationInitialisationStrategy;
 import net.sourceforge.cilib.algorithm.initialisation.PopulationInitialisationStrategy;
 import net.sourceforge.cilib.algorithm.population.IterationStrategy;
 import net.sourceforge.cilib.clustering.entity.ClusterParticle;
 import net.sourceforge.cilib.clustering.iterationstrategies.SinglePopulationDataClusteringIterationStrategy;
 import net.sourceforge.cilib.clustering.iterationstrategies.StandardDataClusteringIterationStrategy;
 import net.sourceforge.cilib.coevolution.cooperative.contributionselection.TopologyBestContributionSelectionStrategy;
-import net.sourceforge.cilib.entity.Particle;
+import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.entity.Topology;
 import net.sourceforge.cilib.entity.topologies.GBestTopology;
 import net.sourceforge.cilib.measurement.generic.Iterations;
-import net.sourceforge.cilib.problem.QuantizationErrorMinimizationProblem;
+import net.sourceforge.cilib.problem.QuantisationErrorMinimisationProblem;
 import net.sourceforge.cilib.problem.boundaryconstraint.CentroidBoundaryConstraint;
 import net.sourceforge.cilib.problem.boundaryconstraint.RandomBoundaryConstraint;
 import net.sourceforge.cilib.stoppingcondition.Maximum;
 import net.sourceforge.cilib.stoppingcondition.MeasuredStoppingCondition;
 import net.sourceforge.cilib.type.types.container.CentroidHolder;
 import net.sourceforge.cilib.type.types.container.ClusterCentroid;
-import net.sourceforge.cilib.util.EuclideanDistanceMeasure;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import net.sourceforge.cilib.util.distancemeasure.EuclideanDistanceMeasure;
 import org.junit.Test;
 
 public class DataClusteringPSOTest {
-    
-    public DataClusteringPSOTest() {
-    }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
-    
     /**
      * Test of algorithmIteration method, of class DataClusteringPSO.
      */
     @Test
     public void testAlgorithmIteration() {
         DataClusteringPSO instance = new DataClusteringPSO();
-        
-        QuantizationErrorMinimizationProblem problem = new QuantizationErrorMinimizationProblem();
+
+        QuantisationErrorMinimisationProblem problem = new QuantisationErrorMinimisationProblem();
         problem.setDomain("R(-5.12:5.12)");
         IterationStrategy strategy = new StandardDataClusteringIterationStrategy();
         CentroidBoundaryConstraint constraint = new CentroidBoundaryConstraint();
@@ -68,26 +45,26 @@ public class DataClusteringPSOTest {
         strategy.setBoundaryConstraint(constraint);
         instance.setIterationStrategy(strategy);
         instance.setOptimisationProblem(problem);
-        DataDependantPopulationInitializationStrategy init = new DataDependantPopulationInitializationStrategy<ClusterParticle>();
-      
+        DataDependantPopulationInitialisationStrategy init = new DataDependantPopulationInitialisationStrategy<ClusterParticle>();
+
         init.setEntityType(new ClusterParticle());
         init.setEntityNumber(2);
         instance.setInitialisationStrategy(init);
         instance.setSourceURL("library/src/test/resources/datasets/iris2.arff");
-        
+
         instance.setOptimisationProblem(problem);
         instance.addStoppingCondition(new MeasuredStoppingCondition());
-        
+
         instance.performInitialisation();
-        
+
         ClusterParticle particleBefore = instance.getTopology().get(0).getClone();
-        
+
         instance.run();
-        
+
         ClusterParticle particleAfter = instance.getTopology().get(0).getClone();
-        
+
         Assert.assertFalse(particleAfter.getCandidateSolution().containsAll(particleBefore.getCandidateSolution()));
-        
+
     }
 
     /**
@@ -103,9 +80,9 @@ public class DataClusteringPSOTest {
         p.setCandidateSolution(holder);
         Topology topology = new GBestTopology();
         topology.add(p);
-        
+
         instance.setTopology(topology);
-        
+
         Assert.assertEquals(topology, instance.getTopology());
     }
 
@@ -121,9 +98,9 @@ public class DataClusteringPSOTest {
         p.setCandidateSolution(holder);
         Topology topology = new GBestTopology();
         topology.add(p);
-        
+
         instance.setTopology(topology);
-        
+
         Assert.assertEquals(topology, instance.getTopology());
     }
 
@@ -133,16 +110,16 @@ public class DataClusteringPSOTest {
     @Test
     public void testPerformInitialisation() {
         DataClusteringPSO instance = new DataClusteringPSO();
-        QuantizationErrorMinimizationProblem problem = new QuantizationErrorMinimizationProblem();
+        QuantisationErrorMinimisationProblem problem = new QuantisationErrorMinimisationProblem();
         problem.setDomain("R(-5.12:5.12)");
         instance.setOptimisationProblem(problem);
         instance.addStoppingCondition(new MeasuredStoppingCondition(new Iterations(), new Maximum(), 1));
-        PopulationInitialisationStrategy init = new DataDependantPopulationInitializationStrategy<ClusterParticle>();
+        PopulationInitialisationStrategy init = new DataDependantPopulationInitialisationStrategy<ClusterParticle>();
         init.setEntityType(new ClusterParticle());
         instance.setInitialisationStrategy(init);
         instance.setSourceURL("library/src/test/resources/datasets/iris2.arff");
         instance.performInitialisation();
-        
+
         Assert.assertTrue(((SinglePopulationDataClusteringIterationStrategy) instance.getIterationStrategy()).getDataset().size() > 0);
         Assert.assertTrue(!instance.getTopology().isEmpty());
     }
@@ -154,7 +131,7 @@ public class DataClusteringPSOTest {
     public void testGetContributionSelectionStrategy() {
        DataClusteringPSO instance = new DataClusteringPSO();
        instance.setContributionSelectionStrategy(new TopologyBestContributionSelectionStrategy());
-       
+
        Assert.assertTrue(instance.getContributionSelectionStrategy() instanceof TopologyBestContributionSelectionStrategy);
     }
 
@@ -165,7 +142,7 @@ public class DataClusteringPSOTest {
     public void testSetContributionSelectionStrategy() {
         DataClusteringPSO instance = new DataClusteringPSO();
        instance.setContributionSelectionStrategy(new TopologyBestContributionSelectionStrategy());
-       
+
        Assert.assertTrue(instance.getContributionSelectionStrategy() instanceof TopologyBestContributionSelectionStrategy);
     }
 
@@ -175,7 +152,7 @@ public class DataClusteringPSOTest {
     @Test
     public void testGetDistanceMeasure() {
         DataClusteringPSO instance = new DataClusteringPSO();
-        
+
         Assert.assertTrue(((StandardDataClusteringIterationStrategy) instance.getIterationStrategy()).getDistanceMeasure() instanceof EuclideanDistanceMeasure);
     }
 }
