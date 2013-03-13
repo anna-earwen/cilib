@@ -21,158 +21,183 @@
  */
 package net.sourceforge.cilib.io;
 
-
+import com.google.common.collect.Lists;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.cilib.io.exception.CIlibIOException;
 import net.sourceforge.cilib.type.types.Type;
+import mnist.tools.MnistManager;
+import net.sourceforge.cilib.type.types.Real;
 
-public class TimeSeriesReader implements DataReader<List<Type>> {
-    private DataReader<List<Type>> delegate;
-    private int embedding = 2; // default value: predict the next step from the previous step, thus, embedding = two steps in the time series
-    private int tau = 1; // specifies the time lag between observations
-    private boolean hasNextRow = true;
-    private int step = 1; // specifies the distance between patterns
-    private List<Type> embeddedRow;
-    private List<Type> dataSample;
+public class MNISTReader implements DataReader<List<Type>> {
+    private boolean hasNextRow = false;
+    private String inputTrain;
+    private String labelTrain;
+    private String inputTest;
+    private String labelTest;
+    private MnistManager mnistTrain;
+    private MnistManager mnistTest;
+    private double lowerRange = -1;
+    private double upperRange = 1;
+    private static final double MNSIT_LOWER_RANGE = 0;
+    private static final double MNIST_UPPER_RANGE = 255;
+    private static final int MNSIT_IMAGE_HEIGHT = 28;
+    private static final int MNSIT_IMAGE_WIDTH = 28;
+    private static final int MNSIT_TARGET_LENGTH = 10;
+    private int mycount = 0;
+    
+    
 
-
-    public TimeSeriesReader() {
+    public MNISTReader() {
         super();
-        this.embeddedRow = new ArrayList<Type>();
-        this.dataSample = new ArrayList<Type>();
     }
 
-
     @Override
-    public void close() throws CIlibIOException {
-       delegate.close();
+    public void close() throws CIlibIOException {       
     }
 
     @Override
     public List<String> getColumnNames() {
-        return delegate.getColumnNames();
+        return new ArrayList<String>();
     }
 
     @Override
     public String getSourceURL() {
-        return delegate.getSourceURL();
+        return "";
     }
 
     @Override
     public boolean hasNextRow() throws CIlibIOException {
-        return hasNextRow && delegate.hasNextRow();
-    }
-
-    /**
-     * Creates the next row based on the specified embedding and tau. Source is expected to be a single column of time-series values.
-     * @return the next row
-     * @obsolete
-     */
-    public List<Type> nextRowObsolete(){
-      for(int i = 0; i < this.embedding; i++) {
-          try {
-              if(delegate.hasNextRow()) {
-                  List<Type> nextInputRow = delegate.nextRow();
-                  for(Type nextRowItem : nextInputRow) {
-                      embeddedRow.add(nextRowItem);
-                  }
-                  if(embeddedRow.size() > embedding) {
-                      while(embeddedRow.size() != embedding) {
-                          embeddedRow.remove(0);
-                      }
-                      return embeddedRow;
-                  }
-              }
-              else { // can't construct another embedded row, so just return the previous one and set hasNextRow flag to false
-                this.hasNextRow = false;
-                return embeddedRow;
-              }
-          } catch (CIlibIOException e) {
+        /*mycount++;
+        if(mycount < 20) return true;
+        else return false;*/
+        try {
+            hasNextRow = mnistTest.getImages().getCurrentIndex() <= mnistTest.getImages().getCount();
+            //mnistTrain.getImages().getCurrentIndex() <= mnistTrain.getImages().getCount()
+              //  || mnistTest.getImages().getCurrentIndex() <= mnistTest.getImages().getCount();
+        } catch (IOException e) {
             e.printStackTrace();
-          }
-      }
-      return embeddedRow;
+        }
+        return hasNextRow;
     }
 
+    
+    private double scaleIt(double val, double valLowerRange, double valUpperRange, double newLowerRange, double newUpperRange) 
+    {
+      return (val - valLowerRange)*(newUpperRange - newLowerRange) 
+        / (valUpperRange - valLowerRange) + newLowerRange;
+    }
+    
     /**
-     * Creates the next row based on the specified embedding and tau. Source is expected to be a single column of time-series values.
+     * 
      * @return the next row
      */
     @Override
-    public List<Type> nextRow(){
-          try {
-              if(dataSample.size() > 0) { // not the first pattern
-                  for(int j = 0; j < step; j++) {
-                      dataSample.remove(0); // remove n previous entries
-                      if(delegate.hasNextRow()) {
-                          dataSample.add(delegate.nextRow().get(0)); // we only operate with index 0 because we assume univariate time series
-                      } else {
-                          hasNextRow = false;
-                          return embeddedRow; // previous pattern
-                      }
-                  }
-              } else { // construct the first dataSample vector
-                  int sampleSize = tau * (embedding - 1) + 1;
-                  for(int c = 0; c < sampleSize; c++) {
-                      if(delegate.hasNextRow()) {
-                          dataSample.add(delegate.nextRow().get(0)); // we only operate with index 0 because we assume univariate time series
-                      } else {
-                          hasNextRow = false;
-                          return embeddedRow; // this will be empty
-                      }
-                  }
-              } // Now that dataSample is constructed, sample the embedded row
-              embeddedRow.clear();
-              for(int j = 0; j < dataSample.size(); j+=tau) {
-                  embeddedRow.add(dataSample.get(j));
-              }
-              return embeddedRow;
-          } catch (CIlibIOException e) {
+    public List<Type> nextRow(){ 
+        
+        List<Type> theNextRow = Lists.newArrayList();
+        try {            
+            int[][] image;
+            int imageLabel;
+            
+            if(mnistTrain.getImages().getCurrentIndex() <= mnistTrain.getImages().getCount() && false) {
+                image = this.mnistTrain.readImage();
+                imageLabel = this.mnistTrain.readLabel();
+                //System.out.println("Train label: " + imageLabel);
+            } else {
+                image = this.mnistTest.readImage();
+                imageLabel = this.mnistTest.readLabel();     
+                //System.out.println("Tesr label: " + imageLabel);           
+            }
+            
+            for(int i = 0; i < MNSIT_IMAGE_WIDTH; i++) {
+                for(int j = 0; j < MNSIT_IMAGE_HEIGHT; j++) {                    
+                    theNextRow.add(Real.valueOf(scaleIt((double)image[i][j], 
+                            MNSIT_LOWER_RANGE, MNIST_UPPER_RANGE, lowerRange, upperRange)));
+                }
+            }
+            
+            for(int i = 0; i < MNSIT_TARGET_LENGTH; i++) {
+                if(i == imageLabel) {
+                    theNextRow.add(Real.valueOf(upperRange));
+                } else {
+                    theNextRow.add(Real.valueOf(lowerRange));
+                }
+            }
+            /*
+            System.out.println("Image length: " + mnistTrain.getImages().getEntryLength());
+            System.out.println("Current Index: " + mnistTrain.getImages().getCurrentIndex());
+
+            System.out.println("Label length: " + mnistTrain.getLabels().getEntryLength());
+            System.out.println("Label Index: " + mnistTrain.getLabels().getCurrentIndex());
+            * */
+        } catch (Exception e) {
             e.printStackTrace();
-            return null;
-          }
+        }
+        return theNextRow;
     }
 
     @Override
     public void open() throws CIlibIOException {
-        delegate.open();
+        try {
+            this.mnistTrain = new MnistManager(this.inputTrain,this.labelTrain);        
+            this.mnistTest = new MnistManager(this.inputTest,this.labelTest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void setSourceURL(String sourceURL) {
-        delegate.setSourceURL(sourceURL);
     }
 
-    public DataReader<List<Type>> getDelegate() {
-        return delegate;
+    public String getInputTrain() {
+        return inputTrain;
     }
 
-    public void setDelegate(DataReader<List<Type>> delegate) {
-        this.delegate = delegate;
+    public void setInputTrain(String inputTrain) {
+        this.inputTrain = inputTrain;
     }
 
-    public int getEmbedding() {
-        return embedding;
+    public String getLabelTrain() {
+        return labelTrain;
     }
 
-    public void setEmbedding(int embedding) {
-        this.embedding = embedding;
+    public void setLabelTrain(String labelTrain) {
+        this.labelTrain = labelTrain;
     }
 
-    public int getTau() {
-        return tau;
+    public String getInputTest() {
+        return inputTest;
     }
 
-    public void setTau(int tau) {
-        this.tau = tau;
+    public void setInputTest(String inputTest) {
+        this.inputTest = inputTest;
     }
 
-    public int getStep() {
-        return step;
+    public String getLabelTest() {
+        return labelTest;
     }
 
-    public void setStep(int step) {
-        this.step = step;
+    public void setLabelTest(String labelTest) {
+        this.labelTest = labelTest;
     }
+
+    public double getLowerRange() {
+        return lowerRange;
+    }
+
+    public void setLowerRange(double lowerRange) {
+        this.lowerRange = lowerRange;
+    }
+
+    public double getUpperRange() {
+        return upperRange;
+    }
+
+    public void setUpperRange(double upperRange) {
+        this.upperRange = upperRange;
+    }
+
 }
