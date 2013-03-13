@@ -69,9 +69,9 @@ public class MNISTReader implements DataReader<List<Type>> {
 
     @Override
     public boolean hasNextRow() throws CIlibIOException {
-        mycount++;
+        /*mycount++;
         if(mycount < 20) return true;
-        else return false;/*
+        else return false;*/
         try {
             hasNextRow = mnistTest.getImages().getCurrentIndex() <= mnistTest.getImages().getCount();
             //mnistTrain.getImages().getCurrentIndex() <= mnistTrain.getImages().getCount()
@@ -79,7 +79,7 @@ public class MNISTReader implements DataReader<List<Type>> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return hasNextRow;*/
+        return hasNextRow;
     }
 
     
