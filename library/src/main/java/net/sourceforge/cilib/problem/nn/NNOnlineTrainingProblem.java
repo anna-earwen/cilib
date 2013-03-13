@@ -15,6 +15,8 @@ import net.sourceforge.cilib.io.exception.CIlibIOException;
 import net.sourceforge.cilib.io.pattern.StandardPattern;
 import net.sourceforge.cilib.io.transform.ShuffleOperator;
 import net.sourceforge.cilib.io.transform.TypeConversionOperator;
+import net.sourceforge.cilib.math.random.ProbabilityDistributionFunction;
+import net.sourceforge.cilib.math.random.UniformDistribution;
 import net.sourceforge.cilib.nn.NeuralNetworks;
 import net.sourceforge.cilib.nn.architecture.visitors.OutputErrorVisitor;
 import net.sourceforge.cilib.problem.AbstractProblem;
@@ -27,34 +29,28 @@ import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
  * Class represents a {@link NNTrainingProblem} where the goal is to optimize
- * the set of weights of a neural network to best fit a given dynamic dataset (either
- * regression, classification etc.). Sliding window is used to simulate dynamic changes.
- * User-specified step size, frequency, and sliding window size control the dynamics
- * of the sliding window. Sliding window moves over the dataset and presents patterns
- * to the neural network in batches equal to the size of the window.
+ * the set of weights of a neural network to best fit a given dataset (either
+ * regression, classification etc.) presented to the network in on-line fashion.
+ * (I.e., one pattern at a time).
  */
-public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
+public class NNOnlineTrainingProblem extends NNTrainingProblem {
     private static final long serialVersionUID = -8765101028460476990L;
 
     private DataTableBuilder dataTableBuilder;
-    private DataTable dataTable; // stores the entire data set from which training & generalisation sets are sampled
-    private int previousShuffleIteration;
-    private int previousIteration;
+    private DataTable dataTable; // stores the entire data set from which training patterns are sampled
     private boolean initialized;
 
-    private int dataChangesCounter = 1; // # times the dataset was dynamically updated (has to start with 1)
-    private int stepSize; // step size for each set, i.e. # patterns by which the sliding window moves forward in each dynamic step
-    private int changeFrequency; // # algorithm iterations after which the window will slide
-    private int windowSize; // number of patterns in the active set
+    private ProbabilityDistributionFunction randomizer;
+    private int onlineSize = 1; // how many patterns to train on each time;
+    private int trainingSize;
 
     /**
      * Default constructor.
      */
-    public NNSlidingWindowTrainingProblem() {
+    public NNOnlineTrainingProblem() {
         super();
+        randomizer = new UniformDistribution();
         dataTableBuilder = new DataTableBuilder(new DelimitedTextFileReader());
-        previousShuffleIteration = -1;
-        previousIteration = -1;
         initialized = false;
     }
 
@@ -71,30 +67,27 @@ public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
             dataTableBuilder.addDataOperator(new TypeConversionOperator());
             dataTableBuilder.addDataOperator(patternConversionOperator);
             dataTableBuilder.buildDataTable();
-            dataTable = dataTableBuilder.getDataTable();
+            dataTable = dataTableBuilder.getDataTable(); // dataTable
+            
+            trainingSize = (int) (dataTable.size() * trainingSetPercentage);
+            //int validationSize = (int) (dataTable.size() * validationSetPercentage);
+            int generalizationSize = dataTable.size() - trainingSize;// - validationSize;            
 
-            int trainingSize = (int)(windowSize * trainingSetPercentage);
-            int generalizationSize = windowSize - trainingSize;
-
-            StandardPatternDataTable candidateSet = new StandardPatternDataTable();
             trainingSet = new StandardPatternDataTable();
             generalizationSet = new StandardPatternDataTable();
-
-            for (int i = 0; i < windowSize; i++) { // fetch patterns to fill the initial window
-                candidateSet.addRow((StandardPattern) dataTable.removeRow(0));
-            }
+            //validationSet =  new StandardPatternDataTable();
 
             if(shuffle) {
                 shuffler = new ShuffleOperator();
-                shuffler.operate(candidateSet);
+                shuffler.operate(dataTable);
             }
 
-            for (int i = 0; i < trainingSize; i++) {
-                trainingSet.addRow((StandardPattern) candidateSet.getRow(i));
+            for (int i = 0; i < onlineSize; i++) {
+                trainingSet.addRow((StandardPattern) dataTable.getRow((int)randomizer.getRandomNumber(0, trainingSize - 1)));
             }
-
+            
             for (int i = trainingSize; i < generalizationSize + trainingSize; i++) {
-                generalizationSet.addRow((StandardPattern) candidateSet.getRow(i));
+                generalizationSet.addRow((StandardPattern) dataTable.getRow(i));
             }
 
             neuralNetwork.initialize();
@@ -126,17 +119,6 @@ public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
             this.initialise();
         }
 
-        int currentIteration = AbstractAlgorithm.get().getIterations();
-        if (currentIteration != previousShuffleIteration && shuffle) {
-            try {
-                shuffler.operate(trainingSet);
-            } catch (CIlibIOException exception) {
-                exception.printStackTrace();
-            }
-        }
-
-        operateOnData(); // slide the window!..
-
         neuralNetwork.setWeights((Vector) solution);
 
         double errorTraining = 0.0;
@@ -153,41 +135,16 @@ public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
         }
         errorTraining /= trainingSet.getNumRows() * error.size();
 
+        operateOnData(); // get new random training patterns into the "on-line" training set
+        
         return objective.evaluate(errorTraining);
     }
 
     @Override
-    public void operateOnData() {
-        int currentIteration = AbstractAlgorithm.get().getIterations();
-        if(currentIteration - changeFrequency * dataChangesCounter == 0 && currentIteration != previousIteration) { // update training & generalisation sets (slide the window)
-            try {
-                previousIteration = currentIteration;
-                dataChangesCounter++;
-                StandardPatternDataTable candidateSet = new StandardPatternDataTable();
-                for (int i = 0; i < stepSize; i++) {
-                    candidateSet.addRow((StandardPattern) dataTable.removeRow(0));
-                }
-
-                if(shuffle) {
-                    shuffler = new ShuffleOperator();
-                    shuffler.operate(candidateSet);
-                }
-
-                int trainingStepSize = (int)(stepSize * trainingSetPercentage);
-                int generalizationStepSize = stepSize - trainingStepSize;
-
-                for (int t = 0; t < trainingStepSize; t++){
-                    trainingSet.removeRow(0);
-                    trainingSet.addRow(candidateSet.removeRow(0));
-                }
-
-                for (int t = 0; t < generalizationStepSize; t++){
-                    generalizationSet.removeRow(0);
-                    generalizationSet.addRow(candidateSet.removeRow(0));
-                }
-            } catch (CIlibIOException exception) {
-                exception.printStackTrace();
-            }
+    public void operateOnData() {        
+        trainingSet.clear();
+        for (int i = 0; i < onlineSize; i++) {
+            trainingSet.addRow((StandardPattern) dataTable.getRow((int)randomizer.getRandomNumber(0, trainingSize - 1)));
         }
     }
     
@@ -238,51 +195,19 @@ public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
         dataTableBuilder.setSourceURL(sourceURL);
     }
 
-    /**
-     * Gets the change frequency value.
-     * @return the change frequency value.
-     */
-    public int getChangeFrequency() {
-        return changeFrequency;
+    public ProbabilityDistributionFunction getRandomizer() {
+        return randomizer;
     }
 
-    /**
-     * Sets the change frequency value.
-     * @param changeFrequency the change frequency value.
-     */
-    public void setChangeFrequency(int changeFrequency) {
-        this.changeFrequency = changeFrequency;
+    public void setRandomizer(ProbabilityDistributionFunction randomizer) {
+        this.randomizer = randomizer;
     }
 
-    /**
-     * Gets the sliding window step size.
-     * @return the sliding window step size.
-     */
-    public int getStepSize() {
-        return stepSize;
+    public int getOnlineSize() {
+        return onlineSize;
     }
 
-    /**
-     * Sets the sliding window step size.
-     * @param stepSize the sliding window step size.
-     */
-    public void setStepSize(int stepSize) {
-        this.stepSize = stepSize;
-    }
-
-    /**
-     * Gets the sliding window size.
-     * @return the sliding window size.
-     */
-    public int getWindowSize() {
-        return windowSize;
-    }
-
-    /**
-     * Sets the sliding window size.
-     * @param windowSize the sliding window size.
-     */
-    public void setWindowSize(int windowSize) {
-        this.windowSize = windowSize;
+    public void setOnlineSize(int onlineSize) {
+        this.onlineSize = onlineSize;
     }
 }

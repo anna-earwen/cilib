@@ -28,7 +28,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * Hyperbolic Tangent Function.
  *
  */
-public class TanH implements ActivationFunction {
+public class Elliott implements ActivationFunction {
 
     private static final long serialVersionUID = -5843046986587459333L;
 
@@ -49,22 +49,21 @@ public class TanH implements ActivationFunction {
      */
     @Override
     public double apply(double input) {
-        double a = Math.exp(input);
-        double b = Math.exp(-input);
-        return ((a - b) / (a + b));
+        return 1.0 / (1.0 + (Math.abs(input)));
     }
 
     @Override
     public Vector getGradient(Vector x) {
-        return Vector.of(this.getGradient(x.getReal(0)));
+        return Vector.of(this.getGradient(x.doubleValueOf(0)));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public double getGradient(double number) {
-        return 1 - number * number;
+    public double getGradient(double number) {        
+    	double d = 1.0 + Math.abs(number);
+    	return  1.0/(d * d);
     }
 
     /**
