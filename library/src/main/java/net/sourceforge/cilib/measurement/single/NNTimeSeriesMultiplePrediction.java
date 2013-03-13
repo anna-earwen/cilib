@@ -45,6 +45,7 @@ public class NNTimeSeriesMultiplePrediction implements Measurement {
      private int tau = 1; // specifies the time lag between observations
     private int step = 1; // specifies the distance between patterns
     private int n = 1; // specifies the extent of multivariate prediction. Can't be bigger than embedding.
+    private int extraSteps = 0;
     /**
      * {@inheritDoc }
      */
@@ -112,9 +113,17 @@ public class NNTimeSeriesMultiplePrediction implements Measurement {
             // add to the resulting vector
             builder.add(prediction);
         }
+        // TODO: add the "extra steps" code!
         return builder.build();
     }
 
+    public int getExtraSteps() {
+        return extraSteps;
+    }
+
+    public void setExtraSteps(int extraSteps) {
+        this.extraSteps = extraSteps;
+    }
 
     public int getN() {
         return n;

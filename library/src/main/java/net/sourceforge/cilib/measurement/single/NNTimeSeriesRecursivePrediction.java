@@ -34,13 +34,12 @@ import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.type.types.container.Vector.Builder;
 
 /**
- * Calculates the MSE generalization error of the best solution of an algorithm
- * optimizing a {@link NNDataTrainingProblem}.
  */
 public class NNTimeSeriesRecursivePrediction implements Measurement {
 
     private static final long serialVersionUID = -1014032196750640716L;
     private int n = 1; // specifies the extent of recursiveness. Can't be bigger than embedding.
+    private int extraSteps = 0;
     /**
      * {@inheritDoc }
      */
@@ -89,12 +88,29 @@ public class NNTimeSeriesRecursivePrediction implements Measurement {
             pattern.setVector(inputs);
             predicted = neuralNetwork.evaluatePattern(pattern);
             // add to the resulting vector
-            for(Numeric element : predicted)
+            for(Numeric element : predicted) {
                 builder.add(element);
+            }
+        }
+        for(int i = 0; i < extraSteps; i++) { // add extra steps - pure prediction, fully recurrent
+            StandardPattern pattern = new StandardPattern();
+            pattern.setVector(predicted);
+            predicted = neuralNetwork.evaluatePattern(pattern);
+            // add to the resulting vector
+            for(Numeric element : predicted) {
+                builder.add(element);
+            }            
         }
         return builder.build();
     }
 
+    public int getExtraSteps() {
+        return extraSteps;
+    }
+
+    public void setExtraSteps(int extraSteps) {
+        this.extraSteps = extraSteps;
+    }
 
     public int getN() {
         return n;
