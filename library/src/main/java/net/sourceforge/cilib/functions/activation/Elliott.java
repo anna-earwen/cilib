@@ -25,7 +25,7 @@ import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
- * Hyperbolic Tangent Function.
+ * Elliott Function. An efficient alternative to TanH, works in the [-1,1] domain, has [-5,5] active range.
  *
  */
 public class Elliott implements ActivationFunction {
@@ -49,7 +49,7 @@ public class Elliott implements ActivationFunction {
      */
     @Override
     public double apply(double input) {
-        return 1.0 / (1.0 + (Math.abs(input)));
+        return input / (1.0 + (Math.abs(input)));
     }
 
     @Override
@@ -62,17 +62,17 @@ public class Elliott implements ActivationFunction {
      */
     @Override
     public double getGradient(double number) {        
-    	double d = 1.0 + Math.abs(number);
+    	double d = 1.0 + Math.abs(number);//Derivative is: 1/((1+|x|)*(1+|x|)).
     	return  1.0/(d * d);
     }
 
     /**
      * {@inheritDoc}
-     * The active range is -Sqrt(3) - Sqrt(3), and Sqrt(3) = 1.732050808
+     * The active range is -5 - 5
      */
     @Override
     public double getLowerActiveRange() {
-        return -1.732050808;
+        return -5;
     }
 
     /**
@@ -80,6 +80,6 @@ public class Elliott implements ActivationFunction {
      */
     @Override
     public double getUpperActiveRange() {
-        return 1.732050808;
+        return 5;
     }
 }
