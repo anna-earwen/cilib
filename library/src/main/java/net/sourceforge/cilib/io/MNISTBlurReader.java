@@ -30,7 +30,7 @@ import net.sourceforge.cilib.type.types.Type;
 import mnist.tools.MnistManager;
 import net.sourceforge.cilib.type.types.Real;
 
-public class MNISTReader implements DataReader<List<Type>> {
+public class MNISTBlurReader implements DataReader<List<Type>> {
     private boolean hasNextRow = false;
     private String inputTrain;
     private String labelTrain;
@@ -51,7 +51,7 @@ public class MNISTReader implements DataReader<List<Type>> {
     
     
 
-    public MNISTReader() {
+    public MNISTBlurReader() {
         super();
     }
 
@@ -71,14 +71,10 @@ public class MNISTReader implements DataReader<List<Type>> {
 
     @Override
     public boolean hasNextRow() throws CIlibIOException {
-        /*mycount++;
-        if(mycount < 20) return true;
-        else return false;*/
+
         try {
             hasNextRow = (mnistTest.getImages().getCurrentIndex() <= mnistTest.getImages().getCount()
                     || mnistTrain.getImages().getCurrentIndex() <= mnistTrain.getImages().getCount());
-            //mnistTrain.getImages().getCurrentIndex() <= mnistTrain.getImages().getCount()
-              //  || mnistTest.getImages().getCurrentIndex() <= mnistTest.getImages().getCount();
             if(!hasNextRow) { System.out.println("Total number of images read = " + (mnistTest.getImages().getCurrentIndex() + mnistTrain.getImages().getCurrentIndex() - 1)); }
         } catch (IOException e) {
             e.printStackTrace();
@@ -113,16 +109,17 @@ public class MNISTReader implements DataReader<List<Type>> {
             } else if(mnistTest.getImages().getCurrentIndex() <= mnistTest.getImages().getCount()){
                 image = this.mnistTest.readImage();
                 imageLabel = this.mnistTest.readLabel();     
-                hasImg = true;         
+                hasImg = true;       
             }
             if(hasImg) {
-                for(int i = 0; i < MNSIT_IMAGE_WIDTH; i++) {
-                    for(int j = 0; j < MNSIT_IMAGE_HEIGHT; j++) {                    
-                        theNextRow.add(Real.valueOf(scaleIt((double)image[i][j], 
+                for(int i = 0; i < MNSIT_IMAGE_WIDTH-1; i+=2) {
+                    for(int j = 0; j < MNSIT_IMAGE_HEIGHT-1; j+=2) {                    
+                        theNextRow.add(Real.valueOf(
+                                scaleIt(((double)image[i][j] + (double)image[i+1][j] + (double)image[i][j+1] + (double)image[i+1][j+1])/4.0, 
                                 MNSIT_LOWER_RANGE, MNIST_UPPER_RANGE, lowerRange, upperRange)));
                     }
                 }
-                
+
                 for(int i = 0; i < MNSIT_TARGET_LENGTH; i++) {
                     if(i == imageLabel) {
                         theNextRow.add(Real.valueOf(targetUpperRange));
