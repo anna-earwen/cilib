@@ -4,7 +4,7 @@
  *  / /__/ / / / /_/ /   http://cilib.net
  *  \___/_/_/_/_.___/
  */
-package net.sourceforge.cilib.entity.initialization;
+package net.sourceforge.cilib.entity.initialisation;
 
 import java.util.ArrayList;
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
@@ -20,26 +20,23 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * @param <E> The entity type.
  */
 public class RandomSimpleBoundedInitializationStrategy<E extends Entity> implements
-        InitializationStrategy<E> {
+        InitialisationStrategy<E> {
 
     private static final long serialVersionUID = -7926839076670354209L;
     protected ControlParameter lowerBound;
     protected ControlParameter upperBound;
     private ProbabilityDistributionFunction random;
-    protected ArrayList<ControlParameter[]> boundsPerDimension;
 
     public RandomSimpleBoundedInitializationStrategy() {
         this.lowerBound = ConstantControlParameter.of(0.1);
         this.upperBound = ConstantControlParameter.of(0.1);
         this.random = new UniformDistribution();
-        boundsPerDimension = new ArrayList<ControlParameter[]>();
     }
 
     public RandomSimpleBoundedInitializationStrategy(RandomSimpleBoundedInitializationStrategy copy) {
         this.lowerBound = copy.lowerBound;
         this.upperBound = copy.upperBound;
         this.random = copy.random;
-        boundsPerDimension = copy.boundsPerDimension;
     }
 
     @Override
@@ -48,7 +45,7 @@ public class RandomSimpleBoundedInitializationStrategy<E extends Entity> impleme
     }
 
     @Override
-    public void initialize(Enum<?> key, E entity) {
+    public void initialise(Enum<?> key, E entity) {
         Type type = entity.getProperties().get(key);
         Vector entityVector = (Vector) type;
         

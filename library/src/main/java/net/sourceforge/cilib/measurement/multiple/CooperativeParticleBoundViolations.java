@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.algorithm.population.MultiPopulationBasedAlgorithm;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.entity.Entity;
 import net.sourceforge.cilib.measurement.Measurement;
 import net.sourceforge.cilib.type.types.Bounds;
@@ -44,10 +44,9 @@ public class CooperativeParticleBoundViolations implements Measurement<Real> {
         MultiPopulationBasedAlgorithm ca = (MultiPopulationBasedAlgorithm) algorithm;
         int numberOfViolations = 0;
         int populationSize = 0;
-        for (PopulationBasedAlgorithm populationBasedAlgorithm : ca.getPopulations()) {
-            populationSize += populationBasedAlgorithm.getTopology().size();
+        for (SinglePopulationBasedAlgorithm<Entity> populationBasedAlgorithm : ca) {
+            populationSize += populationBasedAlgorithm.getTopology().length();
             Iterator<? extends Entity> populationIterator = populationBasedAlgorithm.getTopology().iterator();
-
 
             while (populationIterator.hasNext()) {
                 Entity entity = populationIterator.next();

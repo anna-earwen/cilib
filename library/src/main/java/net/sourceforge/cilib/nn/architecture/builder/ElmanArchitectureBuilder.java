@@ -62,4 +62,9 @@ public class ElmanArchitectureBuilder extends ArchitectureBuilder {
             previousLayerAbsoluteSize = currentLayer.size();
         }
     }
+
+    @Override
+    public ArchitectureBuilder getClone() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

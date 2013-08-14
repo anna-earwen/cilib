@@ -8,7 +8,7 @@ package net.sourceforge.cilib.coevolution.cooperative;
 
 import java.util.Arrays;
 import java.util.List;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.contextupdate.ContextUpdateStrategy;
 import net.sourceforge.cilib.coevolution.cooperative.contributionselection.ContributionSelectionStrategy;
 import net.sourceforge.cilib.coevolution.cooperative.contributionselection.ZeroContributionSelectionStrategy;
@@ -101,7 +101,7 @@ public class GreedyTemperedCooperativeCoevolutionAlgorithm extends CooperativeCo
      * {@inheritDoc}
      */
     @Override
-    public void addPopulationBasedAlgorithm(PopulationBasedAlgorithm algorithm) {
+    public void addPopulationBasedAlgorithm(SinglePopulationBasedAlgorithm algorithm) {
         // TODO: There should be a better way to perfrom this test, rather than using an instanceof.
         if (((ParticipatingAlgorithm) algorithm).getContributionSelectionStrategy() instanceof ZeroContributionSelectionStrategy) {
             ((ParticipatingAlgorithm) algorithm).setContributionSelectionStrategy(contributionSelection);

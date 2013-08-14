@@ -6,10 +6,8 @@
  */
 package net.sourceforge.cilib.measurement.single;
 
-import net.sourceforge.cilib.measurement.multiple.*;
 import net.sourceforge.cilib.algorithm.Algorithm;
-import net.sourceforge.cilib.algorithm.population.MultiPopulationBasedAlgorithm;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.entity.Entity;
 import net.sourceforge.cilib.entity.EntityType;
 import net.sourceforge.cilib.measurement.Measurement;
@@ -38,8 +36,8 @@ public class AverageSpeed implements Measurement {
     @Override
     public Vector getValue(Algorithm algorithm) {
         Builder builder = Vector.newBuilder(); 
-        PopulationBasedAlgorithm currentAlgorithm = (PopulationBasedAlgorithm) algorithm;
-        int dimension = currentAlgorithm.getTopology().get(0).getDimension();
+        SinglePopulationBasedAlgorithm<Entity> currentAlgorithm = (SinglePopulationBasedAlgorithm) algorithm;
+        int dimension = currentAlgorithm.getTopology().last().getDimension();
         Vector averageSpeed = Vector.of();//new Numeric[dimension]);
         for (Entity e : currentAlgorithm.getTopology()) {
             Vector velocity = (Vector)e.getProperties().get(EntityType.Particle.VELOCITY);
@@ -58,33 +56,6 @@ public class AverageSpeed implements Measurement {
         
         return builder.build();
         
-        /*
-         * PopulationBasedAlgorithm populationBasedAlgorithm = (PopulationBasedAlgorithm) algorithm;
-        int populationSize = populationBasedAlgorithm.getTopology().size();
-
-        int dimensions = 0;
-        double sumOfAverageConvergedDimensions = 0.0;
-
-        for (Entity populationEntity : populationBasedAlgorithm.getTopology()) {
-            dimensions = populationEntity.getDimension();
-
-            int dimension = 0;
-            int numberConvergedDimensions = 0;
-            for (Numeric position : (Vector) populationEntity.getCandidateSolution()) {
-                double lowerBound = targetSolution.doubleValueOf(dimension) - this.errorThreshold.getParameter();
-                double upperBound = targetSolution.doubleValueOf(dimension) + this.errorThreshold.getParameter();
-                double value = position.doubleValue();
-
-                if ((value >= lowerBound) && (value <= upperBound)) {
-                    numberConvergedDimensions++;
-                }
-                dimension++;
-            }
-            sumOfAverageConvergedDimensions += (double) numberConvergedDimensions / (double) dimensions;
-        }
-
-        return Real.valueOf(sumOfAverageConvergedDimensions / (double) populationSize * (double) dimensions);
-         */
     }
     
 }

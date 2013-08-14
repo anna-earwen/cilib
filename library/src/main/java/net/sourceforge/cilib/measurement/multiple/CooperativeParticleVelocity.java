@@ -8,11 +8,10 @@ package net.sourceforge.cilib.measurement.multiple;
 
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.algorithm.population.MultiPopulationBasedAlgorithm;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.entity.Entity;
 import net.sourceforge.cilib.entity.EntityType;
 import net.sourceforge.cilib.measurement.Measurement;
-import net.sourceforge.cilib.problem.solution.Fitness;
 import net.sourceforge.cilib.type.types.Numeric;
 import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.type.types.container.Vector.Builder;
@@ -39,7 +38,7 @@ public class CooperativeParticleVelocity implements Measurement {
     public Vector getValue(Algorithm algorithm) {
         Builder builder = Vector.newBuilder(); 
         MultiPopulationBasedAlgorithm ca = (MultiPopulationBasedAlgorithm) algorithm;
-        for (PopulationBasedAlgorithm currentAlgorithm : ca.getPopulations()) {
+        for (SinglePopulationBasedAlgorithm<Entity> currentAlgorithm : ca) {
             for (Entity e : currentAlgorithm.getTopology()) {
                 Vector velocity = (Vector)e.getProperties().get(EntityType.Particle.VELOCITY);
                 for(Numeric n : velocity) {

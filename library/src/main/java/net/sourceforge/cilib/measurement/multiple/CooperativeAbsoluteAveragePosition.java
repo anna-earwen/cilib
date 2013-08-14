@@ -8,10 +8,10 @@ package net.sourceforge.cilib.measurement.multiple;
 
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.algorithm.population.MultiPopulationBasedAlgorithm;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.entity.Entity;
 import net.sourceforge.cilib.entity.EntityType;
-import net.sourceforge.cilib.entity.Particle;
+import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.measurement.Measurement;
 import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
@@ -39,8 +39,8 @@ public class CooperativeAbsoluteAveragePosition implements Measurement {
     public Vector getValue(Algorithm algorithm) {
         Builder builder = Vector.newBuilder(); 
         MultiPopulationBasedAlgorithm ca = (MultiPopulationBasedAlgorithm) algorithm;
-        for (PopulationBasedAlgorithm currentAlgorithm : ca.getPopulations()) {
-            int dimension = currentAlgorithm.getTopology().get(0).getDimension();
+        for (SinglePopulationBasedAlgorithm<Entity> currentAlgorithm : ca) {
+            int dimension = currentAlgorithm.getTopology().last().getDimension();
             Vector averagePosition = Vector.of();//new Numeric[dimension]);
             for (Entity e : currentAlgorithm.getTopology()) {
                 Vector position = (Vector) e.getCandidateSolution();
@@ -58,34 +58,7 @@ public class CooperativeAbsoluteAveragePosition implements Measurement {
             builder.copyOf(averagePosition);
         }
         return builder.build();
-        
-        /*
-         * PopulationBasedAlgorithm populationBasedAlgorithm = (PopulationBasedAlgorithm) algorithm;
-        int populationSize = populationBasedAlgorithm.getTopology().size();
-
-        int dimensions = 0;
-        double sumOfAverageConvergedDimensions = 0.0;
-
-        for (Entity populationEntity : populationBasedAlgorithm.getTopology()) {
-            dimensions = populationEntity.getDimension();
-
-            int dimension = 0;
-            int numberConvergedDimensions = 0;
-            for (Numeric position : (Vector) populationEntity.getCandidateSolution()) {
-                double lowerBound = targetSolution.doubleValueOf(dimension) - this.errorThreshold.getParameter();
-                double upperBound = targetSolution.doubleValueOf(dimension) + this.errorThreshold.getParameter();
-                double value = position.doubleValue();
-
-                if ((value >= lowerBound) && (value <= upperBound)) {
-                    numberConvergedDimensions++;
-                }
-                dimension++;
-            }
-            sumOfAverageConvergedDimensions += (double) numberConvergedDimensions / (double) dimensions;
-        }
-
-        return Real.valueOf(sumOfAverageConvergedDimensions / (double) populationSize * (double) dimensions);
-         */
+                
     }
     
 }

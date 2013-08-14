@@ -8,12 +8,11 @@ package net.sourceforge.cilib.coevolution.cooperative.problemdistribution;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
-
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.CooperativeCoevolutionAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.problem.CooperativeCoevolutionProblemAdapter;
 import net.sourceforge.cilib.coevolution.cooperative.problem.DimensionAllocation;
-import net.sourceforge.cilib.coevolution.cooperative.problem.SequencialDimensionAllocation;
+import net.sourceforge.cilib.coevolution.cooperative.problem.SequentialDimensionAllocation;
 import net.sourceforge.cilib.nn.NeuralNetwork;
 import net.sourceforge.cilib.problem.nn.NNTrainingProblem;
 import net.sourceforge.cilib.problem.Problem;
@@ -34,7 +33,7 @@ public class NeuralNetworkDistributionStrategy implements ProblemDistributionStr
      * @param context The context vector maintained by the {@linkplain CooperativeCoevolutionAlgorithm}.
      */
     @Override
-    public void performDistribution(List<PopulationBasedAlgorithm> populations,
+    public void performDistribution(List<SinglePopulationBasedAlgorithm> populations,
             Problem p, Vector context) {
         Preconditions.checkArgument(populations.size() >= 2, "There should at least be two Cooperating populations in a Cooperative Algorithm");
         NNTrainingProblem problem = (NNTrainingProblem)p; // convert optimisation problem to NNTrainingProblem
@@ -50,7 +49,7 @@ public class NeuralNetworkDistributionStrategy implements ProblemDistributionStr
                 thisLayerSize -=1;
             } // subtract bias, unless we're dealing with output layers
             int subpopulationSize = previousLayerSize * thisLayerSize;
-            DimensionAllocation allocation = new SequencialDimensionAllocation(offset, subpopulationSize);
+            DimensionAllocation allocation = new SequentialDimensionAllocation(offset, subpopulationSize);
             populations.get(l - 1).setOptimisationProblem(new CooperativeCoevolutionProblemAdapter(problem, allocation, context));
             offset += subpopulationSize;
         }

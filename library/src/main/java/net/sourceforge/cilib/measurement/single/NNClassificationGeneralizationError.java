@@ -43,7 +43,7 @@ public class NNClassificationGeneralizationError implements Measurement {
     public Type getValue(Algorithm algorithm) {
         Vector solution = (Vector) algorithm.getBestSolution().getPosition();
         NNTrainingProblem problem = (NNTrainingProblem) algorithm.getOptimisationProblem();
-        StandardPatternDataTable generalizationSet = problem.getGeneralizationSet();
+        StandardPatternDataTable generalizationSet = problem.getGeneralisationSet();
         NeuralNetwork neuralNetwork = problem.getNeuralNetwork();
         neuralNetwork.setWeights(solution);
 

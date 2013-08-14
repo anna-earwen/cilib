@@ -7,10 +7,9 @@
 package net.sourceforge.cilib.measurement.single;
 
 import net.sourceforge.cilib.algorithm.Algorithm;
-import net.sourceforge.cilib.algorithm.population.MultiPopulationBasedAlgorithm;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.entity.Entity;
-import net.sourceforge.cilib.entity.Particle;
+import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.measurement.Measurement;
 import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.type.types.container.Vector.Builder;
@@ -37,11 +36,11 @@ public class ParticleVelocity1Dim implements Measurement {
     public Vector getValue(Algorithm algorithm) {
         Builder builder = Vector.newBuilder(); 
         
-        for(Entity entity : ((PopulationBasedAlgorithm)algorithm).getTopology()) {
+        for(Entity entity : ((SinglePopulationBasedAlgorithm<Entity>)algorithm).getTopology()) {
             Particle e = (Particle) entity;
             builder.add(((Vector)e.getLocalGuide()).get(0).doubleValue());
             builder.add(((Vector)e.getGlobalGuide()).get(0).doubleValue());
-            builder.add(((Vector)e.getPosition()).get(0).doubleValue());               
+            builder.add(((Vector)e.getCandidateSolution()).get(0).doubleValue());               
             builder.add(((Vector)e.getVelocity()).get(0).doubleValue());
         }
         /*Particle e = (Particle)currentAlgorithm.getTopology().get(0);

@@ -14,27 +14,27 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * Linear after 0, flat before 0. Since it is unbounded, the linear function has 
  * no active range, and these values are set to positive and negative max double.
  */
-public class Rectifier implements ActivationFunction {
+public class Rectifier extends ActivationFunction {
 
     private static final long serialVersionUID = -6826800182176063079L;
 
     @Override
-    public Object getClone() {
+    public Rectifier getClone() {
         return this;
     }
     /**
      * {@inheritDoc}
      */
     @Override
-    public Real apply(Real input) {
-        return input;
+    public Real f(Real input) {
+        return Real.valueOf(f(input.doubleValue()));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public double apply(double input) {
+    public double f(double input) {
         return Math.max(0, input);
     }
 

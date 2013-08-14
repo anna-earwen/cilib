@@ -19,7 +19,6 @@ import net.sourceforge.cilib.coevolution.cooperative.contributionselection.ZeroC
 import net.sourceforge.cilib.coevolution.cooperative.problem.CooperativeCoevolutionProblemAdapter;
 import net.sourceforge.cilib.coevolution.cooperative.problemdistribution.PerfectSplitDistributionStrategy;
 import net.sourceforge.cilib.coevolution.cooperative.problemdistribution.ProblemDistributionStrategy;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
 import net.sourceforge.cilib.problem.solution.OptimisationSolution;
 import net.sourceforge.cilib.type.types.container.Vector;
 
@@ -91,7 +90,7 @@ public class CooperativeCoevolutionAlgorithm extends MultiPopulationBasedAlgorit
         a wrapped problem, which contains the original problem and the current context vector*/
         context.initialise(optimisationProblem);
         // Now, make context equal to a random entity! Just make sure it is not zero.
-        context.getCandidateSolution().randomize(new MersenneTwister()); // THIS LINE SAVED THE DAY
+        context.getCandidateSolution().randomise(); // THIS LINE SAVED THE DAY
         problemDistribution.performDistribution(subPopulationsAlgorithms, optimisationProblem, context.getCandidateSolution());
 
         //Initialise each sub population, and add the randomised solution vector from each population to the current context.

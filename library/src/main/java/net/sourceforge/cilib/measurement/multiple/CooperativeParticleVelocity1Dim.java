@@ -9,9 +9,9 @@ package net.sourceforge.cilib.measurement.multiple;
 import java.util.Iterator;
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.algorithm.population.MultiPopulationBasedAlgorithm;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.entity.Entity;
-import net.sourceforge.cilib.entity.Particle;
+import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.measurement.Measurement;
 import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.type.types.container.Vector.Builder;
@@ -38,13 +38,13 @@ public class CooperativeParticleVelocity1Dim implements Measurement {
     public Vector getValue(Algorithm algorithm) {
         Builder builder = Vector.newBuilder(); 
         MultiPopulationBasedAlgorithm ca = (MultiPopulationBasedAlgorithm) algorithm;
-        PopulationBasedAlgorithm currentAlgorithm = ca.getPopulations().get(0);
+        SinglePopulationBasedAlgorithm<Entity> currentAlgorithm = ca.getPopulations().get(0);
         //for(PopulationBasedAlgorithm currentAlgorithm : ca.getPopulations()) {
             for(Entity entity : currentAlgorithm.getTopology()) {
                     Particle e = (Particle) entity;
                     builder.add(((Vector)e.getLocalGuide()).get(0).doubleValue());
                     builder.add(((Vector)e.getGlobalGuide()).get(0).doubleValue());
-                    builder.add(((Vector)e.getPosition()).get(0).doubleValue());               
+                    builder.add(((Vector)e.getCandidateSolution()).get(0).doubleValue());               
                     builder.add(((Vector)e.getVelocity()).get(0).doubleValue());
             }
         //}

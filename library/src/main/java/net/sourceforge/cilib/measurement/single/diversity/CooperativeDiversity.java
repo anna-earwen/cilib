@@ -10,22 +10,22 @@ import java.util.Iterator;
 
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.algorithm.iterator.AlgorithmIterator;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.ContextEntity;
 import net.sourceforge.cilib.coevolution.cooperative.CooperativeCoevolutionAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.contextupdate.ContextUpdateStrategy;
 import net.sourceforge.cilib.coevolution.cooperative.contextupdate.PrimitiveContextUpdateStrategy;
 import net.sourceforge.cilib.coevolution.cooperative.problem.CooperativeCoevolutionProblemAdapter;
-import net.sourceforge.cilib.entity.AbstractTopology;
 import net.sourceforge.cilib.entity.Entity;
-import net.sourceforge.cilib.entity.topologies.GBestTopology;
+import net.sourceforge.cilib.entity.topologies.GBestNeighbourhood;
+import net.sourceforge.cilib.entity.topologies.Neighbourhood;
 import net.sourceforge.cilib.measurement.Measurement;
 import net.sourceforge.cilib.measurement.single.diversity.centerinitialisationstrategies.CenterInitialisationStrategy;
 import net.sourceforge.cilib.measurement.single.diversity.centerinitialisationstrategies.SpatialCenterInitialisationStrategy;
 import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
-import net.sourceforge.cilib.util.DistanceMeasure;
-import net.sourceforge.cilib.util.EuclideanDistanceMeasure;
+import net.sourceforge.cilib.util.distancemeasure.DistanceMeasure;
+import net.sourceforge.cilib.util.distancemeasure.EuclideanDistanceMeasure;
 
 /**
  * TODO: Add JavaDoc.
@@ -63,10 +63,10 @@ public class CooperativeDiversity implements Measurement<Real> {
         ContextUpdateStrategy contextUpdate = new PrimitiveContextUpdateStrategy();
         
         //iterate through each algorithm
-        AlgorithmIterator<PopulationBasedAlgorithm> iter = multiPopulationBasedAlgorithm.getAlgorithmIterator().getClone();
+        AlgorithmIterator<SinglePopulationBasedAlgorithm> iter = multiPopulationBasedAlgorithm.getAlgorithmIterator().getClone();
         iter.setAlgorithms(multiPopulationBasedAlgorithm.getPopulations());
         
-        AbstractTopology pseudoTopology = new GBestTopology();
+        Neighbourhood pseudoTopology = new GBestNeighbourhood();
         //System.out.println("%%%%% Context before interfering: "+multiPopulationBasedAlgorithm.getContext().getCandidateSolution().toString());
         while (iter.hasNext()) { // go through every sub-population
             Iterator<? extends Entity> populationIterator = iter.next().getTopology().iterator();
@@ -80,7 +80,7 @@ public class CooperativeDiversity implements Measurement<Real> {
                 //System.out.println("Candidate solution: "+cs.toString());
                 contextUpdate.updateContext(contextEntity, cs, problem.getProblemAllocation());
                 //ystem.out.println("Context size: "+contextEntity.getDimension());
-                pseudoTopology.add(contextEntity.getClone());
+                pseudoTopology..add(contextEntity.getClone());
                 //System.out.println("Contextualised entity: "+contextEntity.getCandidateSolution().toString());
                 //System.out.println();
                 contextEntity = multiPopulationBasedAlgorithm.getContext().getClone();

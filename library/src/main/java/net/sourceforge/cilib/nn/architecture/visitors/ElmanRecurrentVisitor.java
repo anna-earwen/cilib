@@ -73,4 +73,9 @@ public class ElmanRecurrentVisitor extends ArchitectureOperationVisitor {
     public boolean isDone() {
         return false;
     }
+
+    @Override
+    public ArchitectureOperationVisitor getClone() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

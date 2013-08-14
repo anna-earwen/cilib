@@ -74,7 +74,7 @@ public class NNOnlineTrainingProblem extends NNTrainingProblem {
             int generalizationSize = dataTable.size() - trainingSize;// - validationSize;            
 
             trainingSet = new StandardPatternDataTable();
-            generalizationSet = new StandardPatternDataTable();
+            generalisationSet = new StandardPatternDataTable();
             //validationSet =  new StandardPatternDataTable();
 
             if(shuffle) {
@@ -87,10 +87,10 @@ public class NNOnlineTrainingProblem extends NNTrainingProblem {
             }
             
             for (int i = trainingSize; i < generalizationSize + trainingSize; i++) {
-                generalizationSet.addRow((StandardPattern) dataTable.getRow(i));
+                generalisationSet.addRow((StandardPattern) dataTable.getRow(i));
             }
 
-            neuralNetwork.initialize();
+            neuralNetwork.initialise();
         } catch (CIlibIOException exception) {
             exception.printStackTrace();
         }
@@ -156,11 +156,7 @@ public class NNOnlineTrainingProblem extends NNTrainingProblem {
         if (!initialized) {
             this.initialise();
         }
-        int numWeights = NeuralNetworks.countWeights(neuralNetwork);
-        String domainString = neuralNetwork.getArchitecture().getArchitectureBuilder().getLayerBuilder().getDomain();
-        StringBasedDomainRegistry stringBasedDomainRegistry = new StringBasedDomainRegistry();
-        stringBasedDomainRegistry.setDomainString(domainString + "^" + numWeights);
-        return stringBasedDomainRegistry;
+        return neuralNetwork.getArchitecture().getDomain();
     }
 
     /**

@@ -11,7 +11,6 @@ import net.sourceforge.cilib.io.StandardPatternDataTable;
 import net.sourceforge.cilib.io.pattern.StandardPattern;
 import net.sourceforge.cilib.measurement.Measurement;
 import net.sourceforge.cilib.nn.NeuralNetwork;
-import net.sourceforge.cilib.problem.nn.NNDataTrainingProblem;
 import net.sourceforge.cilib.problem.nn.NNTrainingProblem;
 import net.sourceforge.cilib.type.types.Numeric;
 import net.sourceforge.cilib.type.types.Type;
@@ -42,7 +41,7 @@ public class NNTimeSeriesRecursivePrediction implements Measurement {
         NNTrainingProblem problem = (NNTrainingProblem) algorithm.getOptimisationProblem();
         StandardPatternDataTable dataSet = new StandardPatternDataTable();
         StandardPatternDataTable trainingSet = problem.getTrainingSet();
-        StandardPatternDataTable generalizationSet = problem.getGeneralizationSet();
+        StandardPatternDataTable generalizationSet = problem.getGeneralisationSet();
         StandardPatternDataTable validationSet = problem.getValidationSet();
         for (StandardPattern pattern : trainingSet) {
             dataSet.addRow(pattern);

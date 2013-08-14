@@ -156,4 +156,9 @@ public class CascadeOutputLayerTrainingProblem extends NNTrainingProblem {
     public int getWeightEvaluationCount() {
         return weightEvaluationCount;
     }
+
+    @Override
+    public void operateOnData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
