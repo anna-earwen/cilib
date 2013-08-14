@@ -51,11 +51,10 @@ public abstract class MutationStrategy implements Operator {
      * @param offspringList The list of {@linkplain Entity} instances to perform a
      *                      mutation on.
      */
-    public abstract void mutate(List<? extends Entity> offspringList);
+    public abstract <E extends Entity> List<E> mutate(List<E> offspringList);
 
     /**
-     *
-     * @return
+     * @return the mutation probability.
      */
     public ControlParameter getMutationProbability() {
         return mutationProbability;

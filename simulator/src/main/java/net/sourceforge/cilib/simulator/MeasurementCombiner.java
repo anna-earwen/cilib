@@ -15,10 +15,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -46,10 +50,11 @@ public class MeasurementCombiner {
         Preconditions.checkArgument(descriptions.size() >= 1);
         Preconditions.checkArgument(partials.size() >= 1);
 
-        try {            
+        try {
             if(file.getParent() != null) {
                 file.getParentFile().mkdirs();
             }
+
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             int columnId = 0;
             writer.write("# " + columnId++ + " - Iterations\n");
@@ -66,6 +71,26 @@ public class MeasurementCombiner {
             throw new RuntimeException(ex);
         }
     }
+    
+    private long countLines(File file) {
+        LineNumberReader reader = null;
+        try {
+            reader = new LineNumberReader(new FileReader(file));
+            String lineRead = "";
+            while ((lineRead = reader.readLine()) != null) {}
+            return reader.getLineNumber();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        
+        return 0;
+    }
 
     /**
      * Combine the actual line data. The data is read line for line and
@@ -78,6 +103,12 @@ public class MeasurementCombiner {
      */
     private void combineData(final BufferedWriter writer, final List<File> partials) {
         List<BufferedReader> readers = Lists.newArrayListWithCapacity(partials.size());
+        Collections.sort(partials, new Comparator<File>() {
+            public int compare(File t, File t1) {
+                return Long.compare(countLines(t1), countLines(t));
+            }            
+        });
+        
         for (File f : partials) {
             try {
                 InputStreamReader is = new InputStreamReader(new FileInputStream(f), Charset.forName("UTF-8"));
@@ -91,6 +122,7 @@ public class MeasurementCombiner {
             BufferedReader checkReader = readers.get(0); // There will always be at least 1
             String checkLine = checkReader.readLine();
             String[] parts = checkLine.split(" ");
+            int partsSize = parts.length;
             Entry entry = new Entry(parts[0], parts.length - 1);
             for (int i = 1; i < parts.length; i++) {
                 entry.add(i - 1, parts[i]);
@@ -99,10 +131,16 @@ public class MeasurementCombiner {
             List<BufferedReader> loopingList = readers.subList(1, readers.size());
             while (checkLine != null) {
                 for (BufferedReader reader : loopingList) {
-                    String string = reader.readLine();
-                    String[] localParts = string.split(" ");
-                    for (int i = 1; i < localParts.length; i++) {
-                        entry.add(i - 1, localParts[i]);
+                    try {
+                        String string = reader.readLine();
+                        String[] localParts = string.split(" ");
+                        for (int i = 1; i < localParts.length; i++) {
+                            entry.add(i - 1, localParts[i]);
+                        }
+                    } catch (Exception ex) {
+                        for (int i = 1; i < partsSize; i++) {
+                            entry.add(i - 1, "-");
+                        }
                     }
                 }
 

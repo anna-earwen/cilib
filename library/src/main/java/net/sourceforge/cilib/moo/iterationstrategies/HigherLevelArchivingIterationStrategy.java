@@ -12,10 +12,9 @@ import net.sourceforge.cilib.algorithm.AbstractAlgorithm;
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.algorithm.population.IterationStrategy;
 import net.sourceforge.cilib.algorithm.population.MultiPopulationBasedAlgorithm;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.algorithm.population.RespondingMultiPopulationCriterionBasedAlgorithm;
 import net.sourceforge.cilib.entity.Entity;
-import net.sourceforge.cilib.entity.Topology;
 import net.sourceforge.cilib.moo.archive.Archive;
 import net.sourceforge.cilib.problem.boundaryconstraint.BoundaryConstraint;
 import net.sourceforge.cilib.problem.solution.OptimisationSolution;
@@ -24,26 +23,23 @@ import net.sourceforge.cilib.pso.dynamic.HigherLevelDynamicIterationStrategy;
 import net.sourceforge.cilib.type.types.Type;
 
 /**
- * <p>
- * This class extends {@link} ArchivingIterationStrategy to enable a higher-level
- * algorithm to control the iterations of the sub-algorithms. This will enable
- * a higher-level algorithm, such as VEPSO, to let all swarms respond to a change
- * if a change has been detected in the environment of any of the swarms.
- * </p>
+ * This class enabled a higher-level {@link Algorithm} to control the iterations
+ * of the sub-algorithms. This will enable a higher-level algorithm, such as
+ * VEPSO, to let all swarms respond to a change if a change has been detected in
+ * the environment of any of the swarms.
  *
- *
- * @param <E> The {@link PopulationBasedAlgorithm} that will have its entities' positions
- * added to the archive as potential solutions.
+ * @param <E>   The {@link PopulationBasedAlgorithm} that will have its
+ *              {@link Entity}' positions added to the archive as potential solutions.
  */
-public class HigherLevelArchivingIterationStrategy<E extends PopulationBasedAlgorithm> implements IterationStrategy<E> {
+public class HigherLevelArchivingIterationStrategy<E extends MultiPopulationBasedAlgorithm> implements IterationStrategy<E> {
 
-    private HigherLevelDynamicIterationStrategy iterationStrategy;
+    private HigherLevelDynamicIterationStrategy<E> iterationStrategy;
 
     /**
      * Creates a new instance of HigherLevelArchivingIterationStrategy.
      */
     public HigherLevelArchivingIterationStrategy() {
-        this.iterationStrategy = new HigherLevelAllDynamicIterationStrategy();
+        this.iterationStrategy = new HigherLevelAllDynamicIterationStrategy<>();
     }
 
     /**
@@ -51,28 +47,28 @@ public class HigherLevelArchivingIterationStrategy<E extends PopulationBasedAlgo
      * @param copy Instance to copy.
      */
     public HigherLevelArchivingIterationStrategy(HigherLevelArchivingIterationStrategy<E> copy) {
-        this.iterationStrategy = copy.iterationStrategy.getClone();
+        this.iterationStrategy = (HigherLevelDynamicIterationStrategy<E>) copy.getIterationStrategy().getClone();
     }
 
     /**
-     * @{@inheritDoc}
+     * {@inheritDoc}
      */
     @Override
     public HigherLevelArchivingIterationStrategy<E> getClone() {
-        return new HigherLevelArchivingIterationStrategy<E>(this);
+        return new HigherLevelArchivingIterationStrategy(this);
     }
 
-    public void setIterationStrategy(HigherLevelDynamicIterationStrategy iterationStrategy) {
+    public void setIterationStrategy(HigherLevelDynamicIterationStrategy<E> iterationStrategy) {
         this.iterationStrategy = iterationStrategy;
     }
 
-    public HigherLevelDynamicIterationStrategy getIterationStrategy() {
+    public HigherLevelDynamicIterationStrategy<E> getIterationStrategy() {
         return this.iterationStrategy;
     }
 
-    protected void updateArchive(Topology<? extends Entity> population) {
+    protected void updateArchive(fj.data.List<? extends Entity> population) {
         Algorithm topLevelAlgorithm = AbstractAlgorithm.getAlgorithmList().get(0);
-        List<OptimisationSolution> optimisationSolutions = new ArrayList<OptimisationSolution>();
+        List<OptimisationSolution> optimisationSolutions = new ArrayList<>();
         for (Entity entity : population) {
             Type solution = entity.getCandidateSolution().getClone();
             optimisationSolutions.add(new OptimisationSolution(solution,
@@ -85,7 +81,7 @@ public class HigherLevelArchivingIterationStrategy<E extends PopulationBasedAlgo
      * Performs an iteration of the algorithm:
      *  - Firstly, an iteration of the higher level algorithm is performed;
      *  - Secondly, the archive is updated.
-     * @param algorithm The higher level algorithm e.g. VEPSO.
+     * @param algorithm The higher level {@link Algorithm}, e.g. VEPSO.
      */
     @Override
     public void performIteration(E algorithm) {
@@ -94,8 +90,9 @@ public class HigherLevelArchivingIterationStrategy<E extends PopulationBasedAlgo
         RespondingMultiPopulationCriterionBasedAlgorithm higherLevelAlgorithm =
         	(RespondingMultiPopulationCriterionBasedAlgorithm)AbstractAlgorithm.getAlgorithmList().get(0);
 
-        for (PopulationBasedAlgorithm popAlg: higherLevelAlgorithm.getPopulations())
+        for (SinglePopulationBasedAlgorithm popAlg: higherLevelAlgorithm.getPopulations()) {
         	updateArchive(popAlg.getTopology());
+        }
     }
 
     public void setArchive(Archive archive) {

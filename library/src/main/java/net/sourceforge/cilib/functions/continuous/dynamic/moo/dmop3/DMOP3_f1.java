@@ -18,7 +18,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * Transactions on Evolutionary Computation, 13(1): 103-127, 2009
  *
  */
-public class DMOP3_f1 implements ContinuousFunction {
+public class DMOP3_f1 extends ContinuousFunction {
 
     private static final long serialVersionUID = 4525717945098304120L;
     //members
@@ -55,7 +55,7 @@ public class DMOP3_f1 implements ContinuousFunction {
 
     /**
      * Sets the iteration when r was set.
-     * @param rIteration Iteration when r was last randmomly selected.
+     * @param r the iteration when r was last randomly selected.
      */
     public static void setRIteration(int r) {
         DMOP3_f1.rIteration = r;
@@ -71,7 +71,7 @@ public class DMOP3_f1 implements ContinuousFunction {
 
     /**
      * Sets the frequency of change.
-     * @param tau Change frequency.
+     * @param tau_t Change frequency.
      */
     public void setTau_t(int tau_t) {
         this.tau_t = tau_t;
@@ -89,7 +89,7 @@ public class DMOP3_f1 implements ContinuousFunction {
      * Evaluates the function.
      */
     @Override
-    public Double apply(Vector x) {
+    public Double f(Vector x) {
         int iteration = AbstractAlgorithm.get().getIterations();
         return this.apply(iteration, x);
     }

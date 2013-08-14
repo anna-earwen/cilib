@@ -13,10 +13,12 @@ import java.util.List;
 import net.sourceforge.cilib.nn.architecture.builder.ArchitectureBuilder;
 import net.sourceforge.cilib.nn.architecture.builder.FeedForwardArchitectureBuilder;
 import net.sourceforge.cilib.nn.architecture.visitors.ArchitectureVisitor;
+import net.sourceforge.cilib.type.DomainRegistry;
+import net.sourceforge.cilib.type.StringBasedDomainRegistry;
 
 /**
- * Class represents a neural network architecture and encapsulates a {@link ArchitectureBuilder}
- * and a list of {@link Layers}.
+ * Represents a neural network architecture and encapsulates a
+ * {@link ArchitectureBuilder} and a list of {@link Layer}s.
  */
 public class Architecture {
 
@@ -24,16 +26,25 @@ public class Architecture {
     private List<Layer> layers;
 
     /**
-     * Default constructor. Default ArchitectureBuilder is a {@link FeedForwardArchitectureBuilder}
+     * Default constructor. Default {@link ArchitectureBuilder} is a
+     * {@link FeedForwardArchitectureBuilder}.
      */
     public Architecture() {
         layers = new ArrayList<Layer>();
         architectureBuilder = new FeedForwardArchitectureBuilder();
     }
 
+    public Architecture(Architecture rhs) {
+        layers = new ArrayList<Layer>();
+        for (Layer curLayer : rhs.layers)
+            layers.add(curLayer.getClone());
+
+        architectureBuilder = rhs.architectureBuilder.getClone();
+    }
+
     /**
-     * Initialises the architecture by calling the builder's build method on
-     * 'this' object.
+     * Initialises the architecture by calling the {@link ArchitectureBuilder}'s
+     *  build method on 'this' object.
      */
     public void initialise() {
         architectureBuilder.buildArchitecture(this);
@@ -98,6 +109,31 @@ public class Architecture {
                 return new ActivationLayerIterator();
             }
         };
+    }
+
+    /**
+     * Gets the domain of the Architecture. This is calculated by concatenating
+     * the domains of the Layers in the Architecture.
+     * @return The domain.
+     */
+    public StringBasedDomainRegistry getDomain() {
+        String dString = new String();
+        
+        if (layers.get(1).getDomain() != null) {
+            dString += layers.get(1).getDomain().getDomainString();
+        }
+
+        for (int curLayer = 2; curLayer < layers.size(); ++curLayer) {
+            DomainRegistry nDomain = layers.get(curLayer).getDomain();
+            if (nDomain.getDomainString() != null) {
+                dString += "," + nDomain.getDomainString();
+            }
+        }
+
+        StringBasedDomainRegistry domain = new StringBasedDomainRegistry();
+        domain.setDomainString(dString);
+
+        return domain;
     }
 
     private class ActivationLayerIterator extends AbstractIterator<Layer> {

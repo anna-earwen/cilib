@@ -28,27 +28,26 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * Hyperbolic Tangent Function.
  *
  */
-public class TanH implements ActivationFunction {
+public class TanH extends ActivationFunction {
 
     private static final long serialVersionUID = -5843046986587459333L;
 
     @Override
-    public Object getClone() {
+    public TanH getClone() {
         return this;
     }
     /**
      * {@inheritDoc}
      */
     @Override
-    public Real apply(Real input) {
-        return Real.valueOf(apply(input.doubleValue()));
+    public Real f(Real input) {
+        return Real.valueOf(f(input.doubleValue()));
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public double apply(double input) {
+    public double f(double input) {
         double a = Math.exp(input);
         double b = Math.exp(-input);
         return ((a - b) / (a + b));

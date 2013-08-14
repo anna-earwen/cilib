@@ -15,8 +15,7 @@ import net.sourceforge.cilib.ff.positionupdatestrategies.StandardFireflyPosition
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
- * The abstract entity class for the Firefly algorithm that represents the fireflies.
- *
+ * Abstract entity class for the Firefly algorithm that represents a firefly.
  */
 public abstract class AbstractFirefly extends AbstractEntity implements Firefly {
 
@@ -73,20 +72,6 @@ public abstract class AbstractFirefly extends AbstractEntity implements Firefly 
      * {@inheritDoc}
      */
     @Override
-    public abstract void calculateFitness();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(Entity o) {
-        return getFitness().compareTo(o.getFitness());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public int compareIntensity(Firefly other) {
         return compareTo(other);
     }
@@ -102,6 +87,7 @@ public abstract class AbstractFirefly extends AbstractEntity implements Firefly 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Vector getPosition() {
         return (Vector) this.getCandidateSolution();
     }
@@ -109,27 +95,22 @@ public abstract class AbstractFirefly extends AbstractEntity implements Firefly 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setPosition(Vector position) {
         this.setCandidateSolution(position);
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract int getDimension();
-
-    /**
-     * Get the current {@linkplain PositionInitialisationStrategy}.
-     * @return The current {@linkplain PositionInitialisationStrategy}.
+     * Get the current position {@linkplain InitialisationStrategy}.
+     * @return The current position {@linkplain InitialisationStrategy}.
      */
     public InitialisationStrategy<Firefly> getPositionInitialisationStrategy() {
         return this.positionInitialisationStrategy;
     }
 
     /**
-     * Set the {@linkplain PositionInitialisationStrategy} to be used.
-     * @param positionInitialisationStrategy The value to set.
+     * Set the position {@link InitialisationStrategy} to be used.
+     * @param positionInitialisationStrategy the {@link InitialisationStrategy} to use.
      */
     public void setPositionInitialisationStrategy(InitialisationStrategy positionInitialisationStrategy) {
         this.positionInitialisationStrategy = positionInitialisationStrategy;

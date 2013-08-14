@@ -6,10 +6,10 @@
  */
 package net.sourceforge.cilib.pso.dynamic.responsestrategies;
 
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.entity.Entity;
-import net.sourceforge.cilib.entity.Topology;
 import net.sourceforge.cilib.pso.dynamic.DynamicParticle;
+import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
@@ -19,7 +19,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  *
  * @param <E> some {@link PopulationBasedAlgorithm population based algorithm}
  */
-public class InitialiseNaNElementsReactionStrategy<E extends PopulationBasedAlgorithm> extends EnvironmentChangeResponseStrategy<E> {
+public class InitialiseNaNElementsReactionStrategy<E extends SinglePopulationBasedAlgorithm> extends EnvironmentChangeResponseStrategy {
 
     public InitialiseNaNElementsReactionStrategy() {
     }
@@ -40,13 +40,13 @@ public class InitialiseNaNElementsReactionStrategy<E extends PopulationBasedAlgo
      * {@inheritDoc}
      */
     @Override
-    public void performReaction(E algorithm) {
-        Topology<? extends Entity> entities = algorithm.getTopology();
+    public <P extends Particle, A extends SinglePopulationBasedAlgorithm<P>> void performReaction(A algorithm) {
+        fj.data.List<? extends Entity> entities = algorithm.getTopology();
 
         for (Entity entity : entities) {
             DynamicParticle particle = (DynamicParticle) entity;
             //initialise position
-            Vector position = (Vector) particle.getPosition();
+            Vector position = (Vector) particle.getCandidateSolution();
             for (int curElement = 0; curElement < position.size(); ++curElement) {
                 if (Double.isNaN(position.doubleValueOf(curElement))) {
                     position.get(curElement).randomise();

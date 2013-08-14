@@ -17,7 +17,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * Transactions on Evolutionary Computation, 8(5): 425-442
  *
  */
-public class FDA3_f1 implements ContinuousFunction {
+public class FDA3_f1 extends ContinuousFunction {
 
     //members
     //	number of generations for which t remains fixed
@@ -39,7 +39,7 @@ public class FDA3_f1 implements ContinuousFunction {
 
     /**
      * Sets the iteration number.
-     * @param tau Iteration number.
+     * @param tau iteration number.
      */
     public void setTau(int tau) {
         this.tau = tau;
@@ -47,7 +47,7 @@ public class FDA3_f1 implements ContinuousFunction {
 
     /**
      * Returns the iteration number.
-     * @return tau Iteration number.
+     * @return tau iteration number.
      */
     public int getTau() {
         return this.tau;
@@ -55,7 +55,7 @@ public class FDA3_f1 implements ContinuousFunction {
 
     /**
      * Sets the frequency of change.
-     * @param tau Change frequency.
+     * @param tau_t change frequency.
      */
     public void setTau_t(int tau_t) {
         this.tau_t = tau_t;
@@ -63,7 +63,7 @@ public class FDA3_f1 implements ContinuousFunction {
 
     /**
      * Returns the frequency of change.
-     * @return tau_t Change frequency.
+     * @return tau_t change frequency.
      */
     public int getTau_t() {
         return this.tau_t;
@@ -71,7 +71,7 @@ public class FDA3_f1 implements ContinuousFunction {
 
     /**
      * Sets the severity of change.
-     * @param n_t Change severity.
+     * @param n_t change severity.
      */
     public void setN_t(int n_t) {
         this.n_t = n_t;
@@ -79,7 +79,7 @@ public class FDA3_f1 implements ContinuousFunction {
 
     /**
      * Returns the severity of change.
-     * @return n_t Change severity.
+     * @return n_t change severity.
      */
     public int getN_t() {
         return this.n_t;
@@ -89,7 +89,7 @@ public class FDA3_f1 implements ContinuousFunction {
      * Evaluates the function.
      */
     @Override
-    public Double apply(Vector x) {
+    public Double f(Vector x) {
         this.tau = AbstractAlgorithm.get().getIterations();
         return this.apply(this.tau, x);
     }

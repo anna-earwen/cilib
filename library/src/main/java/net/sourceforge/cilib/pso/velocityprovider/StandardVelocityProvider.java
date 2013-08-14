@@ -75,51 +75,51 @@ public final class StandardVelocityProvider implements VelocityProvider {
     }
 
     /**
-     * Perform the velocity update for the given <tt>Particle</tt>.
-     * @param particle The Particle velocity that should be updated.
+     * Perform the velocity update for the given {@linkplain Particle}.
+     * @param particle The {@linkplain Particle} velocity that should be updated.
      */
     @Override
     public Vector get(Particle particle) {
         Vector velocity = (Vector) particle.getVelocity();
-        Vector position = (Vector) particle.getPosition();
+        Vector position = (Vector) particle.getCandidateSolution();
         Vector localGuide = (Vector) particle.getLocalGuide();
         Vector globalGuide = (Vector) particle.getGlobalGuide();
 
         Vector dampenedVelocity = Vector.copyOf(velocity).multiply(inertiaWeight.getParameter());
         Vector cognitiveComponent = Vector.copyOf(localGuide).subtract(position).multiply(cp(cognitiveAcceleration)).multiply(random());
         Vector socialComponent = Vector.copyOf(globalGuide).subtract(position).multiply(cp(socialAcceleration)).multiply(random());
-        return Vectors.sumOf(dampenedVelocity, cognitiveComponent, socialComponent);
+        return Vectors.sumOf(dampenedVelocity, cognitiveComponent, socialComponent).valueE("Cannot determine velocity");
     }
 
     /**
-     * Get the <code>ControlParameter</code> representing the inertia weight of
-     * the VelocityProvider.
-     * @return Returns the inertia component <tt>ControlParameter</tt>.
+     * Get the {@linkplain ControlParameter} representing the inertia weight of
+     * the {@linkplain VelocityProvider}.
+     * @return the inertia component {@linkplain ControlParameter}.
      */
     public ControlParameter getInertiaWeight() {
         return inertiaWeight;
     }
 
     /**
-     * Set the <tt>ControlParameter</tt> for the inertia weight of the velocity
-     * update equation.
-     * @param inertiaComponent The inertiaComponent to set.
+     * Set the {@linkplain ControlParameter} for the inertia weight of the
+     * velocity update equation.
+     * @param inertiaWeight The inertiaWeight to set.
      */
     public void setInertiaWeight(ControlParameter inertiaWeight) {
         this.inertiaWeight = inertiaWeight;
     }
 
     /**
-     * Gets the <tt>ControlParameter</tt> representing the cognitive component within this
-     * <code>VelocityProvider</code>.
-     * @return Returns the cognitiveComponent.
+     * Gets the {@linkplain ControlParameter} representing the cognitive
+     * component within this {@link VelocityProvider}.
+     * @return the cognitiveComponent.
      */
     public ControlParameter getCognitiveAcceleration() {
         return cognitiveAcceleration;
     }
 
     /**
-     * Set the cognitive component <code>ControlParameter</code>.
+     * Set the cognitive component {@linkplain ControlParameter}.
      * @param cognitiveComponent The cognitiveComponent to set.
      */
     public void setCognitiveAcceleration(ControlParameter cognitiveComponent) {
@@ -127,16 +127,16 @@ public final class StandardVelocityProvider implements VelocityProvider {
     }
 
     /**
-     * Get the <tt>ControlParameter</tt> representing the social component of
-     * the velocity update equation.
-     * @return Returns the socialComponent.
+     * Get the {@linkplain ControlParameter} representing the social component
+     * of the velocity update equation.
+     * @return the socialComponent.
      */
     public ControlParameter getSocialAcceleration() {
         return socialAcceleration;
     }
 
     /**
-     * Set the <tt>ControlParameter</tt> for the social component.
+     * Set the {@linkplain ControlParameter} for the social component.
      * @param socialComponent The socialComponent to set.
      */
     public void setSocialAcceleration(ControlParameter socialComponent) {

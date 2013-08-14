@@ -18,7 +18,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * Transactions on Evolutionary Computation, 8(5): 425-442
  *
  */
-public class FDA5_fk implements ContinuousFunction {
+public class FDA5_fk extends ContinuousFunction {
 
     private static final long serialVersionUID = -7037264042756770881L;
     //members
@@ -116,7 +116,7 @@ public class FDA5_fk implements ContinuousFunction {
 
     /**
      * Sets the frequency of change.
-     * @param tau Change frequency.
+     * @param tau_t Change frequency.
      */
     public void setTau_t(int tau_t) {
         this.tau_t = tau_t;
@@ -167,7 +167,7 @@ public class FDA5_fk implements ContinuousFunction {
     /**
      * Sets the g function that is used in the FDA5 problem without specifying
      * the problem.
-     * @param fda5_g ContinuousFunction used for the g function.
+     * @param g ContinuousFunction used for the g function.
      */
     public void setFDA5_g(ContinuousFunction g) {
         this.fda5_g = g;
@@ -184,7 +184,8 @@ public class FDA5_fk implements ContinuousFunction {
     /**
      * Evaluates the function.
      */
-    public Double apply(Vector x) {
+    @Override
+    public Double f(Vector x) {
         this.tau = AbstractAlgorithm.get().getIterations();
         return this.apply(this.tau, x);
     }

@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 import fj.P2;
 import fj.data.List;
 import net.sourceforge.cilib.algorithm.population.AbstractIterationStrategy;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.niching.NichingAlgorithm;
 import static net.sourceforge.cilib.niching.NichingFunctions.*;
 import net.sourceforge.cilib.niching.NichingSwarms;
@@ -38,7 +38,7 @@ public class NichePSO extends AbstractIterationStrategy<NichingAlgorithm> {
      *   <li>Perform an iteration of the main swarm.</li>
      *   <li>Perform an iteration for each of the contained sub-swarms.</li>
      *   <li>Merge any sub-swarms as defined my the associated {@link MergeStrategy}.</li>
-     *   <li>Perform an absorption step defined by a {@link AbsorptionStrategy}.</li>
+     *   <li>Perform an absorption step defined by a {@link MergeStrategy}.</li>
      *   <li>Identify any new potential niches using a {@link NicheDetection}.</li>
      *   <li>Create new sub-swarms via a {@link NicheCreationStrategy} for the identified niches.</li>
      * </ol>
@@ -46,7 +46,7 @@ public class NichePSO extends AbstractIterationStrategy<NichingAlgorithm> {
      */
     @Override
     public void performIteration(NichingAlgorithm alg) {
-        P2<PopulationBasedAlgorithm, List<PopulationBasedAlgorithm>> newSwarms =
+        P2<SinglePopulationBasedAlgorithm, List<SinglePopulationBasedAlgorithm>> newSwarms =
                 onMainSwarm(alg.getMainSwarmIterator())
                 .andThen(alg.getSubSwarmIterator())
                 .andThen(merge(alg.getMergeDetector(),

@@ -173,6 +173,14 @@ public class VectorTest {
     }
 
     @Test
+    public void testSign() {
+        Vector v = Vector.of(1.0, -2.0, -3.0);
+
+        assertEquals(Vector.of(1.0, -1.0, -1.0), Vector.sign(v));
+        assertEquals(Vector.of(1.0, -2.0, -3.0), v);
+    }
+
+    @Test
     public void testVectorNorm() {
         Vector m = Vector.of(1.0, 1.0, 1.0, 1.0, 1.0);
         assertEquals(sqrt(5.0), m.norm(), 0.0);
@@ -424,5 +432,23 @@ public class VectorTest {
         Vector v1 = Vector.of(1.0, 2.0, 3.0, 4.0);
         Rand.setSeed(1);
         assertEquals(v1.permute(), Vector.of(2.0, 4.0, 3.0, 1.0));
+    }
+
+    @Test
+    public void testSample() {
+        Vector v1 = Vector.of(1.0, 2.0, 3.0, 4.0);
+        Rand.setSeed(1);
+
+        assertEquals(Real.valueOf(2.0), v1.sample());
+        assertEquals(Real.valueOf(4.0), v1.sample());
+        assertEquals(Real.valueOf(3.0), v1.sample());
+    }
+
+    @Test
+    public void testMaxAndMin() {
+        Vector v1 = Vector.of(1.0, 2.0, 3.0, 4.0);
+
+        assertEquals(Real.valueOf(4.0), v1.max());
+        assertEquals(Real.valueOf(1.0), v1.min());
     }
 }

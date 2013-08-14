@@ -9,7 +9,7 @@ package net.sourceforge.cilib.pso.multiswarm;
 import net.sourceforge.cilib.algorithm.population.AbstractCooperativeIterationStrategy;
 import net.sourceforge.cilib.algorithm.population.IterationStrategy;
 import net.sourceforge.cilib.algorithm.population.MultiPopulationBasedAlgorithm;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.clustering.DataClusteringPSO;
 import net.sourceforge.cilib.clustering.entity.ClusterParticle;
 import net.sourceforge.cilib.clustering.iterationstrategies.SinglePopulationDataClusteringIterationStrategy;
@@ -60,8 +60,8 @@ public class CooperativeMultiswarmIterationStrategy extends AbstractCooperativeI
     @Override
     public void performIteration(MultiPopulationBasedAlgorithm algorithm) {
         int populationIndex = 0;
-
-        for(PopulationBasedAlgorithm currentAlgorithm : algorithm.getPopulations()) {
+        
+        for(SinglePopulationBasedAlgorithm currentAlgorithm : algorithm.getPopulations()) {
                 table = ((SinglePopulationDataClusteringIterationStrategy) ((DataClusteringPSO) currentAlgorithm).getIterationStrategy()).getDataset();
 
                 if(!contextinitialised) {
@@ -91,7 +91,7 @@ public class CooperativeMultiswarmIterationStrategy extends AbstractCooperativeI
                         particleWithContext.calculateFitness();
 
                         if(particleWithContext.getFitness().compareTo(particleWithContext.getBestFitness()) > 0) {
-                            particleWithContext.getProperties().put(EntityType.Particle.BEST_POSITION, particleWithContext.getPosition().getClone());
+                            particleWithContext.getProperties().put(EntityType.Particle.BEST_POSITION, particleWithContext.getCandidateSolution().getClone());
                             particleWithContext.getProperties().put(EntityType.Particle.BEST_FITNESS, particleWithContext.getFitness().getClone());
                         }
 
@@ -100,7 +100,7 @@ public class CooperativeMultiswarmIterationStrategy extends AbstractCooperativeI
                         }
 
                         if(contextParticle.getFitness().compareTo(contextParticle.getBestFitness()) > 0) {
-                            contextParticle.getProperties().put(EntityType.Particle.BEST_POSITION, contextParticle.getPosition().getClone());
+                            contextParticle.getProperties().put(EntityType.Particle.BEST_POSITION, contextParticle.getCandidateSolution().getClone());
                             contextParticle.getProperties().put(EntityType.Particle.BEST_FITNESS, contextParticle.getFitness().getClone());
                         }
 

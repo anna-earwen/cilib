@@ -6,11 +6,16 @@
  */
 package net.sourceforge.cilib.algorithm.initialisation;
 
-import com.google.common.base.Preconditions;
-import java.util.ArrayList;
-import java.util.List;
 import net.sourceforge.cilib.entity.Entity;
 import net.sourceforge.cilib.problem.Problem;
+
+import com.google.common.base.Preconditions;
+
+import fj.F;
+import fj.data.List;
+import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
+import net.sourceforge.cilib.controlparameter.ControlParameter;
+import net.sourceforge.cilib.util.functions.Entities;
 
 /**
  * Create a collection of {@linkplain net.sourceforge.cilib.entity.Entity entities}
@@ -18,17 +23,17 @@ import net.sourceforge.cilib.problem.Problem;
  *
  * @param <E> The {@code Entity} type.
  */
-public class ClonedPopulationInitialisationStrategy<E extends Entity> implements PopulationInitialisationStrategy<E> {
+public class ClonedPopulationInitialisationStrategy implements PopulationInitialisationStrategy {
 
     private static final long serialVersionUID = -7354579791235878648L;
     private Entity prototypeEntity;
-    private int entityNumber;
+    private ControlParameter entityNumber;
 
     /**
      * Create an instance of the {@code ClonedPopulationInitialisationStrategy}.
      */
     public ClonedPopulationInitialisationStrategy() {
-        entityNumber = 20;
+        entityNumber = ConstantControlParameter.of(20);
         prototypeEntity = null; // This has to be manually set as Individuals are used in GAs etc...
     }
 
@@ -37,7 +42,7 @@ public class ClonedPopulationInitialisationStrategy<E extends Entity> implements
      * @param copy The instance to copy.
      */
     public ClonedPopulationInitialisationStrategy(ClonedPopulationInitialisationStrategy copy) {
-        this.entityNumber = copy.entityNumber;
+        this.entityNumber = copy.entityNumber.getClone();
 
         if (copy.prototypeEntity != null) {
             this.prototypeEntity = copy.prototypeEntity.getClone();
@@ -60,20 +65,12 @@ public class ClonedPopulationInitialisationStrategy<E extends Entity> implements
      * @throws InitialisationException if the initialisation cannot take place.
      */
     @Override
-    public Iterable<E> initialise(Problem problem) {
+    public <E extends Entity> Iterable<E> initialise(final Problem problem) {
         Preconditions.checkNotNull(problem, "No problem has been specified");
         Preconditions.checkNotNull(prototypeEntity, "No prototype Entity object has been defined for the clone operation in the entity construction process.");
 
-        List<E> clones = new ArrayList<E>();
-
-        for (int i = 0; i < entityNumber; ++i) {
-            E entity = (E) prototypeEntity.getClone();
-
-            entity.initialise(problem);
-            clones.add(entity);
-        }
-
-        return clones;
+        return List.<E>replicate((int) entityNumber.getParameter(), (E) prototypeEntity)
+                .map(Entities.<E>clone_().andThen(Entities.<E>initialise().f(problem)));
     }
 
     /**
@@ -86,9 +83,8 @@ public class ClonedPopulationInitialisationStrategy<E extends Entity> implements
     }
 
     /**
-     * Get the {@linkplain net.sourceforge.cilib.entity.Entity entity} that has been defined as
-     * the prototype to for the copies.
-     * @see ClonedPopulationInitialisationStrategy#getPrototypeEntity()
+     * Gets the {@link Entity} that has been defined as to copy.
+     *
      * @return The prototype {@code Entity}.
      */
     @Override
@@ -102,7 +98,7 @@ public class ClonedPopulationInitialisationStrategy<E extends Entity> implements
      */
     @Override
     public int getEntityNumber() {
-        return this.entityNumber;
+        return (int) this.entityNumber.getParameter();
     }
 
     /**
@@ -111,6 +107,10 @@ public class ClonedPopulationInitialisationStrategy<E extends Entity> implements
      */
     @Override
     public void setEntityNumber(int entityNumber) {
+        this.entityNumber = ConstantControlParameter.of(entityNumber);
+    }
+
+    public void setEntityNumberControlParameter(ControlParameter entityNumber) {
         this.entityNumber = entityNumber;
     }
 }

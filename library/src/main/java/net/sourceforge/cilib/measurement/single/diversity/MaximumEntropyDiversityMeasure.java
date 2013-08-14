@@ -7,7 +7,7 @@
 package net.sourceforge.cilib.measurement.single.diversity;
 
 import net.sourceforge.cilib.algorithm.Algorithm;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.measurement.entropy.DimensionalEntropyMeasurement;
 import net.sourceforge.cilib.measurement.entropy.EntropyMeasurement;
 import net.sourceforge.cilib.type.types.Real;
@@ -44,7 +44,7 @@ public class MaximumEntropyDiversityMeasure extends Diversity {
      */
     @Override
     public Real getValue(Algorithm algorithm) {
-        PopulationBasedAlgorithm populationBasedAlgorithm = (PopulationBasedAlgorithm) algorithm;
+        SinglePopulationBasedAlgorithm populationBasedAlgorithm = (SinglePopulationBasedAlgorithm) algorithm;
         int dimensions = populationBasedAlgorithm.getOptimisationProblem().getDomain().getDimension();
 
         double diversity = 0.0;
@@ -74,7 +74,7 @@ public class MaximumEntropyDiversityMeasure extends Diversity {
     /**
      * Convenience method to set the number of intervals over which
      * entropy is measured.
-     * @param i the number of intervals to set.
+     * @param intervals the number of intervals to set.
      */
     public void setIntervals(int intervals) {
         entropyMeasure.setIntervals(intervals);

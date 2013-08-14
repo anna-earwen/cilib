@@ -6,12 +6,9 @@
  */
 package net.sourceforge.cilib.functions.continuous.decorators;
 
-import fj.F;
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
 import net.sourceforge.cilib.controlparameter.ControlParameter;
 import net.sourceforge.cilib.functions.ContinuousFunction;
-import net.sourceforge.cilib.type.types.Numeric;
-import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
@@ -32,31 +29,32 @@ import net.sourceforge.cilib.type.types.container.Vector;
  *             (c < 0) means that g(x) is f(x) shifted c units downwards
  *
  */
-public class ShiftedFunctionDecorator implements ContinuousFunction {
+public class ShiftedFunctionDecorator extends ContinuousFunction {
 
     private static final long serialVersionUID = 8687711759870298103L;
     private ContinuousFunction function;
     private ControlParameter verticalShift;
     private ControlParameter horizontalShift;
+    private Vector shiftVector;
+    private boolean randomShift;
 
     public ShiftedFunctionDecorator() {
         this.verticalShift = ConstantControlParameter.of(0.0);
         this.horizontalShift = ConstantControlParameter.of(0.0);
+        this.shiftVector = null;
+        this.randomShift = false;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Double apply(Vector input) {
-        Vector tmp = horizontalShift.getParameter() == 0.0 ? input : input.map(new F<Numeric, Numeric>() {
-            @Override
-            public Numeric f(Numeric x) {
-                return Real.valueOf(x.doubleValue() - horizontalShift.getParameter());
-            }
-        });
+    public Double f(Vector input) {
+        shiftVector = randomShift
+                ? (shiftVector == null || input.size() != shiftVector.size()) ? Vector.newBuilder().copyOf(input).buildRandom() : shiftVector
+                : Vector.fill(horizontalShift.getParameter(), input.size());
 
-        return function.apply(tmp) + verticalShift.getParameter();
+        return function.f(input.subtract(shiftVector)) + verticalShift.getParameter();
     }
 
     /**
@@ -103,5 +101,13 @@ public class ShiftedFunctionDecorator implements ContinuousFunction {
      */
     public void setVerticalShift(ControlParameter verticalShift) {
         this.verticalShift = verticalShift;
+    }
+
+    public void setRandomShift(boolean randomShift) {
+        this.randomShift = randomShift;
+    }
+
+    public boolean getRandomShift() {
+        return randomShift;
     }
 }

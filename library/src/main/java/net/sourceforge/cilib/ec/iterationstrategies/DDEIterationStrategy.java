@@ -6,13 +6,14 @@
  */
 package net.sourceforge.cilib.ec.iterationstrategies;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+
+import fj.F;
+
 import net.sourceforge.cilib.algorithm.population.AbstractIterationStrategy;
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
 import net.sourceforge.cilib.ec.EC;
 import net.sourceforge.cilib.ec.Individual;
-import net.sourceforge.cilib.entity.Topology;
 import net.sourceforge.cilib.entity.operators.creation.CreationStrategy;
 import net.sourceforge.cilib.entity.operators.creation.RandCreationStrategy;
 import net.sourceforge.cilib.entity.operators.crossover.CrossoverStrategy;
@@ -103,61 +104,66 @@ public class DDEIterationStrategy  extends AbstractIterationStrategy<EC> {
      */
     @Override
     public void performIteration(EC ec) {
-        Topology<Individual> topology = ec.getTopology();
+        final fj.data.List<Individual> topology = ec.getTopology();
 
         //generate the scaling factor randomly each iteration
         trialVectorCreationStrategy.setScaleParameter(scalingFactorRandom.getRandomNumber());
 
-        for (int i = 0; i < topology.size(); i++) {
-            Individual current = topology.get(i);
-            Individual bestOffspring = current.getClone();
+        ec.setTopology(topology.map(new F<Individual, Individual>(){
+            @Override
+            public Individual f(Individual current) {
+                Individual bestOffspring = current.getClone();
 
-            //take the best offspring from a set of offspring created with the same trial vector
-            for(int o = 0; o < totalOffspring; o++) {
-                // Create the trial vector by applying mutation
-                Individual targetEntity = targetVectorSelectionStrategy.on(topology).exclude(current).select();
+                //take the best offspring from a set of offsprings created with the same trial vector
+                for(int o = 0; o < totalOffspring; o++) {
+                    // Create the trial vector by applying mutation
+                    Individual targetEntity = targetVectorSelectionStrategy.on(topology).exclude(current).select();
 
-                // Create the trial vector / entity
-                Individual trialEntity = trialVectorCreationStrategy.create(targetEntity.getClone(), current.getClone(), topology.getClone());
+                    // Create the trial vector / entity
+                    Individual trialEntity = trialVectorCreationStrategy.create(targetEntity.getClone(), current.getClone(), topology);
 
-                // Create the offspring by applying cross-over
-                Individual currentOffspring = crossoverStrategy
+                    // Create the offspring by applying cross-over
+                    Individual currentOffspring = crossoverStrategy
                         .crossover(Arrays.asList(current, trialEntity)).get(0); // Order is VERY important here!!
-                boundaryConstraint.enforce(currentOffspring);
-                currentOffspring.calculateFitness();
+                    boundaryConstraint.enforce(currentOffspring);
+                    currentOffspring.calculateFitness();
 
-                //Select the best offspring so far
-                if(o > 0) {
-                    bestOffspring = offspringSelectionStrategy.on(Arrays.asList(bestOffspring, currentOffspring)).select();
+                    //Select the best offspring so far
+                    if(o > 0) {
+                        bestOffspring = offspringSelectionStrategy.on(Arrays.asList(bestOffspring, currentOffspring)).select();
+                    } else {
+                        bestOffspring = currentOffspring;
+                    }
+
+                }
+
+                Individual result = current;
+                //select the best between the current entity and the offspring entity
+                if(Rand.nextDouble() > selectorParameter) {
+                    if(bestOffspring.getFitness().compareTo(current.getFitness()) > 0 ){
+                        result = bestOffspring;
+                    }
                 } else {
-                    bestOffspring = currentOffspring;
+                    bestOffspring = nextGenerationSelectionStrategy.on(Arrays.asList(bestOffspring, current)).select();
+                    result = bestOffspring;
                 }
 
+                return result;
             }
-
-            //select the best between the current entity and the offspring entity
-            if(Rand.nextDouble() > selectorParameter) {
-                if(bestOffspring.getFitness().compareTo(current.getFitness()) > 0 ){
-                    topology.set(i, bestOffspring);
-                }
-            } else {
-                bestOffspring = nextGenerationSelectionStrategy.on(Arrays.asList(bestOffspring, current)).select();
-                topology.set(i, bestOffspring);
-            }
-        }
+        }));
     }
 
     /**
-     * Obtain the {@linkplain SelectionStrategy} used to select the target vector.
-     * @return The {@linkplain SelectionStrategy} of the target vector.
+     * Obtain the {@linkplain Selector} used to select the target vector.
+     * @return The {@linkplain Selector} of the target vector.
      */
     public Selector getTargetVectorSelectionStrategy() {
         return targetVectorSelectionStrategy;
     }
 
     /**
-     * Set the {@linkplain SelectionStrategy} used to select the target vector within the DE.
-     * @param targetVectorSelectionStrategy The {@linkplain SelectionStrategy} to use for the
+     * Set the {@linkplain Selector} used to select the target vector within the DE.
+     * @param targetVectorSelectionStrategy The {@linkplain Selector} to use for the
      *        selection of the target vector.
      */
     public void setTargetVectorSelectionStrategy(Selector targetVectorSelectionStrategy) {
@@ -221,7 +227,8 @@ public class DDEIterationStrategy  extends AbstractIterationStrategy<EC> {
     }
 
     /*
-     * sets the current value of the total number of offspring to be generated
+     * Sets the current value of the total number of offspring to be generated.
+     *
      * @param totalOffspring The total number of offspring to be generated
      */
     public void setTotalOffspring(int totalOffspring) {
@@ -238,7 +245,7 @@ public class DDEIterationStrategy  extends AbstractIterationStrategy<EC> {
 
     /**
      * Set the probability distribution that will be used for the scaling factor.
-     * @return The {@linkplain ProbabilityDistributionFunction}.
+     * @param random the {@linkplain ProbabilityDistributionFunction}.
      */
     public void setScalingFactorRandom(ProbabilityDistributionFunction random) {
         this.scalingFactorRandom = random;
@@ -254,7 +261,7 @@ public class DDEIterationStrategy  extends AbstractIterationStrategy<EC> {
 
     /**
      * Set the selection strategy that will be used to select between offspring
-     * @return The {@linkplain Selector}.
+     * @param offspringSelectionStrategy the {@linkplain Selector}.
      */
     public void setOffspringSelectionStrategy(Selector offspringSelectionStrategy) {
         this.offspringSelectionStrategy = offspringSelectionStrategy;
@@ -270,10 +277,9 @@ public class DDEIterationStrategy  extends AbstractIterationStrategy<EC> {
 
      /**
      * Sets the selection strategy that will be used to select survivors for the next generation
-     * @return The {@linkplain Selector}.
+     * @param nextGenerationSelectionStrategy the {@linkplain Selector}.
      */
     public void setNextGenerationSelectionStrategy(Selector nextGenerationSelectionStrategy) {
         this.nextGenerationSelectionStrategy = nextGenerationSelectionStrategy;
     }
-
 }

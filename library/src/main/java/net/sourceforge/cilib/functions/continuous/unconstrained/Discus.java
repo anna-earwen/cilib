@@ -22,13 +22,13 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * </p>
  *
  */
-public class Discus implements ContinuousFunction {
+public class Discus extends ContinuousFunction {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Double apply(Vector input) {
+    public Double f(Vector input) {
         double sum = 0;
 
         for (int i = 1; i < input.size(); i++) {
@@ -36,7 +36,6 @@ public class Discus implements ContinuousFunction {
                 input.doubleValueOf(i);
         }
 
-        return 1E6 * input.doubleValueOf(0) * input.doubleValueOf(0)
-            + sum;
+        return 1E6 * input.doubleValueOf(0) * input.doubleValueOf(0) + sum;
     }
 }

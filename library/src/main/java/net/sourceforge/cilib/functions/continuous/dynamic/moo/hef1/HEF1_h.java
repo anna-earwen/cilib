@@ -20,7 +20,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * The problem has been adapted by Helbig and Engelbrecht to make it a DMOOP.
  *
  */
-public class HEF1_h implements ContinuousFunction {
+public class HEF1_h extends ContinuousFunction {
 
     //members
     //number of generations for which t remains fixed
@@ -102,7 +102,7 @@ public class HEF1_h implements ContinuousFunction {
     /**
      * Sets the f1 function that is used in the HEF1 problem without specifying
      * the problem.
-     * @param hef1_f ContinuousFunction used for the f1 function.
+     * @param hef1_f1 ContinuousFunction used for the f1 function.
      */
     public void setHEF1_f(ContinuousFunction hef1_f1) {
         this.hef1_f1 = hef1_f1;
@@ -134,7 +134,7 @@ public class HEF1_h implements ContinuousFunction {
 
     /**
      * Sets the frequency of change.
-     * @param tau Change frequency.
+     * @param tau_t Change frequency.
      */
     public void setTau_t(int tau_t) {
         this.tau_t = tau_t;
@@ -168,7 +168,7 @@ public class HEF1_h implements ContinuousFunction {
      * Evaluates the function.
      */
     @Override
-    public Double apply(Vector x) {
+    public Double f(Vector x) {
         this.tau = AbstractAlgorithm.get().getIterations();
         return this.apply(this.tau, x);
     }
@@ -180,9 +180,9 @@ public class HEF1_h implements ContinuousFunction {
         double t = (1.0 / (double) n_t) * Math.floor((double) iteration / (double) this.tau_t);
         double H = 0.75 * Math.sin(0.5 * Math.PI * t) + 1.25;
 
-        double g = ((HEF1_g) this.hef1_g).apply(x);
+        double g = ((HEF1_g) this.hef1_g).f(x);
         //evaluate the hef1_f1 function
-        double f1 = this.hef1_f1.apply(x);
+        double f1 = this.hef1_f1.f(x);
 
         double value = 1.0;
         value -= Math.pow((double) f1 / (double) g, H);

@@ -9,7 +9,7 @@ package net.sourceforge.cilib.coevolution.cooperative.problemdistribution;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import net.sourceforge.cilib.algorithm.Algorithm;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.CooperativeCoevolutionAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.problem.CooperativeCoevolutionProblemAdapter;
 import net.sourceforge.cilib.coevolution.cooperative.problem.DimensionAllocation;
@@ -25,13 +25,19 @@ import net.sourceforge.cilib.type.types.container.Vector;
 public class PerfectSplitDistributionStrategy implements ProblemDistributionStrategy {
 
     /**
-     * Splits up the given {@link OptimisationProblem} into sub-problems, where each sub problem contains a sequential, uniform length, portion of the problem vector, and assigns all the sub-problems to the sub population {@link Algorithm}s.
-     * @param populations The list of participating {@linkplain PopulationBasedAlgorithm}s.
-     * @param problem The problem that needs to be re-distributed.
-     * @param context The context vector maintained by the {@linkplain CooperativeCoevolutionAlgorithm}.
+     * Splits up the given {@link Problem} into sub-problems, where each
+     * sub-problem contains a sequential, uniform length, portion of the problem
+     * vector, and assigns all the sub-problems to the sub population
+     * {@link Algorithm}s.
+     *
+     * @param populations   The list of participating
+     *                      {@linkplain PopulationBasedAlgorithm}s.
+     * @param problem       The problem that needs to be re-distributed.
+     * @param context       The context vector maintained by the
+     *                      {@linkplain CooperativeCoevolutionAlgorithm}.
      */
     @Override
-    public void performDistribution(List<PopulationBasedAlgorithm> populations,
+    public void performDistribution(List<SinglePopulationBasedAlgorithm> populations,
             Problem problem, Vector context) {
         Preconditions.checkArgument(populations.size() >= 2, "There should at least be two Cooperating populations in a Cooperative Algorithm");
         Preconditions.checkArgument(problem.getDomain().getDimension() % populations.size() == 0,

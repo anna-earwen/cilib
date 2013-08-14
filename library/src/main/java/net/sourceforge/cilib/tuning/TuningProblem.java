@@ -10,8 +10,10 @@ import fj.F;
 import static fj.data.List.range;
 import static fj.function.Doubles.sum;
 import net.sourceforge.cilib.algorithm.AbstractAlgorithm;
+import net.sourceforge.cilib.algorithm.MeasuringListener;
 import net.sourceforge.cilib.measurement.Measurement;
 import net.sourceforge.cilib.problem.*;
+import net.sourceforge.cilib.problem.objective.Objective;
 import net.sourceforge.cilib.problem.solution.Fitness;
 import net.sourceforge.cilib.tuning.problem.ProblemGenerator;
 import net.sourceforge.cilib.type.types.Real;
@@ -22,12 +24,14 @@ public class TuningProblem extends AbstractProblem {
     private Problem currentProblem;    
     private AbstractAlgorithm targetAlgorithm;
     private ProblemGenerator problemsProvider;
+    private MeasuringListener measuringListener;
     private Measurement<Real> measurement;
     private int samples;
     
     public TuningProblem() {
         this.measurement = new net.sourceforge.cilib.measurement.single.Fitness();
         this.samples = 1;
+        this.measuringListener = new MeasuringListener();
     }
     
     public TuningProblem(TuningProblem copy) {
@@ -35,6 +39,7 @@ public class TuningProblem extends AbstractProblem {
         this.samples = copy.samples;
         this.targetAlgorithm = copy.targetAlgorithm.getClone();
         this.problemsProvider = copy.problemsProvider;
+        this.measuringListener = copy.measuringListener.getClone();
     }
 
     @Override
@@ -47,10 +52,11 @@ public class TuningProblem extends AbstractProblem {
         double f = sum(range(0, samples).map(new F<Integer, Double>(){
             @Override
             public Double f(Integer a) {
+                measuringListener.setMeasurement(measurement.getClone());
                 targetAlgorithm.setOptimisationProblem(currentProblem);
                 targetAlgorithm.performInitialisation();
                 targetAlgorithm.runAlgorithm();
-                return measurement.getValue(targetAlgorithm).doubleValue();
+                return ((Real)measuringListener.getLastMeasurement()).doubleValue();
             }                    
         })) / samples;
 
@@ -79,6 +85,7 @@ public class TuningProblem extends AbstractProblem {
     
     public void setTargetAlgorithm(AbstractAlgorithm targetAlgorithm) {
         this.targetAlgorithm = targetAlgorithm;
+        this.targetAlgorithm.addAlgorithmListener(measuringListener);
     }
 
     public AbstractAlgorithm getTargetAlgorithm() {
@@ -91,5 +98,18 @@ public class TuningProblem extends AbstractProblem {
 
     public int getSamples() {
         return samples;
+    }
+
+    public Problem getCurrentProblem() {
+        return currentProblem;
+    }
+
+    @Override
+    public Objective getObjective() {
+        return ((AbstractProblem) currentProblem).getObjective();
+    }
+
+    public void setMeasuringListener(MeasuringListener measuringListener) {
+        this.measuringListener = measuringListener;
     }
 }

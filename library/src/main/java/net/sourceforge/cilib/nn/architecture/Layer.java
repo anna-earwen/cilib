@@ -9,15 +9,34 @@ package net.sourceforge.cilib.nn.architecture;
 import java.util.ArrayList;
 import net.sourceforge.cilib.nn.components.Neuron;
 import net.sourceforge.cilib.type.types.container.Vector;
+import net.sourceforge.cilib.type.DomainRegistry;
+import net.sourceforge.cilib.type.StringBasedDomainRegistry;
+import net.sourceforge.cilib.util.Cloneable;
 
 /**
  * Class represents a layer in a neural network, therefore it simply extends
  * an ArrayList<Neuron> . It also implements the {@link NeuralInputSource}
  * interface and can therefore be used as input for a neuron.
  */
-public class Layer extends ArrayList<Neuron> implements NeuralInputSource {
+public class Layer extends ArrayList<Neuron> implements NeuralInputSource, Cloneable {
 
     protected boolean bias;
+
+    public Layer() {
+        bias = false;
+    }
+
+    public Layer(Layer rhs) {
+        bias = rhs.bias;
+
+        for (Neuron curNeuron : rhs) {
+            add(curNeuron.getClone());
+        }
+    }
+
+    public Layer getClone() {
+        return new Layer(this);
+    }
 
     /**
      * Gets the neural input of this layer by getting the activation of the
@@ -66,5 +85,30 @@ public class Layer extends ArrayList<Neuron> implements NeuralInputSource {
     @Override
 	public Neuron getNeuron(int index) {
 		return this.get(index);
+    }
+
+    /**
+     * Gets the domain of the Layer. This is calculated by concatenating the
+     * domains of the Neurons in the Layer.
+     * @return The domain.
+     */
+    public StringBasedDomainRegistry getDomain() {
+        String dString = new String();
+        
+        if (get(0).getDomain() != null) {
+            dString += get(0).getDomain().getDomainString();
+        }
+
+        for (int curNeuron = 1; curNeuron < size(); ++curNeuron) {
+            DomainRegistry nDomain = get(curNeuron).getDomain();
+            if (nDomain.getDomainString() != null) {
+                dString += "," + nDomain.getDomainString();
+            }
+        }
+
+        StringBasedDomainRegistry domain = new StringBasedDomainRegistry();
+        domain.setDomainString(dString);
+
+        return domain;
     }
 }

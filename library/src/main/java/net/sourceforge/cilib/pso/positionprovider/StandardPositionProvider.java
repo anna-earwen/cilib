@@ -8,13 +8,9 @@ package net.sourceforge.cilib.pso.positionprovider;
 
 import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.type.types.container.Vector;
-import net.sourceforge.cilib.util.Vectors;
 
 /**
  * This is the normal position update as described by Kennedy and Eberhart.
- * @reference paper
- *
- *
  */
 public class StandardPositionProvider implements PositionProvider {
 
@@ -46,8 +42,8 @@ public class StandardPositionProvider implements PositionProvider {
      */
     @Override
     public Vector get(Particle particle) {
-        Vector position = (Vector) particle.getPosition();
+        Vector position = (Vector) particle.getCandidateSolution();
         Vector velocity = (Vector) particle.getVelocity();
-        return Vectors.sumOf(position, velocity);
+        return position.plus(velocity);
     }
 }

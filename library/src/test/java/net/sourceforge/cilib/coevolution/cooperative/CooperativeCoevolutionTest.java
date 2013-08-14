@@ -7,7 +7,7 @@
 package net.sourceforge.cilib.coevolution.cooperative;
 
 import java.util.List;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.contextupdate.SelectiveContextUpdateStrategy;
 import net.sourceforge.cilib.coevolution.cooperative.contributionselection.ContributionSelectionStrategy;
 import net.sourceforge.cilib.coevolution.cooperative.problem.CooperativeCoevolutionProblemAdapter;
@@ -42,7 +42,7 @@ public class CooperativeCoevolutionTest {
 
         //mock contribution selection that will return desired contribution
         final ContributionSelectionStrategy strategy = mock(ContributionSelectionStrategy.class);
-        when(strategy.getContribution(any(PopulationBasedAlgorithm.class))).thenReturn(pop1Result, pop2Result);
+        when(strategy.getContribution(any(SinglePopulationBasedAlgorithm.class))).thenReturn(pop1Result, pop2Result);
 
         final DomainRegistry problemDomain = new StringBasedDomainRegistry();
         problemDomain.setDomainString("R(0.0:4.0)^2");
@@ -83,11 +83,11 @@ public class CooperativeCoevolutionTest {
         testAlgorithm.setOptimisationProblem(problem);
 
         testAlgorithm.performInitialisation();
-
+        
         testAlgorithm.performIteration();
-
+        
         //ensure that the solutions from the sub populations have been copied into the context vector
-        assertEquals(1.0, testAlgorithm.getContext().getCandidateSolution().get(0).doubleValue(), 0.0);
+        assertEquals(4.0, testAlgorithm.getContext().getCandidateSolution().get(0).doubleValue(), 0.0);
         assertEquals(2.0, testAlgorithm.getContext().getCandidateSolution().get(1).doubleValue(), 0.0);
         assertEquals(1.0, testAlgorithm.getContext().getFitness().getValue(), 1.0);
 

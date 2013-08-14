@@ -20,7 +20,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * Berlin/Heidelberg, 2007.
  *
  */
-public class FDA1_h implements ContinuousFunction {
+public class FDA1_h extends ContinuousFunction {
 
     private static final long serialVersionUID = -539665464941830813L;
     //members
@@ -63,7 +63,7 @@ public class FDA1_h implements ContinuousFunction {
 
     /**
      * Sets the frequency of change.
-     * @param tau Change frequency.
+     * @param tau_t Change frequency.
      */
     public void setTau_t(int tau_t) {
         this.tau_t = tau_t;
@@ -149,7 +149,7 @@ public class FDA1_h implements ContinuousFunction {
     /**
      * Sets the f1 function that is used in the FDA1 problem without specifying
      * the problem.
-     * @param fda1_f ContinuousFunction used for the f1 function.
+     * @param fda1_f1 ContinuousFunction used for the f1 function.
      */
     public void setFDA1_f(ContinuousFunction fda1_f1) {
         this.fda1_f1 = fda1_f1;
@@ -167,7 +167,7 @@ public class FDA1_h implements ContinuousFunction {
      * Evaluates the function.
      */
     @Override
-    public Double apply(Vector x) {
+    public Double f(Vector x) {
         int iteration = AbstractAlgorithm.get().getIterations();
         return apply(iteration, x);
     }
@@ -186,7 +186,7 @@ public class FDA1_h implements ContinuousFunction {
         //evaluate the fda1_g function
         double g = ((FDA1_g) this.fda1_g).apply(iteration, x);
         //evaluate the fda1_f1 function
-        double f1 = this.fda1_f1.apply(y);
+        double f1 = this.fda1_f1.f(y);
 
         double value = 1.0;
         value -= Math.pow((double) f1 / (double) g, H);

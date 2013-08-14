@@ -9,7 +9,7 @@ package net.sourceforge.cilib.coevolution.cooperative;
 import java.util.Arrays;
 import java.util.List;
 import net.sourceforge.cilib.algorithm.population.MultiPopulationBasedAlgorithm;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.coevolution.CoevolutionAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.contextupdate.ContextUpdateStrategy;
 import net.sourceforge.cilib.coevolution.cooperative.contextupdate.SelectiveContextUpdateStrategy;
@@ -30,15 +30,13 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * fitness values are computed by inserting an entity's solution into the
  * current context vector before it is evaluated. The context vector is simply
  * the concatenation of the best solutions from each participating population.
- *
+ * <p>
  * Any algorithm that wishes to participate in a co-operative optimisation
  * algorithm must implement the {@link ParticipatingAlgorithm} interface. This class
  * also implements {@link ParticipatingAlgorithm}, meaning that co-operative
  * algorithms can be composed of co-operative algorithms again.
- *
  * <p>
  * References:
- * </p>
  * <p>
  * <ul>
  * <li> M. Potter and K.D. Jong, "A Cooperative Coevolutionary approach to function optimization,"
@@ -49,9 +47,8 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * IEEE Transactions on Evolutionary Computation, vol. 8, no. 3, pp 225-239, 2004.
  * </li>
  * </ul>
- * </p>
  *
- * @TODO: test this class.
+ * TODO: test this class.
  *
  */
 public class CooperativeCoevolutionAlgorithm extends MultiPopulationBasedAlgorithm implements ParticipatingAlgorithm, CoevolutionAlgorithm {
@@ -93,11 +90,12 @@ public class CooperativeCoevolutionAlgorithm extends MultiPopulationBasedAlgorit
         a wrapped problem, which contains the original problem and the current context vector*/
         context.initialise(optimisationProblem);
         problemDistribution.performDistribution(subPopulationsAlgorithms, optimisationProblem, context.getCandidateSolution());
-        context.clear();
+
         //Initialise each sub population, and add the randomised solution vector from each population to the current context.
-        for (PopulationBasedAlgorithm algorithm : subPopulationsAlgorithms) {
+        for (SinglePopulationBasedAlgorithm algorithm : subPopulationsAlgorithms) {
+            CooperativeCoevolutionProblemAdapter problem = (CooperativeCoevolutionProblemAdapter) algorithm.getOptimisationProblem();
             algorithm.performInitialisation();
-            context.append(algorithm.getBestSolution().getPosition());
+            context.copyFrom((Vector) algorithm.getBestSolution().getPosition(), problem.getProblemAllocation());
         }
         context.calculateFitness();
     }
@@ -149,8 +147,8 @@ public class CooperativeCoevolutionAlgorithm extends MultiPopulationBasedAlgorit
      * {@inheritDoc}
      */
     @Override
-    public void addPopulationBasedAlgorithm(PopulationBasedAlgorithm algorithm) {
-        // TODO: There should be a better way to perform this test, rather than using an instanceof.
+    public void addPopulationBasedAlgorithm(SinglePopulationBasedAlgorithm algorithm) {
+        // TODO: There should be a better way to perfrom this test, rather than using an instanceof.
         if (((ParticipatingAlgorithm) algorithm).getContributionSelectionStrategy() instanceof ZeroContributionSelectionStrategy) {
             ((ParticipatingAlgorithm) algorithm).setContributionSelectionStrategy(contributionSelection);
         }

@@ -6,6 +6,9 @@
  */
 package net.sourceforge.cilib.ec;
 
+import fj.F;
+import fj.Ord;
+import fj.Ordering;
 import net.sourceforge.cilib.entity.AbstractEntity;
 import net.sourceforge.cilib.entity.Entity;
 import net.sourceforge.cilib.entity.EntityType;
@@ -22,6 +25,19 @@ import net.sourceforge.cilib.type.types.container.Vector;
 public class Individual extends AbstractEntity {
 
     protected static final long serialVersionUID = -578986147850240655L;
+	public static Ord<Individual> ordering = Ord.ord(
+			new F<Individual, F<Individual, Ordering>>() {
+				@Override
+				public F<Individual, Ordering> f(final Individual a) {
+					return new F<Individual, Ordering>() {
+						@Override
+						public Ordering f(final Individual b) {
+							int x = a.compareTo(b);
+							return x < 0 ? Ordering.LT : x == 0 ? Ordering.EQ : Ordering.GT;
+						}
+					};
+				}
+			});
     protected InitialisationStrategy<Individual> initialisationStrategy;
 
     /**
@@ -99,38 +115,6 @@ public class Individual extends AbstractEntity {
 
         this.getProperties().put(EntityType.STRATEGY_PARAMETERS, strategy);
         this.getProperties().put(EntityType.FITNESS, InferiorFitness.instance());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(Entity o) {
-        return this.getFitness().compareTo(o.getFitness());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setCandidateSolution(StructuredType type) {
-        super.setCandidateSolution(type);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void calculateFitness() {
-        this.getProperties().put(EntityType.FITNESS, this.getFitnessCalculator().getFitness(this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getDimension() {
-        return getCandidateSolution().size();
     }
 
     /**

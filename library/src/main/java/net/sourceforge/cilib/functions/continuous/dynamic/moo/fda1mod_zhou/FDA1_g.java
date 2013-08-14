@@ -19,7 +19,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  *
  */
 
-public class FDA1_g implements ContinuousFunction {
+public class FDA1_g extends ContinuousFunction {
 
     private static final long serialVersionUID = 1721209032942724811L;
 
@@ -59,7 +59,7 @@ public class FDA1_g implements ContinuousFunction {
 
     /**
      * Sets the frequency of change.
-     * @param tau Change frequency.
+     * @param tau_t Change frequency.
      */
     public void setTau_t(int tau_t) {
         this.tau_t = tau_t;
@@ -93,7 +93,7 @@ public class FDA1_g implements ContinuousFunction {
      * Evaluates the function.
      */
     @Override
-    public Double apply(Vector x) {
+    public Double f(Vector x) {
         this.tau = AbstractAlgorithm.get().getIterations();
     	return this.apply(this.tau, x);
     }

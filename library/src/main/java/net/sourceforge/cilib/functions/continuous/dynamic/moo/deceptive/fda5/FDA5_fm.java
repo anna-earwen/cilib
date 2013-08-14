@@ -16,9 +16,8 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * the following article: M.Farina, K.Deb, P.Amato. Dynamic multiobjective
  * optimization problems: test cases, approximations and applications, IEEE
  * Transactions on Evolutionary Computation, 8(5): 425-442
- *
  */
-public class FDA5_fm implements ContinuousFunction {
+public class FDA5_fm extends ContinuousFunction {
 
     private static final long serialVersionUID = 5989956430200382145L;
     //members
@@ -124,7 +123,7 @@ public class FDA5_fm implements ContinuousFunction {
     /**
      * Sets the frequency of change.
      *
-     * @param tau Change frequency.
+     * @param tau_t Change frequency.
      */
     public void setTau_t(int tau_t) {
         this.tau_t = tau_t;
@@ -183,8 +182,8 @@ public class FDA5_fm implements ContinuousFunction {
      *
      * @param fda5_g ContinuousFunction used for the g function.
      */
-    public void setFDA5_g(ContinuousFunction g) {
-        this.fda5_g = g;
+    public void setFDA5_g(ContinuousFunction fda5_g) {
+        this.fda5_g = fda5_g;
     }
 
     /**
@@ -200,7 +199,7 @@ public class FDA5_fm implements ContinuousFunction {
      * Evaluates the function.
      */
     @Override
-    public Double apply(Vector x) {
+    public Double f(Vector x) {
         this.tau = AbstractAlgorithm.get().getIterations();
         return this.apply(this.tau, x);
     }

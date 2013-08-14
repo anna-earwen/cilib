@@ -6,10 +6,10 @@
  */
 package net.sourceforge.cilib.pso.iterationstrategies.moo;
 
+import fj.data.List;
 import net.sourceforge.cilib.algorithm.AbstractAlgorithm;
 import net.sourceforge.cilib.algorithm.population.AbstractIterationStrategy;
 import net.sourceforge.cilib.pso.particle.Particle;
-import net.sourceforge.cilib.entity.Topology;
 import net.sourceforge.cilib.problem.Problem;
 import net.sourceforge.cilib.problem.solution.MOFitness;
 import net.sourceforge.cilib.problem.solution.OptimisationSolution;
@@ -29,7 +29,8 @@ public class NonDominatedMOOSynchronousIterationStrategy extends AbstractIterati
     }
 
     /**
-     * <p>This is an Synchronous strategy:</p>
+     * This is an Synchronous strategy:
+     *
      * <ol>
      * <li>For all particles:</li>
      * <ol><li>Update the particle velocity</li>
@@ -40,12 +41,11 @@ public class NonDominatedMOOSynchronousIterationStrategy extends AbstractIterati
      *     <ol><li>Update the neighbourhood best</li></ol></ol>
      * </ol>
      *
-     * @see net.sourceforge.cilib.PSO.IterationStrategy#performIteration(net.sourceforge.cilib.PSO.PSO)
      * @param pso The {@link PSO} to have an iteration applied.
      */
     @Override
     public void performIteration(PSO pso) {
-        Topology<Particle> topology = pso.getTopology();
+        List<Particle> topology = pso.getTopology();
 
         for (Particle current : topology) {
             current.updateVelocity();
@@ -57,7 +57,7 @@ public class NonDominatedMOOSynchronousIterationStrategy extends AbstractIterati
         Problem problem = AbstractAlgorithm.getAlgorithmList().get(0).getOptimisationProblem();
         for (Particle current : topology) {
             current.calculateFitness();
-            for (Particle other : topology.neighbourhood(current)) {
+            for (Particle other : pso.getNeighbourhood().f(topology, current)) {
                 Particle p1 = current.getNeighbourhoodBest().getClone();
                 Particle p2 = other.getNeighbourhoodBest().getClone();
                 OptimisationSolution s1 = new OptimisationSolution(p1.getCandidateSolution().getClone(), problem.getFitness(p1.getCandidateSolution().getClone()));

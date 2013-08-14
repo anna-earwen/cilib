@@ -6,7 +6,6 @@
  */
 package net.sourceforge.cilib.pso;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.List;
 import net.sourceforge.cilib.algorithm.initialisation.ClonedPopulationInitialisationStrategy;
@@ -46,9 +45,11 @@ public class PSO extends SinglePopulationBasedAlgorithm<Particle> {
     private IterationStrategy<PSO> iterationStrategy;
 
     /**
-     * Creates a new instance of <code>PSO</code>. All fields are initialised to reasonable
-     * defaults. Note that the {@link net.sourceforge.cilib.problem.OptimisationProblem} is initially
-     * <code>null</code> and must be set before {@link #initialise()} is called.
+     * Creates a new instance of {@link PSO}.
+     * <p>
+     * All fields are initialised to reasonable defaults. Note that the
+     * {@link net.sourceforge.cilib.problem.Problem} is initially {@code null}
+     * and must be set before {@link #algorithmInitialisation()} is called.
      */
     public PSO() {
         iterationStrategy = new SynchronousIterationStrategy();
@@ -65,7 +66,7 @@ public class PSO extends SinglePopulationBasedAlgorithm<Particle> {
         this.iterationStrategy = copy.iterationStrategy.getClone();
 
         for (Particle p : topology) {
-            Particle nBest = Topologies.getNeighbourhoodBest(topology, p, new SocialBestFitnessComparator());
+            Particle nBest = Topologies.getNeighbourhoodBest(topology, p, this.neighbourhood, new SocialBestFitnessComparator());
             p.setNeighbourhoodBest(nBest);
         }
     }
@@ -84,8 +85,7 @@ public class PSO extends SinglePopulationBasedAlgorithm<Particle> {
      */
     @Override
     public void algorithmInitialisation() {
-        topology.clear();
-        Iterables.addAll(topology, initialisationStrategy.initialise(optimisationProblem));
+        this.topology = fj.data.List.iterableList(initialisationStrategy.<Particle>initialise(optimisationProblem));
 
         for (Particle p : topology) {
             p.calculateFitness();
@@ -120,7 +120,7 @@ public class PSO extends SinglePopulationBasedAlgorithm<Particle> {
     @Override
     public List<OptimisationSolution> getSolutions() {
         List<OptimisationSolution> solutions = Lists.newLinkedList();
-        for (Particle e : Topologies.getNeighbourhoodBestEntities(topology, new SocialBestFitnessComparator<Particle>())) {
+        for (Particle e : Topologies.getNeighbourhoodBestEntities(topology, neighbourhood, new SocialBestFitnessComparator<Particle>())) {
             solutions.add(new OptimisationSolution(e.getBestPosition(), e.getBestFitness()));
         }
         return solutions;

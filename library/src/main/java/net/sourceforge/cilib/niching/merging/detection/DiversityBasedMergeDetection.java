@@ -6,7 +6,7 @@
  */
 package net.sourceforge.cilib.niching.merging.detection;
 
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
 import net.sourceforge.cilib.controlparameter.ControlParameter;
 import net.sourceforge.cilib.measurement.single.diversity.Diversity;
@@ -28,12 +28,12 @@ public class DiversityBasedMergeDetection extends MergeDetection {
     /**
      * Determines if two swarms should be merged based on whether they overlap and
      * if the diversity of the first swarm is below a threshold.
-     * @param a
-     * @param b
-     * @return
+     * @param a a {@linkplain PopulationBasedAlgorithm}.
+     * @param b a {@linkplain PopulationBasedAlgorithm}.
+     * @return whether the two swarms should be merged.
      */
     @Override
-    public Boolean f(PopulationBasedAlgorithm a, PopulationBasedAlgorithm b) {
+    public Boolean f(SinglePopulationBasedAlgorithm a, SinglePopulationBasedAlgorithm b) {
         return diversityMeasure.getValue(a).doubleValue() < threshold.getParameter();
     }
 

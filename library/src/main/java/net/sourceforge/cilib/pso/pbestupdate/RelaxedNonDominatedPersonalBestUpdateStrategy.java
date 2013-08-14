@@ -16,14 +16,10 @@ import net.sourceforge.cilib.problem.solution.MOFitness;
 import net.sourceforge.cilib.type.types.Int;
 
 /**
- * <p>
- * Implementation of {@link GuideUpdateStrategy} where a particle's guide
- * can get updated if the new guide is not dominated by the current guide,
- * i.e. both of the guides are non-dominated. If both guides are non-
- * dominated the new guide is selected.
- * </p>
- *
- *
+ * Implementation of {@link PersonalBestUpdateStrategy} where a
+ * {@link Particle}'s guide can get updated if the new guide is not dominated
+ * by the current guide, i.e. both of the guides are non-dominated.
+ * If both guides are non-dominated the new guide is selected.
  */
 public class RelaxedNonDominatedPersonalBestUpdateStrategy implements PersonalBestUpdateStrategy {
 
@@ -40,7 +36,6 @@ public class RelaxedNonDominatedPersonalBestUpdateStrategy implements PersonalBe
      * selected. However, if both guides are non-dominated, one of the guides is
      * randomly selected.
      * @param particle The particle who's guide is to be updated.
-     * @param guideType If the local or global guide should be updated
      */
     @Override
     public void updatePersonalBest(Particle particle) {
@@ -48,35 +43,35 @@ public class RelaxedNonDominatedPersonalBestUpdateStrategy implements PersonalBe
         Problem problem = topLevelAlgorithm.getOptimisationProblem();
 
         if (particle.getFitness().getClass().getName().matches("MinimisationFitness")) {
-         if ((particle.getBestFitness() == null) || (problem.getFitness(particle.getPosition()).compareTo(problem.getFitness(particle.getBestPosition())) > 0)) {
+         if ((particle.getBestFitness() == null) || (problem.getFitness(particle.getCandidateSolution()).compareTo(problem.getFitness(particle.getBestPosition())) > 0)) {
             particle.getProperties().put(EntityType.Particle.Count.PBEST_STAGNATION_COUNTER, Int.valueOf(0));
             particle.getProperties().put(EntityType.Particle.BEST_FITNESS, particle.getFitness().getClone());
-            particle.getProperties().put(EntityType.Particle.BEST_POSITION, particle.getPosition().getClone());
+            particle.getProperties().put(EntityType.Particle.BEST_POSITION, particle.getCandidateSolution().getClone());
             return;
          }
-         else if ((particle.getBestFitness() == null) || (problem.getFitness(particle.getPosition()).compareTo(problem.getFitness(particle.getBestPosition())) == 0)) {
+         else if ((particle.getBestFitness() == null) || (problem.getFitness(particle.getCandidateSolution()).compareTo(problem.getFitness(particle.getBestPosition())) == 0)) {
             int random = Rand.nextInt(2);
             if (random == 1) {
                 particle.getProperties().put(EntityType.Particle.Count.PBEST_STAGNATION_COUNTER, Int.valueOf(0));
                 particle.getProperties().put(EntityType.Particle.BEST_FITNESS, particle.getFitness().getClone());
-                particle.getProperties().put(EntityType.Particle.BEST_POSITION, particle.getPosition().getClone());
+                particle.getProperties().put(EntityType.Particle.BEST_POSITION, particle.getCandidateSolution().getClone());
                 return;
             }
          }
         }
          else if (particle.getFitness().getClass().getName().matches("StandardMOFitness")) {
-             if ((((MOFitness)particle.getBestFitness()) == null) || (((MOFitness)problem.getFitness(particle.getPosition())).compareTo(((MOFitness)problem.getFitness(particle.getBestPosition()))) > 0)) {
+             if ((((MOFitness)particle.getBestFitness()) == null) || (((MOFitness)problem.getFitness(particle.getCandidateSolution())).compareTo(((MOFitness)problem.getFitness(particle.getBestPosition()))) > 0)) {
                 particle.getProperties().put(EntityType.Particle.Count.PBEST_STAGNATION_COUNTER, Int.valueOf(0));
                 particle.getProperties().put(EntityType.Particle.BEST_FITNESS, particle.getFitness().getClone());
-                particle.getProperties().put(EntityType.Particle.BEST_POSITION, particle.getPosition().getClone());
+                particle.getProperties().put(EntityType.Particle.BEST_POSITION, particle.getCandidateSolution().getClone());
                 return;
             }
-            else if ((((MOFitness)particle.getBestFitness()) == null) || (((MOFitness)problem.getFitness(particle.getPosition())).compareTo(((MOFitness)problem.getFitness(particle.getBestPosition()))) == 0)) {
+            else if ((((MOFitness)particle.getBestFitness()) == null) || (((MOFitness)problem.getFitness(particle.getCandidateSolution())).compareTo(((MOFitness)problem.getFitness(particle.getBestPosition()))) == 0)) {
                 int random = Rand.nextInt(20);
                 if (random > 10) {
                     particle.getProperties().put(EntityType.Particle.Count.PBEST_STAGNATION_COUNTER, Int.valueOf(0));
                     particle.getProperties().put(EntityType.Particle.BEST_FITNESS, particle.getFitness().getClone());
-                    particle.getProperties().put(EntityType.Particle.BEST_POSITION, particle.getPosition().getClone());
+                    particle.getProperties().put(EntityType.Particle.BEST_POSITION, particle.getCandidateSolution().getClone());
                     return;
                 }
             }

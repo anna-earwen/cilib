@@ -8,6 +8,7 @@ package net.sourceforge.cilib.util;
 
 import com.google.common.collect.Lists;
 import fj.F;
+import fj.data.Java;
 import java.util.List;
 import net.sourceforge.cilib.math.random.GaussianDistribution;
 import net.sourceforge.cilib.math.random.ProbabilityDistributionFunction;
@@ -21,7 +22,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * Utility functions pertaining to Matrices.
  */
 public class Matrices {
-    
+
     /**
      * Creates a square identity matrix.
      * @param size The dimension of the matrix.
@@ -30,7 +31,7 @@ public class Matrices {
     public static Matrix getIdentityMatrix(int size) {
         return Matrix.builder().dimensions(size, size).identity().build();
     }
-    
+
     /**
      * Creates a random square orthonormal matrix.
      * @param size The dimension of the matrix.
@@ -53,10 +54,10 @@ public class Matrices {
         }
 
         //orthonormalize the random vectors
-        vecs = Vectors.orthonormalize(vecs);
+        vecs = Java.<Vector>List_ArrayList().f(Vectors.orthonormalize(fj.data.List.iterableList(vecs)));
 
         //convert vectors to matrix
-        for (Vector v : vecs) {
+        for (Vector v : Vectors.orthonormalize(fj.data.List.iterableList(vecs))) {
             Double[] vals = new Double[size];
             int i = 0;
 
@@ -69,35 +70,34 @@ public class Matrices {
 
         return builder.build();
     }
-    
+
     /**
      * Creates a random linear transformation matrix:
      * PxNxQ where P and Q are orthonormal matrices and N is a diagonal matrix with
      * n_ii = c^(U(1,D)-1 / D). c is the condition number.
      * @param size
      * @param condition
-     * @return 
+     * @return the random linear transformation matrix.
      */
     public static Matrix getRandomLinearTransformationMatrix(int size, int condition) {
         ProbabilityDistributionFunction random = new UniformDistribution();
-        
+
         Matrix p = getRandomOrthonormalMatrix(size);
         Matrix q = getRandomOrthonormalMatrix(size);
         Matrix.Builder builder = Matrix.builder().dimensions(size, size);
-        
-        
+
         for (int i = 0; i < size; i++) {
             Double[] row = new Double[size];
-            
+
             for (int j = 0; j < size; j++) {
                 row[j] = i == j ? Math.pow(condition, (random.getRandomNumber(1, size + 1) - 1) / (size)) : 0.0;
             }
-            
+
             builder.addRow(row);
         }
-        
+
         Matrix n = builder.build();
-        
+
         return p.times(n).times(q);
     }
 }

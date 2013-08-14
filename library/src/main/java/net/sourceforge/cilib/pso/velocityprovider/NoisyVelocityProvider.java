@@ -13,9 +13,8 @@ import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.util.Vectors;
 
 /**
- * Decorates a {@link PositionUpdateVisitor} or a {@link VelocityProvider}
- * with random noise from any probability distribution function.
- *
+ * Decorates a {@link VelocityProvider} with random noise from any
+ * {@link ProbabilityDistributionFunction}.
  */
 public class NoisyVelocityProvider implements VelocityProvider {
 
@@ -40,7 +39,7 @@ public class NoisyVelocityProvider implements VelocityProvider {
         for (int i = 0; i < velocity.size(); i++) {
             builder.add(this.distribution.getRandomNumber());
         }
-        return Vectors.sumOf(velocity, builder.build());
+        return velocity.plus(builder.build());
     }
 
     @Override

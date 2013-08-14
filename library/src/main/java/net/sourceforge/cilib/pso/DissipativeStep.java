@@ -16,8 +16,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * TODO: This needs to be checked
  *
  * <p>
- * This implements the dissipative PSO (DPSO). Apply this to the standard PSO
- * using {@link PSO#setDissipativeStep(DissipativeStep)}.
+ * This implements the dissipative PSO (DPSO).
  * </p><p>
  * References:
  * </p><ul><li>
@@ -67,7 +66,7 @@ public class DissipativeStep {
                 /*particle.getPosition()[i] = randomGenerator.nextDouble()
                 //* (d.getUpperBound() - d.getLowerBound()) + d.getLowerBound();
                 * (component.getUpperBound() - component.getLowerBound()) + component.getLowerBound();*/
-                Vector position = (Vector) particle.getPosition();
+                Vector position = (Vector) particle.getCandidateSolution();
                 position.setReal(i, Rand.nextDouble()*(component.getBounds().getUpperBound() - component.getBounds().getLowerBound())+ component.getBounds().getLowerBound());
             }
         }

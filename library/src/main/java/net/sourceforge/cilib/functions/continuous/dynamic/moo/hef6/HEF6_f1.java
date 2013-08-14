@@ -18,9 +18,8 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * Evolutionary Computation, 13(2):284-302, 2009.
  *
  * The problem has been adapted by Helbig and Engelbrecht to make it a DMOOP.
- *
  */
-public class HEF6_f1 implements ContinuousFunction {
+public class HEF6_f1 extends ContinuousFunction {
 
     private static final long serialVersionUID = 5888250144779320506L;
     //members
@@ -93,7 +92,7 @@ public class HEF6_f1 implements ContinuousFunction {
     /**
      * Sets the g function that is used in the HEF6 problem without specifying
      * the problem.
-     * @param hef6_g ContinuousFunction used for the g function.
+     * @param g ContinuousFunction used for the g function.
      */
     public void setHEF6_g(ContinuousFunction g) {
         this.hef6_g = g;
@@ -111,7 +110,7 @@ public class HEF6_f1 implements ContinuousFunction {
      * Evaluates the function.
      */
     @Override
-    public Double apply(Vector x) {
+    public Double f(Vector x) {
         int iteration = AbstractAlgorithm.get().getIterations();
         return this.apply(iteration, x);
     }

@@ -14,7 +14,6 @@ import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.pso.velocityprovider.StandardVelocityProvider;
 import net.sourceforge.cilib.pso.velocityprovider.VelocityProvider;
 import net.sourceforge.cilib.type.types.container.Vector;
-import net.sourceforge.cilib.util.Vectors;
 
 /**
  * VelocityProvider that the so called Charged PSO makes use of.
@@ -49,7 +48,7 @@ public class ChargedVelocityProvider implements VelocityProvider {
 
     @Override
     public Vector get(Particle particle) {
-        Vector position = (Vector) particle.getPosition();
+        Vector position = (Vector) particle.getCandidateSolution();
 
         PSO pso = (PSO) AbstractAlgorithm.get();
 
@@ -57,14 +56,14 @@ public class ChargedVelocityProvider implements VelocityProvider {
         Vector.Builder builder = Vector.newBuilder();
         for (int i = 0; i < particle.getDimension(); ++i) {
             double accSum = 0;
-            for (Particle other : pso.getTopology().neighbourhood(particle)) {
+            for (Particle other : pso.getNeighbourhood().f(pso.getTopology(), particle)) {
                 if (particle.getId() == other.getId()) {
                     continue;
                 }
 
                 double qi = ((ChargedParticle) particle).getCharge();
                 double qj = ((ChargedParticle) other).getCharge();
-                Vector rij = position.subtract((Vector) other.getPosition());
+                Vector rij = position.subtract((Vector) other.getCandidateSolution());
                 double magnitude = rij.norm();
 
                 if (this.pCore.getParameter() <= magnitude && magnitude <= this.p.getParameter()) {
@@ -78,7 +77,7 @@ public class ChargedVelocityProvider implements VelocityProvider {
 
         Vector velocity = this.delegate.get(particle);
 
-        return Vectors.sumOf(velocity, acceleration);
+        return velocity.plus(acceleration);
     }
 
     public void setDelegate(VelocityProvider delegate) {

@@ -6,11 +6,11 @@
  */
 package net.sourceforge.cilib.functions.continuous.decorators;
 
-import fj.F;
 import net.sourceforge.cilib.functions.ContinuousFunction;
 import net.sourceforge.cilib.type.types.Numeric;
 import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
+import fj.F;
 
 /**
  * Implementation to create an irregular function.
@@ -23,13 +23,13 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * on Real-Parameter Optimization." (2013).
  * </p>
  */
-public class IrregularFunctionDecorator implements ContinuousFunction {
+public class IrregularFunctionDecorator extends ContinuousFunction {
 
     private ContinuousFunction function;
+    private F<Numeric, Numeric> mapping;
 
-    @Override
-    public Double apply(Vector input) {
-        return function.apply(input.map(new F<Numeric, Numeric>() {
+    public IrregularFunctionDecorator() {
+        mapping = new F<Numeric, Numeric>() {
             @Override
             public Numeric f(Numeric a) {
                 double x = a.doubleValue();
@@ -39,7 +39,12 @@ public class IrregularFunctionDecorator implements ContinuousFunction {
                 double result = Math.signum(x) * Math.exp(xHat + 0.049 * (Math.sin(xHat * c1) + Math.sin(xHat * c2)));
                 return Real.valueOf(result);
             }
-        }));
+        };
+    }
+
+    @Override
+    public Double f(Vector input) {
+        return function.f(input.map(mapping));
     }
 
     public void setFunction(ContinuousFunction function) {
@@ -48,6 +53,10 @@ public class IrregularFunctionDecorator implements ContinuousFunction {
 
     public ContinuousFunction getFunction() {
         return function;
+    }
+
+    public F<Numeric, Numeric> getMapping() {
+        return mapping;
     }
 
 }

@@ -46,11 +46,13 @@ public class StandardParticle extends AbstractParticle {
 
     @Override
     public boolean equals(Object object) {
-        if (this == object)
+        if (this == object) {
             return true;
+        }
 
-        if ((object == null) || (this.getClass() != object.getClass()))
+        if ((object == null) || (this.getClass() != object.getClass())) {
             return false;
+        }
 
         StandardParticle other = (StandardParticle) object;
         return super.equals(object) &&
@@ -82,24 +84,8 @@ public class StandardParticle extends AbstractParticle {
      * {@inheritDoc}
      */
     @Override
-    public int getDimension() {
-        return getPosition().size();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Particle getNeighbourhoodBest() {
         return this.neighbourhoodBest;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Vector getPosition() {
-        return (Vector) getCandidateSolution();
     }
 
     /**
@@ -116,8 +102,8 @@ public class StandardParticle extends AbstractParticle {
     @Override
     public void initialise(Problem problem) {
         this.getProperties().put(EntityType.CANDIDATE_SOLUTION, problem.getDomain().getBuiltRepresentation().getClone());
-        this.getProperties().put(EntityType.Particle.BEST_POSITION, Vector.copyOf(getPosition()));
-        this.getProperties().put(EntityType.Particle.VELOCITY, Vector.copyOf(getPosition()));
+        this.getProperties().put(EntityType.Particle.BEST_POSITION, Vector.copyOf((Vector) getCandidateSolution()));
+        this.getProperties().put(EntityType.Particle.VELOCITY, Vector.copyOf((Vector) getCandidateSolution()));
 
         this.positionInitialisationStrategy.initialise(EntityType.CANDIDATE_SOLUTION, this);
         this.personalBestInitialisationStrategy.initialise(EntityType.Particle.BEST_POSITION, this);
@@ -146,10 +132,7 @@ public class StandardParticle extends AbstractParticle {
      */
     @Override
     public void calculateFitness() {
-        Fitness fitness = getFitnessCalculator().getFitness(this);
-        this.getProperties().put(EntityType.PREVIOUS_FITNESS, this.getFitness());
-        this.getProperties().put(EntityType.FITNESS, fitness);
-
+        super.calculateFitness();
         this.personalBestUpdateStrategy.updatePersonalBest(this);
     }
 
@@ -175,7 +158,6 @@ public class StandardParticle extends AbstractParticle {
     @Override
     public void reinitialise() {
         this.positionInitialisationStrategy.initialise(EntityType.CANDIDATE_SOLUTION, this);
-        this.personalBestInitialisationStrategy.initialise(EntityType.Particle.BEST_POSITION, this);
         this.velocityInitialisationStrategy.initialise(EntityType.Particle.VELOCITY, this);
     }
 }

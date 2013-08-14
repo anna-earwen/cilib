@@ -16,40 +16,40 @@ import net.sourceforge.cilib.entity.operators.crossover.CrossoverStrategy;
 import net.sourceforge.cilib.math.random.ProbabilityDistributionFunction;
 import net.sourceforge.cilib.math.random.UniformDistribution;
 import net.sourceforge.cilib.type.types.container.Vector;
-import net.sourceforge.cilib.util.Entities;
 import net.sourceforge.cilib.util.Vectors;
+import net.sourceforge.cilib.util.functions.Entities;
 
 /**
  * <p> Simplex Crossover Strategy </p>
  *
- * <p> References: </p> 
- * 
+ * <p> References: </p>
+ *
  * <p> Tsutsui, S.; Goldberg, D.E.; , "Simplex crossover
  * and linkage identification: single-stage evolution vs. multi-stage
  * evolution," Evolutionary Computation, 2002. CEC '02. Proceedings of the 2002
  * Congress on, vol.1, no., pp.974-979, 12-17 May 2002 doi:
  * 10.1109/CEC.2002.1007057 URL:
  * http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1007057&isnumber=21693
- * </p> 
- * 
+ * </p>
+ *
  * <p> The code is based on the MOEA Framework under the LGPL license:
  * http://www.moeaframework.org </p>
  */
 public class SimplexCrossoverStrategy implements CrossoverStrategy {
 
-    private int numberOfOffspring;
+    private ControlParameter numberOfOffspring;
     private ControlParameter epsilon;
     private boolean useDefaultEpsilon;
-    private int numberOfParents;
+    private ControlParameter numberOfParents;
 
     /**
      * Default constructor.
      */
     public SimplexCrossoverStrategy() {
-        this.numberOfOffspring = 1;
+        this.numberOfOffspring = ConstantControlParameter.of(1);
         this.epsilon = ConstantControlParameter.of(0.1);
         this.useDefaultEpsilon = true;
-        this.numberOfParents = 3;
+        this.numberOfParents = ConstantControlParameter.of(3);
     }
 
     /**
@@ -58,10 +58,10 @@ public class SimplexCrossoverStrategy implements CrossoverStrategy {
      * @param copy
      */
     public SimplexCrossoverStrategy(SimplexCrossoverStrategy copy) {
-        this.numberOfOffspring = copy.numberOfOffspring;
+        this.numberOfOffspring = copy.numberOfOffspring.getClone();
         this.epsilon = copy.epsilon.getClone();
         this.useDefaultEpsilon = copy.useDefaultEpsilon;
-        this.numberOfParents = copy.numberOfParents;
+        this.numberOfParents = copy.numberOfParents.getClone();
     }
 
     /**
@@ -78,13 +78,13 @@ public class SimplexCrossoverStrategy implements CrossoverStrategy {
     @Override
     public <E extends Entity> List<E> crossover(List<E> parentCollection) {
         Preconditions.checkArgument(parentCollection.size() >= 3, "ParentCentricCrossoverStrategy requires at least 3 parents.");
-        Preconditions.checkState(numberOfOffspring > 0, "At least one offspring must be generated. Check 'numberOfOffspring'.");
+        Preconditions.checkState(numberOfOffspring.getParameter() > 0, "At least one offspring must be generated. Check 'numberOfOffspring'.");
 
-        List<Vector> solutions = Entities.<Vector>getCandidateSolutions(parentCollection);
+        List<Vector> solutions = Entities.<Vector, E>getCandidateSolutions(parentCollection);
         List<Vector> simplexVertices = Lists.newArrayList();
         List<E> offspring = Lists.newArrayList();
         ProbabilityDistributionFunction random = new UniformDistribution();
-        Vector mean = Vectors.mean(solutions);
+        Vector mean = Vectors.mean(fj.data.List.iterableList(solutions)).valueE("Failed to obtain mean");
         final int n = solutions.size();
 
         if (useDefaultEpsilon) {
@@ -96,7 +96,7 @@ public class SimplexCrossoverStrategy implements CrossoverStrategy {
             simplexVertices.add(mean.plus(v.subtract(mean).multiply(epsilon.getParameter())));
         }
 
-        for (int os = 0; os < numberOfOffspring; os++) {
+        for (int os = 0; os < numberOfOffspring.getParameter(); os++) {
             // calculate offset vectors
             List<Vector> offsetVectors = Lists.newArrayList();
             offsetVectors.add(mean.subtract(mean)); // add a zero vector (using mean - mean to preserve bounds)
@@ -112,7 +112,7 @@ public class SimplexCrossoverStrategy implements CrossoverStrategy {
 
             E child = (E) parentCollection.get(n - 1).getClone();
             child.setCandidateSolution(variables);
-            
+
             offspring.add(child);
         }
 
@@ -143,27 +143,29 @@ public class SimplexCrossoverStrategy implements CrossoverStrategy {
      *
      * @param numberOfOffspring The number of offspring required
      */
-    public void setNumberOfOffspring(int numberOfOffspring) {
+    public void setNumberOfOffspring(ControlParameter numberOfOffspring) {
         this.numberOfOffspring = numberOfOffspring;
     }
 
-    public int getNumberOfOffspring() {
+    public ControlParameter getNumberOfOffspring() {
         return numberOfOffspring;
     }
 
     @Override
     public int getNumberOfParents() {
-        return numberOfParents;
+        return (int) numberOfParents.getParameter();
     }
 
-    public void setNumberOfParents(int numberOfParents) {
+    public void setNumberOfParents(ControlParameter numberOfParents) {
         this.numberOfParents = numberOfParents;
     }
-    
+
+    @Override
     public void setCrossoverPointProbability(double crossoverPointProbability) {
         throw new UnsupportedOperationException("Not applicable");
     }
-    
+
+    @Override
     public ControlParameter getCrossoverPointProbability() {
         throw new UnsupportedOperationException("Not applicable");
     }

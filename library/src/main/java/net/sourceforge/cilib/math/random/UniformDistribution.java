@@ -25,9 +25,19 @@ public class UniformDistribution implements ProbabilityDistributionFunction {
     }
 
     /**
+     * Contructor to initialize bounds to non-default values.
+     * @param lowerBound The lower bound of the distribution.
+     * @param upperBound The upper bound of the distribution.
+     */
+    public UniformDistribution(ControlParameter lowerBound, ControlParameter upperBound) {
+        this.lowerBound = lowerBound;
+        this.upperBound = upperBound;
+    }
+
+    /**
      * Get a uniform random number located within {@code 0 &lt;= x &lt; 1}.
      *
-     * @return Uniform random number ({@code 0 &lt;= x &lt; 1}).
+     * @return uniform random number ({@code 0 &lt;= x &lt; 1}).
      */
     @Override
     public double getRandomNumber() {
@@ -37,13 +47,12 @@ public class UniformDistribution implements ProbabilityDistributionFunction {
     /**
      * Get the uniform random number. The number is located within {@code A &lt;= x &lt; B}
      * where {@code A == mean} and {@code B == deviation}.
-     *
+     * <p>
      * Two parameters are required. The first specifies the lower bound,
      * the second specifies the upper bound.
      *
-     * @param lower The lower bound for the number generation.
-     * @param upper The upper bound for the number generation.
-     * @return Uniform random number ({@code lower &lt;= x &lt; upper}).
+     * @param bounds the bounds for the number generation.
+     * @return uniform random number ({@code lower &lt;= x &lt; upper}).
      */
     @Override
     public double getRandomNumber(double... bounds) {

@@ -18,25 +18,24 @@ import net.sourceforge.cilib.type.types.Types;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
- * This {@linkplain OptimisationProblem} is used by the participants of a
- * {@linkplain CooperativeCoevolutionAlgorithm}. It stores the
- * {@linkplain DimensionAllocation} of the participant, and provides the
- * means to calculate the fitness of {@linkplain Entity}s
+ * This {@linkplain CooperativeCoevolutionProblemAdapter optimisation problem}
+ * is used by the participants of a {@linkplain CooperativeCoevolutionAlgorithm}.
+ * It stores the {@linkplain DimensionAllocation} of the participant, and
+ * provides the means to calculate the fitness of {@linkplain Entity}s
  * of the participating {@linkplain Algorithm}s.
- *
  */
 public class CooperativeCoevolutionProblemAdapter extends AbstractProblem {
 
     private static final long serialVersionUID = 3764040830993620887L;
-    private Problem problem;
-    //private DomainRegistry problemDomain;
+    private final Problem problem;
     private Vector context;
-    private DimensionAllocation problemAllocation;
+    private final DimensionAllocation problemAllocation;
 
     /**
-     * Creates an CooperativeCoevolutionProblemAdapter, which is assigned to each participant in\
-     * a {@linkplain CooperativeCoevolutionAlgorithm}.
-     * @param problem The original problem that is being optimized
+     * Creates an CooperativeCoevolutionProblemAdapter, which is assigned to
+     * each participant in a {@linkplain CooperativeCoevolutionAlgorithm}.
+     *
+     * @param problem The original problem that is being optimised.
      * @param problemAllocation The {@linkplain DimensionAllocation} which dictates how the solutions
      *     of the {@linkplain Entity}'s that are optimizing this problem fits into the original problem.
      * @param context The current context solution of the {@linkplain CooperativeCoevolutionAlgorithm}

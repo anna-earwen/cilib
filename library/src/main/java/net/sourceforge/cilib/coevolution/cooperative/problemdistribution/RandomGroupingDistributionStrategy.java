@@ -10,7 +10,7 @@ import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.cilib.algorithm.Algorithm;
-import net.sourceforge.cilib.algorithm.population.PopulationBasedAlgorithm;
+import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.CooperativeCoevolutionAlgorithm;
 import net.sourceforge.cilib.coevolution.cooperative.problem.CooperativeCoevolutionProblemAdapter;
 import net.sourceforge.cilib.coevolution.cooperative.problem.RandomDimensionAllocation;
@@ -27,21 +27,28 @@ import net.sourceforge.cilib.util.selection.arrangement.RandomArrangement;
  * {@linkplain PopulationBasedAlgorithm}. Defaults into a split of equal
  * sizes if possible. The order in which the algorithms are assigned
  * is generated randomly.
- *
  */
 public class RandomGroupingDistributionStrategy implements
         ProblemDistributionStrategy {
 
     /**
-     * Splits up the given {@link OptimisationProblem} into sub-problems, where each sub problem contains a portion of the problem, of non-uniform length, which consists of random dimensions of the problem vector, and assigns them to all the participating {@link Algorithm}s.
-     * This implementation assigns a portion of length dimensionality/number of populations + 1 to dimensionality % number of populations of the participating populations.
-     * The order in which the algorithms are assigned is generated randomly.
-     * @param populations The list of participating {@linkplain PopulationBasedAlgorithm}s.
-     * @param problem The problem that needs to be re-distributed.
-     * @param context The context vector maintained by the {@linkplain CooperativeCoevolutionAlgorithm}.
+     * Splits up the given {@link Problem} into
+     * sub-problems, where each sub-problem contains a portion of the problem,
+     * of non-uniform length, which consists of random dimensions of the problem
+     * vector, and assigns them to all the participating {@link Algorithm}s.
+     * This implementation assigns a portion of length dimensionality/number of
+     * populations + 1 to dimensionality % number of populations of the
+     * participating populations. The order in which the algorithms are assigned
+     * is generated randomly.
+     *
+     * @param populations   The list of participating
+     *                      {@linkplain PopulationBasedAlgorithm}s.
+     * @param problem       The {@linkplain Problem} that needs to be re-distributed.
+     * @param context       The context vector maintained by the
+     *                      {@linkplain CooperativeCoevolutionAlgorithm}.
      */
     @Override
-    public void performDistribution(List<PopulationBasedAlgorithm> populations,
+    public void performDistribution(List<SinglePopulationBasedAlgorithm> populations,
             Problem problem, Vector context) {
         //need to do a completely random split depending on the number of sub populations
         Preconditions.checkArgument(populations.size() >= 2,

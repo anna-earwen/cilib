@@ -6,26 +6,26 @@
  */
 package net.sourceforge.cilib.pso.velocityprovider;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
 import net.sourceforge.cilib.algorithm.AbstractAlgorithm;
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
 import net.sourceforge.cilib.controlparameter.ControlParameter;
 import net.sourceforge.cilib.entity.Entity;
-import net.sourceforge.cilib.entity.Topology;
 import net.sourceforge.cilib.math.random.ProbabilityDistributionFunction;
 import net.sourceforge.cilib.math.random.UniformDistribution;
-import net.sourceforge.cilib.math.random.generator.Rand;
 import net.sourceforge.cilib.pso.PSO;
 import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.type.types.container.Vector;
 
+import com.google.common.collect.Lists;
+
 /**
- *  The <tt>VelocityProvider</tt> which uses a DE strategy where the trial
+ * A {@link VelocityProvider} which uses a DE strategy where the trial
  * vector is the bare bones attractor point.
  *
  *  TODO: To be published by Omran and Engelbrecht
- *
  */
 public class BareBonesDEVelocityProvider implements VelocityProvider {
 
@@ -79,14 +79,13 @@ public class BareBonesDEVelocityProvider implements VelocityProvider {
         Vector globalGuide = (Vector) particle.getGlobalGuide();
 
         PSO pso = (PSO) AbstractAlgorithm.get();
-        List<Entity> positions = getRandomParentEntities(pso.getTopology());
+        fj.data.List<Entity> positions = getRandomParentEntities(pso.getTopology());
 
         //select three random individuals, all different and different from particle
         ProbabilityDistributionFunction pdf = new UniformDistribution();
 
-        Vector position1 = (Vector) positions.get(0).getCandidateSolution();
-        Vector position2 = (Vector) positions.get(1).getCandidateSolution();
-//        Vector position3 = (Vector) positions.get(2).getContents();
+        Vector position1 = (Vector) positions.index(0).getCandidateSolution();
+        Vector position2 = (Vector) positions.index(1).getCandidateSolution();
 
         Vector.Builder builder = Vector.newBuilder();
         for (int i = 0; i < particle.getDimension(); ++i) {
@@ -97,7 +96,7 @@ public class BareBonesDEVelocityProvider implements VelocityProvider {
             if (this.rand2.getRandomNumber(0, 1) > this.crossoverProbability.getParameter()) {
                 builder.add(attractor + stepSize);
             } else {
-                builder.add(((Vector) particle.getPosition()).doubleValueOf(i)); //position3.getReal(i));
+                builder.add(((Vector) particle.getCandidateSolution()).doubleValueOf(i));
             }
         }
         return builder.build();
@@ -106,38 +105,26 @@ public class BareBonesDEVelocityProvider implements VelocityProvider {
     /**
      * Get a list of individuals that are suitable to be used within
      * the recombination arithmetic operator.
-     * @param topology The {@see net.sourceforge.cilib.entity.Topology Topology} containing the entities.
+     *
+     * @param topology The {@link Topology} containing the entities.
      * @return A list of unique entities.
      */
-    public static List<Entity> getRandomParentEntities(Topology<? extends Entity> topology) {
-        List<Entity> parents = new ArrayList<Entity>(3);
-
-        ProbabilityDistributionFunction randomNumber = new UniformDistribution();
-
-        int count = 0;
-
-        while (count < 3) {
-            int random = Rand.nextInt(topology.size());
-            Entity parent = topology.get(random);
-            if (!parents.contains(parent)) {
-                parents.add(parent);
-                count++;
-            }
-        }
-
-        return parents;
+    public static fj.data.List<Entity> getRandomParentEntities(fj.data.List<? extends Entity> topology) {
+    	List<Entity> collection = Lists.newArrayList(topology.toCollection());
+    	Collections.shuffle(collection);
+        return fj.data.List.iterableList(collection.subList(0, 3));
     }
 
     /**
-     * Get the first {@linkplain RandomNumber}.
-     * @return The first {@linkplain RandomNumber}.
+     * Get the first {@code RandomNumber}.
+     * @return The first {@code RandomNumber}.
      */
     public ProbabilityDistributionFunction getRand1() {
         return this.rand1;
     }
 
     /**
-     * Set the first {@linkplain RandomNumber}.
+     * Set the first {@code RandomNumber}.
      * @param rand1 The value to set.
      */
     public void setRand1(ProbabilityDistributionFunction rand1) {
@@ -145,15 +132,15 @@ public class BareBonesDEVelocityProvider implements VelocityProvider {
     }
 
     /**
-     * Get the second{@linkplain RandomNumber}.
-     * @return The second {@linkplain RandomNumber}.
+     * Get the second{@code RandomNumber}.
+     * @return The second {@code RandomNumber}.
      */
     public ProbabilityDistributionFunction getRand2() {
         return this.rand2;
     }
 
     /**
-     * Set the second {@linkplain RandomNumber}.
+     * Set the second {@code RandomNumber}.
      * @param rand2 The value to set.
      */
     public void setRand2(ProbabilityDistributionFunction rand2) {
@@ -161,15 +148,15 @@ public class BareBonesDEVelocityProvider implements VelocityProvider {
     }
 
     /**
-     * Get the third {@linkplain RandomNumber}.
-     * @return The third {@linkplain RandomNumber}.
+     * Get the third {@code RandomNumber}.
+     * @return The third {@code RandomNumber}.
      */
     public ProbabilityDistributionFunction getRand3() {
         return this.rand3;
     }
 
     /**
-     * Set the third {@linkplain RandomNumber}.
+     * Set the third {@code RandomNumber}.
      * @param rand3 The value to set.
      */
     public void setRand3(ProbabilityDistributionFunction rand3) {

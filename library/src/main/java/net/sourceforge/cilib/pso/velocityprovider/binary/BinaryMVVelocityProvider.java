@@ -69,8 +69,8 @@ public final class BinaryMVVelocityProvider implements VelocityProvider {
         if ((properties.get(Velocity.V0) == null)
             || (properties.get(Velocity.V1) == null)) {
 
-            particle.getProperties().put(Velocity.V0, particle.getPosition());
-            particle.getProperties().put(Velocity.V1, particle.getPosition());
+            particle.getProperties().put(Velocity.V0, particle.getCandidateSolution());
+            particle.getProperties().put(Velocity.V1, particle.getCandidateSolution());
         }
 
         Vector v0 = (Vector) properties.get(Velocity.V0);
@@ -107,7 +107,7 @@ public final class BinaryMVVelocityProvider implements VelocityProvider {
 
         // return combined velocity
         Vector.Builder combined = Vector.newBuilder();
-        Vector position = (Vector) particle.getPosition();
+        Vector position = (Vector) particle.getCandidateSolution();
         for (int i = 0; i < particle.getDimension(); i++) {
             if (position.booleanValueOf(i)) {
                 combined.addWithin(v0.doubleValueOf(i), position.boundsOf(i));
@@ -149,7 +149,7 @@ public final class BinaryMVVelocityProvider implements VelocityProvider {
     /**
      * Set the <tt>ControlParameter</tt> for the inertia weight of the velocity
      * update equation.
-     * @param inertiaComponent The inertiaComponent to set.
+     * @param inertiaWeight The inertiaWeight to set.
      */
     public void setInertiaWeight(ControlParameter inertiaWeight) {
         this.inertiaWeight = inertiaWeight;

@@ -28,12 +28,6 @@ public interface Particle extends Entity, SocialEntity, MemoryBasedEntity {
     Particle getClone();
 
     /**
-     * Get the current position of the {@linkplain Particle}.
-     * @return The {@linkplain Type} representing the position.
-     */
-    StructuredType getPosition();
-
-    /**
      * Get the current velocity of the {@linkplain Particle}.
      * @return The {@linkplain Type} representing the velocity.
      */
@@ -79,7 +73,7 @@ public interface Particle extends Entity, SocialEntity, MemoryBasedEntity {
 
     /**
      * Get the strategy for the initialisation of the velocity.
-     * @return The {@linkplain VelocityInitialisationStrategy} that is currently set.
+     * @return The velocity {@linkplain InitialisationStrategy} that is currently set.
      */
     InitialisationStrategy getVelocityInitialisationStrategy();
 
@@ -121,7 +115,7 @@ public interface Particle extends Entity, SocialEntity, MemoryBasedEntity {
 
     /**
      * Set the behavior that the current particle should follow.
-     * @param behavior The {@link ParticleBehavior} to use.
+     * @param particleBehavior The {@linkplain ParticleBehavior} to use.
      */
     void setParticleBehavior(ParticleBehavior particleBehavior);
 
