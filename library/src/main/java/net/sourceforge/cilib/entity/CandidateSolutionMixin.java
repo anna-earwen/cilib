@@ -32,7 +32,7 @@ public class CandidateSolutionMixin implements CandidateSolution {
      * data structure.
      */
     public CandidateSolutionMixin() {
-        this.properties = new Blackboard<Enum<?>, Type>();
+        this.properties = new /*Archived*/Blackboard<Enum<?>, Type>();
     }
 
     /**
@@ -41,7 +41,7 @@ public class CandidateSolutionMixin implements CandidateSolution {
      * @param copy The template object to copy.
      */
     public CandidateSolutionMixin(CandidateSolutionMixin copy) {
-        this.properties = new Blackboard<Enum<?>, Type>();
+        this.properties = new /*Archived*/Blackboard<Enum<?>, Type>();
 
         for (Map.Entry<Enum<?>, Type> entry : copy.properties.entrySet()) {
             this.properties.put(entry.getKey(), entry.getValue().getClone());

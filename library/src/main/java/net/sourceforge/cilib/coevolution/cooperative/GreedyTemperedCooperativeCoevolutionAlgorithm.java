@@ -1,23 +1,8 @@
-/**
- * Computational Intelligence Library (CIlib)
- * Copyright (C) 2003 - 2010
- * Computational Intelligence Research Group (CIRG@UP)
- * Department of Computer Science
- * University of Pretoria
- * South Africa
- *
- * This library is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, see <http://www.gnu.org/licenses/>.
+/**           __  __
+ *    _____ _/ /_/ /_    Computational Intelligence Library (CIlib)
+ *   / ___/ / / / __ \   (c) CIRG @ UP
+ *  / /__/ / / / /_/ /   http://cilib.net
+ *  \___/_/_/_/_.___/
  */
 package net.sourceforge.cilib.coevolution.cooperative;
 
@@ -32,7 +17,10 @@ import net.sourceforge.cilib.coevolution.cooperative.problemdistribution.Problem
 import net.sourceforge.cilib.problem.solution.OptimisationSolution;
 
 /**
- *
+ * This class implements a greedy thresholded approach to cooperative optimization.
+ * Only one subpopulation is worked on at every iteration, moving to the next 
+ * subpopulation when the threshold number of iterations has been reached.
+ * 
  */
 public class GreedyTemperedCooperativeCoevolutionAlgorithm extends CooperativeCoevolutionAlgorithm {
 

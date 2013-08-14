@@ -1,23 +1,8 @@
-/**
- * Computational Intelligence Library (CIlib)
- * Copyright (C) 2003 - 2010
- * Computational Intelligence Research Group (CIRG@UP)
- * Department of Computer Science
- * University of Pretoria
- * South Africa
- *
- * This library is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, see <http://www.gnu.org/licenses/>.
+/**           __  __
+ *    _____ _/ /_/ /_    Computational Intelligence Library (CIlib)
+ *   / ___/ / / / __ \   (c) CIRG @ UP
+ *  / /__/ / / / /_/ /   http://cilib.net
+ *  \___/_/_/_/_.___/
  */
 package net.sourceforge.cilib.coevolution.cooperative;
 
@@ -33,36 +18,10 @@ import net.sourceforge.cilib.measurement.single.ThresholdedStagnationFlag;
 import net.sourceforge.cilib.problem.solution.OptimisationSolution;
 
 /**
- * This class forms the basis for any co-operative coevolution optimization
- * algorithm implementations. A cooperative algorithm is an algorithm that
- * maintains a context solution and a list of participating algorithms. Each
- * participating algorithm optimizes only a subsection of the problem, and
- * fitness values are computed by inserting an enitie's solution into the
- * current context vector before it is evaluated. The context vector is simply
- * the concatenation of the best solutions from each participating population.
- *
- * Any algorithm that wishes to participate in a co-operative optimisation
- * algorithm must implement the {@link ParticipatingAlgorithm} interface. This class
- * also implements {@link ParticipatingAlgorithm}, meaning that co-operative
- * algorithms can be composed of co-operative algorithms again.
- *
- * <p>
- * References:
- * </p>
- * <p>
- * <ul>
- * <li> M. Potter and K.D. Jong, "A Cooperative Coevolutionary approach to function optimization,"
- * in Proceedings of the Third conference on Paralell Problem Solving from Nature, pp. 249-257,
- * Springer-Verlag, 1994.
- * </li>
- * <li> F. van den Bergh and A. Engelbrecht, "A cooperative approach to particle swarm optimization,"
- * IEEE Transactions on Evolutionary Computation, vol. 8, no. 3, pp 225-239, 2004.
- * </li>
- * </ul>
- * </p>
- *
- * @TODO: test this class.
- *
+ * This class implements a greedy approach to cooperative optimization.
+ * Only one subpopulation is worked on at every iteration, moving to 
+ * the next subpopulation when the current one stagnates. 
+ * 
  */
 public class GreedyCooperativeCoevolutionAlgorithm extends CooperativeCoevolutionAlgorithm {
 

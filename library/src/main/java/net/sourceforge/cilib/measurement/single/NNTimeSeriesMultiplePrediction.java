@@ -1,23 +1,8 @@
-/**
- * Computational Intelligence Library (CIlib)
- * Copyright (C) 2003 - 2010
- * Computational Intelligence Research Group (CIRG@UP)
- * Department of Computer Science
- * University of Pretoria
- * South Africa
- *
- * This library is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, see <http://www.gnu.org/licenses/>.
+/**           __  __
+ *    _____ _/ /_/ /_    Computational Intelligence Library (CIlib)
+ *   / ___/ / / / __ \   (c) CIRG @ UP
+ *  / /__/ / / / /_/ /   http://cilib.net
+ *  \___/_/_/_/_.___/
  */
 package net.sourceforge.cilib.measurement.single;
 
@@ -25,9 +10,10 @@ import java.util.ArrayList;
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.io.StandardPatternDataTable;
 import net.sourceforge.cilib.io.pattern.StandardPattern;
+import net.sourceforge.cilib.math.random.GaussianDistribution;
+import net.sourceforge.cilib.math.random.ProbabilityDistributionFunction;
 import net.sourceforge.cilib.measurement.Measurement;
 import net.sourceforge.cilib.nn.NeuralNetwork;
-import net.sourceforge.cilib.problem.nn.NNDataTrainingProblem;
 import net.sourceforge.cilib.problem.nn.NNTrainingProblem;
 import net.sourceforge.cilib.type.types.Numeric;
 import net.sourceforge.cilib.type.types.Real;
@@ -36,16 +22,22 @@ import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.type.types.container.Vector.Builder;
 
 /**
- * Calculates the MSE generalization error of the best solution of an algorithm
- * optimizing a {@link NNDataTrainingProblem}.
+ * Generates NN time series prediction data for networks with one-step-ahead prediction
  */
 public class NNTimeSeriesMultiplePrediction implements Measurement {
 
     private static final long serialVersionUID = -1014032196750640716L;
-     private int tau = 1; // specifies the time lag between observations
-    private int step = 1; // specifies the distance between patterns
     private int n = 1; // specifies the extent of multivariate prediction. Can't be bigger than embedding.
     private int extraSteps = 0;
+    private ProbabilityDistributionFunction randomNumber;
+    private double variance;
+    private Boolean noisy = false;
+    
+    public NNTimeSeriesMultiplePrediction() {        
+        randomNumber = new GaussianDistribution();
+        variance = 0.5;
+    }
+    
     /**
      * {@inheritDoc }
      */
@@ -83,10 +75,15 @@ public class NNTimeSeriesMultiplePrediction implements Measurement {
         for(int i = 0; i < n; i++) { // predict n values
             StandardPattern pattern = dataSet.getRow(i);
             Vector inputs = pattern.getVector();
-            for(int j = 0; j <predicted.size(); j++ ) { // substitute predicted values into the pattern
-                inputs.setReal(pattern.getVector().size() - predicted.size() + j, predicted.get(j).doubleValue());
-            }
             //System.out.println("Original Inputs: "+inputs.toString());
+            for(int j = 0; j <predicted.size(); j++ ) { // substitute predicted values into the pattern
+                double predVal = predicted.get(j).doubleValue();
+                if(noisy) {
+                    predVal += randomNumber.getRandomNumber(0.0, variance);
+                }
+                inputs.setReal(pattern.getVector().size() - predicted.size() + j, predVal);
+            }
+            //System.out.println("Inputs with replaced items: "+inputs.toString());
             pattern.setVector(inputs);
             Vector prediction = neuralNetwork.evaluatePattern(pattern);
             for(Numeric value : prediction) {
@@ -98,9 +95,15 @@ public class NNTimeSeriesMultiplePrediction implements Measurement {
         for (StandardPattern pattern : dataSet) {
             // set the input vector
             Vector inputs = pattern.getVector();
+            //System.out.println("Original Inputs: "+inputs.toString());
             for(int j = 0; j < n; j++ ) { // substitute predicted values into the pattern
-                inputs.setReal(pattern.getVector().size() - n + j, predicted.get(j).doubleValue());
+                double predVal = predicted.get(j).doubleValue();
+                if(noisy) {
+                    predVal += randomNumber.getRandomNumber(0.0, variance);
+                }
+                inputs.setReal(pattern.getVector().size() - n + j, predVal);
             }
+            //System.out.println("Inputs with replaced items: "+inputs.toString());
             // get the prediction
             //System.out.println("Inputs: "+inputs.toString());
             pattern.setVector(inputs);
@@ -131,6 +134,30 @@ public class NNTimeSeriesMultiplePrediction implements Measurement {
 
     public void setN(int n) {
         this.n = n;
+    }
+
+    public ProbabilityDistributionFunction getRandomNumber() {
+        return randomNumber;
+    }
+
+    public void setRandomNumber(ProbabilityDistributionFunction randomNumber) {
+        this.randomNumber = randomNumber;
+    }
+
+    public double getVariance() {
+        return variance;
+    }
+
+    public void setVariance(double variance) {
+        this.variance = variance;
+    }
+
+    public Boolean getNoisy() {
+        return noisy;
+    }
+
+    public void setNoisy(Boolean noisy) {
+        this.noisy = noisy;
     }
 
 }
