@@ -134,7 +134,7 @@ public class GreedyCooperativeCoevolutionAlgorithm extends CooperativeCoevolutio
      * {@inheritDoc}
      */
     @Override
-    public void addPopulationBasedAlgorithm(PopulationBasedAlgorithm algorithm) {
+    public void addPopulationBasedAlgorithm(SinglePopulationBasedAlgorithm algorithm) {
         // TODO: There should be a better way to perfrom this test, rather than using an instanceof.
         if (((ParticipatingAlgorithm) algorithm).getContributionSelectionStrategy() instanceof ZeroContributionSelectionStrategy) {
             ((ParticipatingAlgorithm) algorithm).setContributionSelectionStrategy(contributionSelection);
