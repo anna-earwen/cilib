@@ -1,23 +1,8 @@
-/**
- * Computational Intelligence Library (CIlib)
- * Copyright (C) 2003 - 2010
- * Computational Intelligence Research Group (CIRG@UP)
- * Department of Computer Science
- * University of Pretoria
- * South Africa
- *
- * This library is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, see <http://www.gnu.org/licenses/>.
+/**           __  __
+ *    _____ _/ /_/ /_    Computational Intelligence Library (CIlib)
+ *   / ___/ / / / __ \   (c) CIRG @ UP
+ *  / /__/ / / / /_/ /   http://cilib.net
+ *  \___/_/_/_/_.___/
  */
 package net.sourceforge.cilib.measurement.single;
 
@@ -34,13 +19,12 @@ import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.type.types.container.Vector.Builder;
 
 /**
- * Calculates the MSE generalization error of the best solution of an algorithm
- * optimizing a {@link NNDataTrainingProblem}.
  */
 public class NNTimeSeriesRecursivePrediction implements Measurement {
 
     private static final long serialVersionUID = -1014032196750640716L;
     private int n = 1; // specifies the extent of recursiveness. Can't be bigger than embedding.
+    private int extraSteps = 0;
     /**
      * {@inheritDoc }
      */
@@ -89,12 +73,29 @@ public class NNTimeSeriesRecursivePrediction implements Measurement {
             pattern.setVector(inputs);
             predicted = neuralNetwork.evaluatePattern(pattern);
             // add to the resulting vector
-            for(Numeric element : predicted)
+            for(Numeric element : predicted) {
                 builder.add(element);
+            }
+        }
+        for(int i = 0; i < extraSteps; i++) { // add extra steps - pure prediction, fully recurrent
+            StandardPattern pattern = new StandardPattern();
+            pattern.setVector(predicted);
+            predicted = neuralNetwork.evaluatePattern(pattern);
+            // add to the resulting vector
+            for(Numeric element : predicted) {
+                builder.add(element);
+            }            
         }
         return builder.build();
     }
 
+    public int getExtraSteps() {
+        return extraSteps;
+    }
+
+    public void setExtraSteps(int extraSteps) {
+        this.extraSteps = extraSteps;
+    }
 
     public int getN() {
         return n;

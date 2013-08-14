@@ -118,7 +118,7 @@ public class NNDataTrainingProblem extends NNTrainingProblem {
         if (trainingSet == null) {
             this.initialise();
         }
-
+        
         int currentIteration = AbstractAlgorithm.get().getIterations();
         if (currentIteration != previousShuffleIteration && shuffle) {
             try {
@@ -134,7 +134,7 @@ public class NNDataTrainingProblem extends NNTrainingProblem {
         OutputErrorVisitor visitor = new OutputErrorVisitor();
         Vector error = null;
         for (StandardPattern pattern : trainingSet) {
-            Vector output = neuralNetwork.evaluatePattern(pattern);
+            neuralNetwork.evaluatePattern(pattern);
             visitor.setInput(pattern);
             neuralNetwork.getArchitecture().accept(visitor);
             error = visitor.getOutput();

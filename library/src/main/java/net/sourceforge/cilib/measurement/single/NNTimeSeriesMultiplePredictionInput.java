@@ -24,16 +24,17 @@ import net.sourceforge.cilib.type.types.container.Vector.Builder;
 /**
  * Generates NN time series prediction data for networks with one-step-ahead prediction
  */
-public class NNTimeSeriesMultiplePrediction implements Measurement {
+public class NNTimeSeriesMultiplePredictionInput implements Measurement {
 
     private static final long serialVersionUID = -1014032196750640716L;
     private int n = 1; // specifies the extent of multivariate prediction. Can't be bigger than embedding.
+    private int m = 0; // number of output (starts from 0)
     private int extraSteps = 0;
     private ProbabilityDistributionFunction randomNumber;
     private double variance;
     private Boolean noisy = false;
     
-    public NNTimeSeriesMultiplePrediction() {        
+    public NNTimeSeriesMultiplePredictionInput() {        
         randomNumber = new GaussianDistribution();
         variance = 0.5;
     }
@@ -85,10 +86,10 @@ public class NNTimeSeriesMultiplePrediction implements Measurement {
             }
             //System.out.println("Inputs with replaced items: "+inputs.toString());
             pattern.setVector(inputs);
+            builder.add(inputs.get(m));         
             Vector prediction = neuralNetwork.evaluatePattern(pattern);
             for(Numeric value : prediction) {
                 predicted.add(value);
-                builder.add(value);
             }
         }
         // Now that n predictions are gathered, do the cycle
@@ -107,14 +108,13 @@ public class NNTimeSeriesMultiplePrediction implements Measurement {
             // get the prediction
             //System.out.println("Inputs: "+inputs.toString());
             pattern.setVector(inputs);
+            builder.add(inputs.get(m));  
             Real prediction = (Real)neuralNetwork.evaluatePattern(pattern).get(0);
             // update the "predicted" array
             for(int i = 0; i < n - 1; i++) {
                 predicted.set(i, predicted.get(i+1));
             }
             predicted.set(n - 1, prediction);
-            // add to the resulting vector
-            builder.add(prediction);
         }
         // TODO: add the "extra steps" code!
         return builder.build();
@@ -134,6 +134,14 @@ public class NNTimeSeriesMultiplePrediction implements Measurement {
 
     public void setN(int n) {
         this.n = n;
+    }
+
+    public int getM() {
+        return m;
+    }
+
+    public void setM(int m) {
+        this.m = m;
     }
 
     public ProbabilityDistributionFunction getRandomNumber() {

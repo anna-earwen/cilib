@@ -68,7 +68,7 @@ public class PretrainedWeightsSettingAlgorithm extends AbstractAlgorithm impleme
     }
 
     @Override
-    public Object getClone() {
+    public PretrainedWeightsSettingAlgorithm getClone() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

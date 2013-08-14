@@ -15,7 +15,7 @@ import net.sourceforge.cilib.math.random.generator.RandomProvider;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
- *  The <tt>VelocityProvider</tt> for the Bare Bones PSO as defined by Kennedy.
+ *  The <tt>VelocityProvider</tt> for the high-dim PSO as defined by...
  *
  *  TODO: get the required references
  *
@@ -61,7 +61,7 @@ public class CauchyGaussianVelocityProvider implements VelocityProvider {
             if(sigma == 0) { sigma = 1; }
             //System.out.println("Sigma: "+sigma);
             //according to Kennedy
-            double mean = 1;//(localGuide.doubleValueOf(i) + globalGuide.doubleValueOf(i)) / 2;
+            double mean = (localGuide.doubleValueOf(i) + globalGuide.doubleValueOf(i)) / 2;
             //andries proposal: double mean = (tmp1*personalBestPosition.getReal(i) + tmp2*nBestPosition.getReal(i)) / (tmp1+tmp2);
             if(provider.nextDouble() < p) {
                 builder.add(localGuide.doubleValueOf(i) + this.cauchyDistribution.getRandomNumber(mean, sigma));

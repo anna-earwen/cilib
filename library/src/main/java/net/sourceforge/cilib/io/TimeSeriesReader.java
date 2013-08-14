@@ -1,23 +1,8 @@
-/**
- * Computational Intelligence Library (CIlib)
- * Copyright (C) 2003 - 2010
- * Computational Intelligence Research Group (CIRG@UP)
- * Department of Computer Science
- * University of Pretoria
- * South Africa
- *
- * This library is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, see <http://www.gnu.org/licenses/>.
+/**           __  __
+ *    _____ _/ /_/ /_    Computational Intelligence Library (CIlib)
+ *   / ___/ / / / __ \   (c) CIRG @ UP
+ *  / /__/ / / / /_/ /   http://cilib.net
+ *  \___/_/_/_/_.___/
  */
 package net.sourceforge.cilib.io;
 
@@ -62,37 +47,6 @@ public class TimeSeriesReader implements DataReader<List<Type>> {
     @Override
     public boolean hasNextRow() throws CIlibIOException {
         return hasNextRow && delegate.hasNextRow();
-    }
-
-    /**
-     * Creates the next row based on the specified embedding and tau. Source is expected to be a single column of time-series values.
-     * @return the next row
-     * @obsolete
-     */
-    public List<Type> nextRowObsolete(){
-      for(int i = 0; i < this.embedding; i++) {
-          try {
-              if(delegate.hasNextRow()) {
-                  List<Type> nextInputRow = delegate.nextRow();
-                  for(Type nextRowItem : nextInputRow) {
-                      embeddedRow.add(nextRowItem);
-                  }
-                  if(embeddedRow.size() > embedding) {
-                      while(embeddedRow.size() != embedding) {
-                          embeddedRow.remove(0);
-                      }
-                      return embeddedRow;
-                  }
-              }
-              else { // can't construct another embedded row, so just return the previous one and set hasNextRow flag to false
-                this.hasNextRow = false;
-                return embeddedRow;
-              }
-          } catch (CIlibIOException e) {
-            e.printStackTrace();
-          }
-      }
-      return embeddedRow;
     }
 
     /**

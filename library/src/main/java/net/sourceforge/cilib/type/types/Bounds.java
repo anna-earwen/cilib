@@ -7,11 +7,12 @@
 package net.sourceforge.cilib.type.types;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import java.io.Serializable;
 
 /**
  *
  */
-public final class Bounds {
+public final class Bounds implements Serializable {
     private final double lowerBound;
     private final double upperBound;
 

@@ -1,23 +1,8 @@
-/**
- * Computational Intelligence Library (CIlib)
- * Copyright (C) 2003 - 2010
- * Computational Intelligence Research Group (CIRG@UP)
- * Department of Computer Science
- * University of Pretoria
- * South Africa
- *
- * This library is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, see <http://www.gnu.org/licenses/>.
+/**           __  __
+ *    _____ _/ /_/ /_    Computational Intelligence Library (CIlib)
+ *   / ___/ / / / __ \   (c) CIRG @ UP
+ *  / /__/ / / / /_/ /   http://cilib.net
+ *  \___/_/_/_/_.___/
  */
 package net.sourceforge.cilib.functions.activation;
 
@@ -25,7 +10,7 @@ import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
- * Hyperbolic Tangent Function.
+ * Elliott Function. An efficient alternative to TanH, works in the [-1,1] domain, has [-5,5] active range.
  *
  */
 public class Elliott implements ActivationFunction {
@@ -49,7 +34,7 @@ public class Elliott implements ActivationFunction {
      */
     @Override
     public double apply(double input) {
-        return 1.0 / (1.0 + (Math.abs(input)));
+        return input / (1.0 + (Math.abs(input)));
     }
 
     @Override
@@ -62,17 +47,17 @@ public class Elliott implements ActivationFunction {
      */
     @Override
     public double getGradient(double number) {        
-    	double d = 1.0 + Math.abs(number);
+    	double d = 1.0 + Math.abs(number);//Derivative is: 1/((1+|x|)*(1+|x|)).
     	return  1.0/(d * d);
     }
 
     /**
      * {@inheritDoc}
-     * The active range is -Sqrt(3) - Sqrt(3), and Sqrt(3) = 1.732050808
+     * The active range is -5 - 5
      */
     @Override
     public double getLowerActiveRange() {
-        return -1.732050808;
+        return -5;
     }
 
     /**
@@ -80,6 +65,6 @@ public class Elliott implements ActivationFunction {
      */
     @Override
     public double getUpperActiveRange() {
-        return 1.732050808;
+        return 5;
     }
 }

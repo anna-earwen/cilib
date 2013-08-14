@@ -14,32 +14,31 @@ import net.sourceforge.cilib.coevolution.cooperative.contributionselection.Contr
 import net.sourceforge.cilib.coevolution.cooperative.contributionselection.ZeroContributionSelectionStrategy;
 import net.sourceforge.cilib.coevolution.cooperative.problem.CooperativeCoevolutionProblemAdapter;
 import net.sourceforge.cilib.coevolution.cooperative.problemdistribution.ProblemDistributionStrategy;
-import net.sourceforge.cilib.measurement.single.ThresholdedStagnationFlag;
 import net.sourceforge.cilib.problem.solution.OptimisationSolution;
 
 /**
- * This class implements a greedy approach to cooperative optimization.
- * Only one subpopulation is worked on at every iteration, moving to 
- * the next subpopulation when the current one stagnates. 
+ * This class implements a greedy thresholded approach to cooperative optimization.
+ * Only one subpopulation is worked on at every iteration, moving to the next 
+ * subpopulation when the threshold number of iterations has been reached.
  * 
  */
-public class GreedyCooperativeCoevolutionAlgorithm extends CooperativeCoevolutionAlgorithm {
+public class GreedyTemperedCooperativeCoevolutionAlgorithm extends CooperativeCoevolutionAlgorithm {
 
     private static final long serialVersionUID = 3351497412601778L;
-    private ThresholdedStagnationFlag stagnationFlag;
+    private int greedyIterations = 10;
+    private int greedyIterationsCounter = 0;
     /**
      * Constructor
      */
-    public GreedyCooperativeCoevolutionAlgorithm() {
+    public GreedyTemperedCooperativeCoevolutionAlgorithm() {
         super();
-        this.stagnationFlag = new ThresholdedStagnationFlag();
     }
 
     /**
      * Copy constructor
      * @param copy The {@linkplain CooperativeCoevolutionAlgorithm} to make a copy of.
      */
-    public GreedyCooperativeCoevolutionAlgorithm(GreedyCooperativeCoevolutionAlgorithm copy) {
+    public GreedyTemperedCooperativeCoevolutionAlgorithm(GreedyTemperedCooperativeCoevolutionAlgorithm copy) {
         super(copy);
     }
 
@@ -54,23 +53,32 @@ public class GreedyCooperativeCoevolutionAlgorithm extends CooperativeCoevolutio
      */
     @Override
     protected void algorithmIteration() {
-        //System.out.println("Current algo index: " + (algorithmIterator.nextIndex() - 1));
-         //get the optimisation problem from the algorithm
         CooperativeCoevolutionProblemAdapter problem = (CooperativeCoevolutionProblemAdapter) algorithmIterator.current().getOptimisationProblem();
         //update the context solution to point to the current context
         problem.updateContext(context.getCandidateSolution());
         //perform an iteration of the sub population algorithm
         algorithmIterator.current().performIteration();
+        greedyIterationsCounter++;
         //select the contribution from the population
-        contextUpdate.updateContext(context, ((ParticipatingAlgorithm) algorithmIterator.current()).getContributionSelectionStrategy().getContribution(algorithmIterator.current()), problem.getProblemAllocation());
-        // check for stagnation:
-        if(stagnationFlag.getValue(this).booleanValue()) { // stagnation! Therefore, go to the next subpopulation
-            if(algorithmIterator.hasNext()) algorithmIterator.next();
+        contextUpdate.updateContext(context, ((ParticipatingAlgorithm) algorithmIterator.current()).getContributionSelectionStrategy().getContribution(algorithmIterator.current()), ((CooperativeCoevolutionProblemAdapter) algorithmIterator.current().getOptimisationProblem()).getProblemAllocation());
+        if(greedyIterationsCounter == greedyIterations) { // Reached pre-specified number of iterations. Therefore, go to the next subpopulation
+            greedyIterationsCounter = 0;
+            if(algorithmIterator.hasNext()) {
+                algorithmIterator.next();
+            }
             else {
                 algorithmIterator.setAlgorithms(subPopulationsAlgorithms); // set the iterator right away!
                 algorithmIterator.next(); // set iterator index to something sensible
             }
         }
+    }
+
+    public int getGreedyIterations() {
+        return greedyIterations;
+    }
+
+    public void setGreedyIterations(int greedyIterations) {
+        this.greedyIterations = greedyIterations;
     }
 
     /**
@@ -93,7 +101,7 @@ public class GreedyCooperativeCoevolutionAlgorithm extends CooperativeCoevolutio
      * {@inheritDoc}
      */
     @Override
-    public void addPopulationBasedAlgorithm(SinglePopulationBasedAlgorithm algorithm) {
+    public void addPopulationBasedAlgorithm(PopulationBasedAlgorithm algorithm) {
         // TODO: There should be a better way to perfrom this test, rather than using an instanceof.
         if (((ParticipatingAlgorithm) algorithm).getContributionSelectionStrategy() instanceof ZeroContributionSelectionStrategy) {
             ((ParticipatingAlgorithm) algorithm).setContributionSelectionStrategy(contributionSelection);

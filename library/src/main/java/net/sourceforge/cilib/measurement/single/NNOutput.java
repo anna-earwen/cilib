@@ -1,30 +1,12 @@
-/**
- * Computational Intelligence Library (CIlib)
- * Copyright (C) 2003 - 2010
- * Computational Intelligence Research Group (CIRG@UP)
- * Department of Computer Science
- * University of Pretoria
- * South Africa
- *
- * This library is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, see <http://www.gnu.org/licenses/>.
+/**           __  __
+ *    _____ _/ /_/ /_    Computational Intelligence Library (CIlib)
+ *   / ___/ / / / __ \   (c) CIRG @ UP
+ *  / /__/ / / / /_/ /   http://cilib.net
+ *  \___/_/_/_/_.___/
  */
 package net.sourceforge.cilib.measurement.single;
 
 import net.sourceforge.cilib.algorithm.Algorithm;
-import net.sourceforge.cilib.io.CSVFileWriter;
-import net.sourceforge.cilib.io.FileWriter;
-import net.sourceforge.cilib.io.NNOutputReader;
 import net.sourceforge.cilib.io.StandardPatternDataTable;
 import net.sourceforge.cilib.io.pattern.StandardPattern;
 import net.sourceforge.cilib.measurement.Measurement;
@@ -37,15 +19,12 @@ import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.type.types.container.Vector.Builder;
 
 /**
- * Calculates the MSE generalization error of the best solution of an algorithm
- * optimizing a {@link NNDataTrainingProblem}.
+ * Calculates the NN output of the best solution of an algorithm
+ * optimizing a {@link NNDataTrainingProblem}, for the entire data set.
  */
 public class NNOutput implements Measurement {
 
     private static final long serialVersionUID = -1014032196750640716L;
-    private NNOutputReader outputReader;
-    private FileWriter fileWriter = new CSVFileWriter();
-    private String destinationURL;
     /**
      * {@inheritDoc }
      */
@@ -55,7 +34,7 @@ public class NNOutput implements Measurement {
     }
 
     /**
-     * Return file name; write output to a separate file.
+     * Return NN outputs for the entire dataset, using the current best solution to set up the weights.
      */
     @Override
     public Type getValue(Algorithm algorithm) {
@@ -87,39 +66,5 @@ public class NNOutput implements Measurement {
             }
         }
         return builder.build();
-
-        /*
-        StandardDataTable<Type> dataTable = new StandardDataTable<Type>();
-
-        try {
-            this.outputReader.open();
-            while(outputReader.hasNextRow()) {
-                dataTable.addRow(outputReader.nextRow());
-            }
-            this.outputReader.close();
-            // Got the outputs; write to file now.
-            this.fileWriter.setDestinationURL(this.destinationURL + "_" + algorithm.getIterations());
-            this.fileWriter.open();
-            this.fileWriter.write(dataTable);
-            this.fileWriter.close();
-        } catch (CIlibIOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return new StringType(fileWriter.getDestinationURL());
-
-         */
-    }
-
-    public void setOutputReader(NNOutputReader outputReader) {
-        this.outputReader = outputReader;
-    }
-
-    public void setFileWriter(FileWriter fileWriter) {
-        this.fileWriter = fileWriter;
-    }
-
-    public void setDestinationURL(String destinationURL) {
-        this.destinationURL = destinationURL;
     }
 }
