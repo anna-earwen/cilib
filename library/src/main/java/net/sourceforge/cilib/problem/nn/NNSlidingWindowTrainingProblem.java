@@ -83,10 +83,11 @@ public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
             for (int i = 0; i < windowSize; i++) { // fetch patterns to fill the initial window
                 candidateSet.addRow((StandardPattern) dataTable.removeRow(0));
             }
-
-            ShuffleOperator initialShuffler = new ShuffleOperator();
-            initialShuffler.operate(candidateSet);
-
+            
+            if(shuffle) {
+                ShuffleOperator initialShuffler = new ShuffleOperator();
+                initialShuffler.operate(candidateSet);
+            }
 
             for (int i = 0; i < trainingSize; i++) {
                 trainingSet.addRow((StandardPattern) candidateSet.getRow(i));
@@ -126,7 +127,7 @@ public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
         }
 
         int currentIteration = AbstractAlgorithm.get().getIterations();
-        if (currentIteration != previousShuffleIteration) {
+        if (currentIteration != previousShuffleIteration && shuffle) {
             try {
                 shuffler.operate(trainingSet);
             } catch (CIlibIOException exception) {
@@ -134,43 +135,15 @@ public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
             }
         }
 
-        if(currentIteration - changeFrequency * dataChangesCounter == 0 && currentIteration != previousIteration) { // update training & generalisation sets (slide the window)
-            try {
-                previousIteration = currentIteration;
-                dataChangesCounter++;
-
-                StandardPatternDataTable candidateSet = new StandardPatternDataTable();
-                for (int i = 0; i < stepSize; i++) {
-                    candidateSet.addRow((StandardPattern) dataTable.removeRow(0));
-                }
-
-                ShuffleOperator initialShuffler = new ShuffleOperator();
-                initialShuffler.operate(candidateSet);
-
-                int trainingStepSize = (int)(stepSize * trainingSetPercentage);
-                int generalisationStepSize = stepSize - trainingStepSize;
-
-                for (int t = 0; t < trainingStepSize; t++){
-                    trainingSet.removeRow(0);
-                    trainingSet.addRow(candidateSet.removeRow(0));
-                }
-
-                for (int t = 0; t < generalisationStepSize; t++){
-                    generalisationSet.removeRow(0);
-                    generalisationSet.addRow(candidateSet.removeRow(0));
-                }
-            } catch (CIlibIOException exception) {
-                exception.printStackTrace();
-            }
-        }
-
+        operateOnData(); // slide the window!..
+        
         neuralNetwork.setWeights((Vector) solution);
 
         double errorTraining = 0.0;
         OutputErrorVisitor visitor = new OutputErrorVisitor();
         Vector error = null;
         for (StandardPattern pattern : trainingSet) {
-            Vector output = neuralNetwork.evaluatePattern(pattern);
+            neuralNetwork.evaluatePattern(pattern);
             visitor.setInput(pattern);
             neuralNetwork.getArchitecture().accept(visitor);
             error = visitor.getOutput();
@@ -182,7 +155,42 @@ public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
 
         return objective.evaluate(errorTraining);
     }
+    
+    @Override
+    public void operateOnData() {
+        int currentIteration = AbstractAlgorithm.get().getIterations();
+        if(currentIteration - changeFrequency * dataChangesCounter == 0 && currentIteration != previousIteration) { // update training & generalisation sets (slide the window)
+            try {
+                previousIteration = currentIteration;
+                dataChangesCounter++;
+                StandardPatternDataTable candidateSet = new StandardPatternDataTable();
+                for (int i = 0; i < stepSize; i++) {
+                    candidateSet.addRow((StandardPattern) dataTable.removeRow(0));
+                }
 
+                if(shuffle) {
+                    shuffler = new ShuffleOperator();
+                    shuffler.operate(candidateSet);
+                }
+
+                int trainingStepSize = (int)(stepSize * trainingSetPercentage);
+                int generalizationStepSize = stepSize - trainingStepSize;
+
+                for (int t = 0; t < trainingStepSize; t++){
+                    trainingSet.removeRow(0);
+                    trainingSet.addRow(candidateSet.removeRow(0));
+                }
+
+                for (int t = 0; t < generalizationStepSize; t++){
+                    generalisationSet.removeRow(0);
+                    generalisationSet.addRow(candidateSet.removeRow(0));
+                }
+            } catch (CIlibIOException exception) {
+                exception.printStackTrace();
+            }
+        }
+    }
+    
     /**
      * {@inheritDoc}
      */
