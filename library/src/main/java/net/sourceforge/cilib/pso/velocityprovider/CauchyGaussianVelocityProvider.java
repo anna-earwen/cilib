@@ -6,12 +6,11 @@
  */
 package net.sourceforge.cilib.pso.velocityprovider;
 
-import net.sourceforge.cilib.entity.Particle;
 import net.sourceforge.cilib.math.random.CauchyDistribution;
 import net.sourceforge.cilib.math.random.GaussianDistribution;
 import net.sourceforge.cilib.math.random.ProbabilityDistributionFunction;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
+import net.sourceforge.cilib.math.random.generator.Rand;
+import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
@@ -24,7 +23,6 @@ public class CauchyGaussianVelocityProvider implements VelocityProvider {
 
     private static final long serialVersionUID = -823686042197742768L;
     
-    private RandomProvider provider;
     private double p = 0.5;
     protected ProbabilityDistributionFunction cauchyDistribution;
     protected ProbabilityDistributionFunction gaussianDistribution;
@@ -32,13 +30,11 @@ public class CauchyGaussianVelocityProvider implements VelocityProvider {
     public CauchyGaussianVelocityProvider() {
         this.cauchyDistribution = new CauchyDistribution();
         this.gaussianDistribution = new GaussianDistribution();
-        this.provider = new MersenneTwister();
     }
 
     public CauchyGaussianVelocityProvider(CauchyGaussianVelocityProvider copy) {
         this.cauchyDistribution = copy.cauchyDistribution;
         this.gaussianDistribution = copy.gaussianDistribution;
-        this.provider = copy.provider;
         this.p = copy.p;
     }
 
@@ -63,7 +59,7 @@ public class CauchyGaussianVelocityProvider implements VelocityProvider {
             //according to Kennedy
             double mean = (localGuide.doubleValueOf(i) + globalGuide.doubleValueOf(i)) / 2;
             //andries proposal: double mean = (tmp1*personalBestPosition.getReal(i) + tmp2*nBestPosition.getReal(i)) / (tmp1+tmp2);
-            if(provider.nextDouble() < p) {
+            if(Rand.nextDouble() < p) {
                 builder.add(localGuide.doubleValueOf(i) + this.cauchyDistribution.getRandomNumber(mean, sigma));
             } else {
                 builder.add(globalGuide.doubleValueOf(i) + this.gaussianDistribution.getRandomNumber(mean, sigma));

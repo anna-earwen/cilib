@@ -7,11 +7,10 @@
 package net.sourceforge.cilib.pso.positionprovider;
 
 
-import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
 import net.sourceforge.cilib.entity.EntityType;
-import net.sourceforge.cilib.entity.Particle;
 import net.sourceforge.cilib.problem.solution.Fitness;
 import net.sourceforge.cilib.pso.particle.DecayingParticle;
+import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /** Implements weight decay for PSO NN training. To be used with DecayingParticle type particles only (they store personal lambda values)

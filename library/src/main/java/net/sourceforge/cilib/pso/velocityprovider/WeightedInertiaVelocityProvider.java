@@ -9,9 +9,8 @@ package net.sourceforge.cilib.pso.velocityprovider;
 import fj.P1;
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
 import net.sourceforge.cilib.controlparameter.ControlParameter;
-import net.sourceforge.cilib.entity.Particle;
-import net.sourceforge.cilib.math.random.generator.MersenneTwister;
-import net.sourceforge.cilib.math.random.generator.RandomProvider;
+import net.sourceforge.cilib.math.random.generator.Rand;
+import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.util.Vectors;
 
@@ -26,23 +25,16 @@ public final class WeightedInertiaVelocityProvider implements VelocityProvider {
     protected Vector inertiaWeight;
     protected ControlParameter socialAcceleration;
     protected ControlParameter cognitiveAcceleration;
-    protected RandomProvider r1;
-    protected RandomProvider r2;
 
     /** Creates a new instance of StandardVelocityUpdate. */
     public WeightedInertiaVelocityProvider() {
         this(ConstantControlParameter.of(1.496180),
-            ConstantControlParameter.of(1.496180),
-            new MersenneTwister(),
-            new MersenneTwister());
+            ConstantControlParameter.of(1.496180));
     }
 
-    public WeightedInertiaVelocityProvider(ControlParameter social, ControlParameter cog,
-            RandomProvider r1, RandomProvider r2) {
+    public WeightedInertiaVelocityProvider(ControlParameter social, ControlParameter cog) {
         this.socialAcceleration = social;
         this.cognitiveAcceleration = cog;
-        this.r1 = r1;
-        this.r2 = r2;
         inertiaWeight = Vector.of();//builder.build();
     }
 
@@ -53,8 +45,6 @@ public final class WeightedInertiaVelocityProvider implements VelocityProvider {
     public WeightedInertiaVelocityProvider(WeightedInertiaVelocityProvider copy) {
         this.cognitiveAcceleration = copy.cognitiveAcceleration.getClone();
         this.socialAcceleration = copy.socialAcceleration.getClone();
-        this.r1 = copy.r1;
-        this.r2 = copy.r2;
     }
 
     /**
@@ -65,11 +55,11 @@ public final class WeightedInertiaVelocityProvider implements VelocityProvider {
         return new WeightedInertiaVelocityProvider(this);
     }
     
-    private static P1<Number> random(final RandomProvider r) {
+    private static P1<Number> random() {
         return new P1<Number>() {
             @Override
             public Number _1() {
-                return r.nextDouble();
+                return Rand.nextDouble();
             }
         };
     }
@@ -90,7 +80,7 @@ public final class WeightedInertiaVelocityProvider implements VelocityProvider {
     @Override
     public Vector get(Particle particle) {
         Vector velocity = (Vector) particle.getVelocity();
-        Vector position = (Vector) particle.getPosition();
+        Vector position = (Vector) particle.getCandidateSolution();
         Vector localGuide = (Vector) particle.getLocalGuide();
         Vector globalGuide = (Vector) particle.getGlobalGuide();
    
@@ -100,16 +90,16 @@ public final class WeightedInertiaVelocityProvider implements VelocityProvider {
         }
        
         Vector dampenedVelocity = builder4.build();
-        Vector cognitiveComponent = Vector.copyOf(localGuide).subtract(position).multiply(cp(cognitiveAcceleration)).multiply(random(r1));        
-        Vector socialComponent = Vector.copyOf(globalGuide).subtract(position).multiply(cp(socialAcceleration)).multiply(random(r2));
+        Vector cognitiveComponent = Vector.copyOf(localGuide).subtract(position).multiply(cp(cognitiveAcceleration)).multiply(random());        
+        Vector socialComponent = Vector.copyOf(globalGuide).subtract(position).multiply(cp(socialAcceleration)).multiply(random());
 
         Vector.Builder builder5 = Vector.newBuilder();
-        Vector velo = Vectors.sumOf(dampenedVelocity, cognitiveComponent, socialComponent);
+        Vector velo = Vectors.sumOf(dampenedVelocity, cognitiveComponent, socialComponent).valueE("Cannot determine velocity");
         for(int i = 0; i < inertiaWeight.size(); i++) {
             builder5.add(velo.doubleValueOf(i) * (2 - inertiaWeight.doubleValueOf(i)));
         }
         
-        return Vectors.sumOf(dampenedVelocity, cognitiveComponent, socialComponent);
+        return Vectors.sumOf(dampenedVelocity, cognitiveComponent, socialComponent).valueE("Cannot determine velocity");
     }
 
     /**
@@ -145,23 +135,7 @@ public final class WeightedInertiaVelocityProvider implements VelocityProvider {
     public void setSocialAcceleration(ControlParameter socialComponent) {
         this.socialAcceleration = socialComponent;
     }
-
-    public RandomProvider getR1() {
-        return r1;
-    }
-
-    public void setR1(RandomProvider r1) {
-        this.r1 = r1;
-    }
-
-    public RandomProvider getR2() {
-        return r2;
-    }
-
-    public void setR2(RandomProvider r2) {
-        this.r2 = r2;
-    }
-
+    
     public void setInertiaWeight(Vector inertiaWeight) {
         this.inertiaWeight = inertiaWeight;//Vector.copyOf(inertiaWeight);
     }

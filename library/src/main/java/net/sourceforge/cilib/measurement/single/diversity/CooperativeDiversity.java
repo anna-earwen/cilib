@@ -17,11 +17,13 @@ import net.sourceforge.cilib.coevolution.cooperative.contextupdate.ContextUpdate
 import net.sourceforge.cilib.coevolution.cooperative.contextupdate.PrimitiveContextUpdateStrategy;
 import net.sourceforge.cilib.coevolution.cooperative.problem.CooperativeCoevolutionProblemAdapter;
 import net.sourceforge.cilib.entity.Entity;
-import net.sourceforge.cilib.entity.topologies.GBestNeighbourhood;
-import net.sourceforge.cilib.entity.topologies.Neighbourhood;
+import net.sourceforge.cilib.entity.EntityType;
 import net.sourceforge.cilib.measurement.Measurement;
 import net.sourceforge.cilib.measurement.single.diversity.centerinitialisationstrategies.CenterInitialisationStrategy;
 import net.sourceforge.cilib.measurement.single.diversity.centerinitialisationstrategies.SpatialCenterInitialisationStrategy;
+import net.sourceforge.cilib.pso.PSO;
+import net.sourceforge.cilib.pso.particle.Particle;
+import net.sourceforge.cilib.pso.particle.StandardParticle;
 import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.util.distancemeasure.DistanceMeasure;
@@ -66,7 +68,7 @@ public class CooperativeDiversity implements Measurement<Real> {
         AlgorithmIterator<SinglePopulationBasedAlgorithm> iter = multiPopulationBasedAlgorithm.getAlgorithmIterator().getClone();
         iter.setAlgorithms(multiPopulationBasedAlgorithm.getPopulations());
         
-        Neighbourhood pseudoTopology = new GBestNeighbourhood();
+        fj.data.List<Particle> pseudoTopology = fj.data.List.list();//new fj.data.Array<Particle>();
         //System.out.println("%%%%% Context before interfering: "+multiPopulationBasedAlgorithm.getContext().getCandidateSolution().toString());
         while (iter.hasNext()) { // go through every sub-population
             Iterator<? extends Entity> populationIterator = iter.next().getTopology().iterator();
@@ -79,8 +81,11 @@ public class CooperativeDiversity implements Measurement<Real> {
                 Vector cs = (Vector) populationIterator.next().getCandidateSolution();
                 //System.out.println("Candidate solution: "+cs.toString());
                 contextUpdate.updateContext(contextEntity, cs, problem.getProblemAllocation());
+                Particle pseudoParticle = new StandardParticle();
+                pseudoParticle.getProperties().put(EntityType.CANDIDATE_SOLUTION, contextEntity.getProperties().get(EntityType.CANDIDATE_SOLUTION));
+                pseudoParticle.getProperties().put(EntityType.FITNESS, contextEntity.getProperties().get(EntityType.FITNESS));
                 //ystem.out.println("Context size: "+contextEntity.getDimension());
-                pseudoTopology..add(contextEntity.getClone());
+                pseudoTopology = pseudoTopology.cons(pseudoParticle);
                 //System.out.println("Contextualised entity: "+contextEntity.getCandidateSolution().toString());
                 //System.out.println();
                 contextEntity = multiPopulationBasedAlgorithm.getContext().getClone();
@@ -88,22 +93,10 @@ public class CooperativeDiversity implements Measurement<Real> {
         }
         
         //System.out.println("%%%%% Context after interfering: "+multiPopulationBasedAlgorithm.getContext().getCandidateSolution().toString());
-        int numberOfEntities = pseudoTopology.size();
-
-        Vector center = populationCenter.getCenter(pseudoTopology);
-        Iterator<? extends Entity> populationIterator = pseudoTopology.iterator();
-
-        double distanceSum = 0.0;
-
-        while (populationIterator.hasNext()) {
-            Vector currentEntityPosition = (Vector) (((Entity) populationIterator.next()).getCandidateSolution());
-            distanceSum += distanceMeasure.distance(center, currentEntityPosition);
-        }
-
-        distanceSum /= numberOfEntities;
-        //distanceSum /= normalisationParameter.getNormalisationParameter(multiPopulationBasedAlgorithm);
-
-        return Real.valueOf(distanceSum);
+        SinglePopulationBasedAlgorithm<Particle> pseudoAlgorithm = new PSO();
+        pseudoAlgorithm.setTopology(pseudoTopology);
+        Diversity diversityCalculator = new Diversity();
+        return diversityCalculator.getValue(pseudoAlgorithm);
     }
 
     /**

@@ -6,7 +6,6 @@
  */
 package net.sourceforge.cilib.entity.initialisation;
 
-import java.util.ArrayList;
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
 import net.sourceforge.cilib.controlparameter.ControlParameter;
 import net.sourceforge.cilib.entity.Entity;

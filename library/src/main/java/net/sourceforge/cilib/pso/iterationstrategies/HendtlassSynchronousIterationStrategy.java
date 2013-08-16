@@ -6,6 +6,7 @@
  */
 package net.sourceforge.cilib.pso.iterationstrategies;
 
+import fj.F;
 import java.util.Iterator;
 
 import net.sourceforge.cilib.algorithm.population.AbstractIterationStrategy;
@@ -13,9 +14,8 @@ import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
 import net.sourceforge.cilib.controlparameter.ControlParameter;
 import net.sourceforge.cilib.entity.Entity;
 import net.sourceforge.cilib.entity.EntityType;
-import net.sourceforge.cilib.entity.Particle;
-import net.sourceforge.cilib.entity.Topology;
 import net.sourceforge.cilib.pso.PSO;
+import net.sourceforge.cilib.pso.particle.Particle;
 import net.sourceforge.cilib.pso.velocityprovider.WeightedInertiaVelocityProvider;
 import net.sourceforge.cilib.type.types.Numeric;
 import net.sourceforge.cilib.type.types.Real;
@@ -60,8 +60,43 @@ public class HendtlassSynchronousIterationStrategy extends AbstractIterationStra
      * @param pso The {@link PSO} to have an iteration applied.
      */
     @Override
-    public void performIteration(PSO pso) {
-        Topology<Particle> topology = pso.getTopology();
+    public void performIteration(final PSO pso) {
+        final fj.data.List<Particle> topology = pso.getTopology();
+        this.calculateAbsoluteAverages(pso);
+        this.updateInertia(pso);
+        final F<Particle, Particle> first = new F<Particle, Particle>() {
+			@Override
+			public Particle f(Particle current) {
+                            WeightedInertiaVelocityProvider wp = (WeightedInertiaVelocityProvider)current.getVelocityProvider(); // put 
+                            wp.setInertiaWeight(inertiaWeight);
+                            current.updateVelocity();
+                            current.updatePosition();
+
+                            boundaryConstraint.enforce(current);
+                            return current;
+			}
+        };
+
+        final F<Particle, Particle> second = new F<Particle, Particle>() {
+        	public Particle f(Particle current) {
+        		current.calculateFitness();
+        		for (Particle other : pso.getNeighbourhood().f(topology, current)) {
+        			if (current.getSocialFitness().compareTo(other.getNeighbourhoodBest().getSocialFitness()) > 0) {
+        				other.setNeighbourhoodBest(current);
+        			}
+        		}
+
+        		return current;
+        	}
+        };
+
+        pso.setTopology(topology.map(first).map(second));
+    }
+    
+/*
+    public void performIteration2(PSO pso) {
+        
+        final fj.data.List<Particle> topology = pso.getTopology();//Neighbourhood<Particle> neighbourhood = pso.getNeighbourhood();
         
         this.calculateAbsoluteAverages(pso);
         this.updateInertia(pso);
@@ -90,9 +125,11 @@ public class HendtlassSynchronousIterationStrategy extends AbstractIterationStra
         }
     }
     
+    * */
+    
     private void calculateAbsoluteAverages(PSO pso) {
         
-        int dimension = pso.getTopology().get(0).getDimension();
+        int dimension = pso.getTopology().last().getDimension();
         absoluteAverageVelocityVector = Vector.of();
         averageSpeedVector = Vector.of();
         
@@ -118,7 +155,7 @@ public class HendtlassSynchronousIterationStrategy extends AbstractIterationStra
     
     private void updateInertia(PSO pso) {
         
-        int dimension = pso.getTopology().get(0).getDimension();
+        int dimension = pso.getTopology().last().getDimension();
         
         if(inertiaWeight.size() < dimension) {
             Vector.Builder builder = Vector.newBuilder();

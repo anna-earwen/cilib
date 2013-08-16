@@ -8,11 +8,6 @@
 
 <simulator>
     <algorithms>
-        <algorithm id="gradientdecent" class="gd.GradientDescentBackpropagationTraining">
-            <!--learningRate class="controlparameter.ConstantControlParameter" parameter="0.05" />
-            <momentum class="controlparameter.ConstantControlParameter" parameter="0.05" /-->
-            <addStoppingCondition class="stoppingcondition.MeasuredStoppingCondition" target="1000"/>
-        </algorithm>
         <algorithm id="barebones" class="pso.PSO">
             <addStoppingCondition class="stoppingcondition.MeasuredStoppingCondition"/>
             <!--iterationStrategy class="pso.iterationstrategies.ASynchronousIterationStrategy"/-->
@@ -145,9 +140,48 @@
                 <entityType class="pso.particle.StandardParticle">
                     <personalBestUpdateStrategy class="pso.pbestupdate.BoundedPersonalBestUpdateStrategy" />
                     <positionInitialisationStrategy class="entity.initialization.RandomSimpleBoundedInitializationStrategy">
-                        <lowerBound class="controlparameter.ConstantControlParameter" parameter="-1" />
-                        <upperBound class="controlparameter.ConstantControlParameter" parameter="1" />                
+                        <lowerBound class="controlparameter.ConstantControlParameter" parameter="-2" />
+                        <upperBound class="controlparameter.ConstantControlParameter" parameter="2" />                
                     </positionInitialisationStrategy>
+                    <!--velocityProvider class="pso.velocityprovider.WeightedInertiaVelocityProvider" /-->
+                    <!--velocityProvider class="pso.velocityprovider.NoisyVelocityProvider">
+                       <delegate class="pso.velocityprovider.StandardVelocityProvider" />
+                    </velocityProvider-->
+                </entityType>
+            </initialisationStrategy>  
+            <iterationStrategy class="pso.iterationstrategies.SynchronousIterationStrategy">
+                <boundaryConstraint class="problem.boundaryconstraint.RandomBoundaryConstraint" />
+            </iterationStrategy>
+        </algorithm>
+        <algorithm id="greedy-coop-pso-3" class="coevolution.cooperative.GreedyTemperedCooperativeCoevolutionAlgorithm" greedyIterations="5">
+            <addStoppingCondition class="stoppingcondition.MeasuredStoppingCondition" target="1000"/>
+            <problemDistribution class="coevolution.cooperative.problemdistribution.ImperfectSplitDistributionStrategy" />
+            <contributionSelectionStrategy class="coevolution.cooperative.contributionselection.SocialFitnessContributionSelectionStrategy"/>
+            <addPopulationBasedAlgorithm idref="gbest-b"/>
+            <addPopulationBasedAlgorithm idref="gbest-b"/>
+            <addPopulationBasedAlgorithm idref="gbest-b"/>
+        </algorithm>
+        <algorithm id="greedy-tempered-hendtlass-coop-pso-3" class="coevolution.cooperative.GreedyTemperedCooperativeCoevolutionAlgorithm" greedyIterations="5">
+            <addStoppingCondition class="stoppingcondition.MeasuredStoppingCondition" target="1000"/>
+            <problemDistribution class="coevolution.cooperative.problemdistribution.ImperfectSplitDistributionStrategy" />
+            <contributionSelectionStrategy class="coevolution.cooperative.contributionselection.SocialFitnessContributionSelectionStrategy"/>
+            <addPopulationBasedAlgorithm idref="gbest-hendtlass"/>
+            <addPopulationBasedAlgorithm idref="gbest-hendtlass"/>
+            <addPopulationBasedAlgorithm idref="gbest-hendtlass"/>
+        </algorithm>
+        <algorithm id="gbest-hendtlass" class="pso.PSO">
+            <addStoppingCondition class="stoppingcondition.MeasuredStoppingCondition"/>
+            <initialisationStrategy class="algorithm.initialisation.ClonedPopulationInitialisationStrategy" entityNumber="10">
+                <entityType class="pso.particle.StandardParticle">
+                    <personalBestUpdateStrategy class="pso.pbestupdate.BoundedPersonalBestUpdateStrategy" />
+                    <positionInitialisationStrategy class="entity.initialisation.RandomSimpleBoundedInitializationStrategy">
+                        <lowerBound class="controlparameter.ConstantControlParameter" parameter="-2" />
+                        <upperBound class="controlparameter.ConstantControlParameter" parameter="2" />                
+                    </positionInitialisationStrategy>
+                    <!--velocityInitializationStrategy class="entity.initialization.RandomSimpleBoundedInitializationStrategy">
+                        <lowerBound class="controlparameter.ConstantControlParameter" parameter="-1" />
+                        <upperBound class="controlparameter.ConstantControlParameter" parameter="1" />                                        
+                    </velocityInitializationStrategy-->
                     <velocityProvider class="pso.velocityprovider.WeightedInertiaVelocityProvider" />
                     <!--velocityProvider class="pso.velocityprovider.NoisyVelocityProvider">
                        <delegate class="pso.velocityprovider.StandardVelocityProvider" />
@@ -155,16 +189,10 @@
                 </entityType>
             </initialisationStrategy>  
             <iterationStrategy class="pso.iterationstrategies.HendtlassSynchronousIterationStrategy">
-            <!--iterationStrategy class="pso.iterationstrategies.SynchronousIterationStrategy"-->
                 <boundaryConstraint class="problem.boundaryconstraint.RandomBoundaryConstraint" />
+                <!--filter class="controlparameter.ConstantControlParameter" parameter="0.5" />
+                <pwr class="controlparameter.ConstantControlParameter" parameter="1" /-->                
             </iterationStrategy>
-        </algorithm>
-        <algorithm id="greedy-coop-pso-2" class="coevolution.cooperative.GreedyTemperedCooperativeCoevolutionAlgorithm" greedyIterations="5">
-            <addStoppingCondition class="stoppingcondition.MeasuredStoppingCondition" target="1000"/>
-            <problemDistribution class="coevolution.cooperative.problemdistribution.ImperfectSplitDistributionStrategy" />
-            <contributionSelectionStrategy class="coevolution.cooperative.contributionselection.SocialFitnessContributionSelectionStrategy"/>
-            <addPopulationBasedAlgorithm idref="gbest-b"/>
-            <addPopulationBasedAlgorithm idref="gbest-b"/>
         </algorithm>
         <algorithm id="coop-pso-imperfect-5" class="coevolution.cooperative.CooperativeCoevolutionAlgorithm">
             <addStoppingCondition class="stoppingcondition.MeasuredStoppingCondition" target="1000"/>
@@ -339,8 +367,8 @@
         <addMeasurement class="measurement.single.Fitness"/>
         <addMeasurement class="measurement.single.MSEGeneralizationError"/>
         <addMeasurement class="measurement.single.NNClassificationGeneralizationError"/>  
-        <addMeasurement class="measurement.multiple.CooperativeParticleBoundViolations" />       
-        <addMeasurement class="measurement.multiple.CooperativeParticleVelocity"/>      
+        <!--addMeasurement class="measurement.multiple.CooperativeParticleBoundViolations" />       
+        <addMeasurement class="measurement.multiple.CooperativeParticleVelocity"/-->      
         <!--addMeasurement class="measurement.multiple.CooperativeAbsoluteAverageVelocity"/-->       
         <!--addMeasurement class="measurement.single.AverageSpeed"/-->             
         <!--addMeasurement class="measurement.multiple.CooperativeAbsoluteAveragePosition"/>       
@@ -351,10 +379,10 @@
 
     <simulations>
         <simulation samples="1">
-            <algorithm idref="greedy-coop-pso-2"/><!--greedy-coop-pso-2 coop-pso-imperfect-5 gbest-single -->
+            <algorithm idref="greedy-tempered-hendtlass-coop-pso-3"/><!--greedy-coop-pso-2 coop-pso-imperfect-5 gbest-single -->
             <problem idref="nn-300-elliott"/><!-- nn-300-elliott -->
             <measurements idref="fitness" />
-            <output format="TXT" file="data/test.csv"/>
+            <output format="TXT" file="data/test_hendtlass.csv"/>
         </simulation>
     
         <!--simulation samples="2">

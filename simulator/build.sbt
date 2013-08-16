@@ -2,6 +2,8 @@ import AssemblyKeys._
 
 assemblySettings
 
+test in assembly := {}
+
 name := "cilib-simulator"
 
 description := "Simulator environment fo running experiments using the CIlib library"
