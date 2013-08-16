@@ -56,12 +56,12 @@ public class NNTimeSeriesMultiplePredictionOutput implements Measurement {
         NNTrainingProblem problem = (NNTrainingProblem) algorithm.getOptimisationProblem();
         StandardPatternDataTable dataSet = new StandardPatternDataTable();
         StandardPatternDataTable trainingSet = problem.getTrainingSet();
-        StandardPatternDataTable generalizationSet = problem.getGeneralisationSet();
+        StandardPatternDataTable generalisationSet = problem.getGeneralisationSet();
         StandardPatternDataTable validationSet = problem.getValidationSet();
         for (StandardPattern pattern : trainingSet) {
             dataSet.addRow(pattern);
         }
-        for (StandardPattern pattern : generalizationSet) {
+        for (StandardPattern pattern : generalisationSet) {
             dataSet.addRow(pattern);
         }
         for (StandardPattern pattern : validationSet) {

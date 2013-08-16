@@ -174,14 +174,14 @@ public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
                 }
 
                 int trainingStepSize = (int)(stepSize * trainingSetPercentage);
-                int generalizationStepSize = stepSize - trainingStepSize;
+                int generalisationStepSize = stepSize - trainingStepSize;
 
                 for (int t = 0; t < trainingStepSize; t++){
                     trainingSet.removeRow(0);
                     trainingSet.addRow(candidateSet.removeRow(0));
                 }
 
-                for (int t = 0; t < generalizationStepSize; t++){
+                for (int t = 0; t < generalisationStepSize; t++){
                     generalisationSet.removeRow(0);
                     generalisationSet.addRow(candidateSet.removeRow(0));
                 }

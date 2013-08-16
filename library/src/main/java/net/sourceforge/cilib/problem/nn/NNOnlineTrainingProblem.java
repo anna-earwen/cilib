@@ -56,7 +56,7 @@ public class NNOnlineTrainingProblem extends NNTrainingProblem {
 
     /**
      * Initializes the problem by reading in the data and constructing the data table,
-     * as well as the initial training and generalization sets. Also initializes (constructs) the neural network.
+     * as well as the initial training and generalisation sets. Also initializes (constructs) the neural network.
      */
     @Override
     public void initialise() {
@@ -71,7 +71,7 @@ public class NNOnlineTrainingProblem extends NNTrainingProblem {
             
             trainingSize = (int) (dataTable.size() * trainingSetPercentage);
             //int validationSize = (int) (dataTable.size() * validationSetPercentage);
-            int generalizationSize = dataTable.size() - trainingSize;// - validationSize;            
+            int generalisationSize = dataTable.size() - trainingSize;// - validationSize;            
 
             trainingSet = new StandardPatternDataTable();
             generalisationSet = new StandardPatternDataTable();
@@ -86,7 +86,7 @@ public class NNOnlineTrainingProblem extends NNTrainingProblem {
                 trainingSet.addRow((StandardPattern) dataTable.getRow((int)randomizer.getRandomNumber(0, trainingSize - 1)));
             }
             
-            for (int i = trainingSize; i < generalizationSize + trainingSize; i++) {
+            for (int i = trainingSize; i < generalisationSize + trainingSize; i++) {
                 generalisationSet.addRow((StandardPattern) dataTable.getRow(i));
             }
 
@@ -109,7 +109,7 @@ public class NNOnlineTrainingProblem extends NNTrainingProblem {
      * Calculates the fitness of the given solution by setting the neural network
      * weights to the solution and evaluating the training set in order to calculate
      * the MSE (which is minimized). Also checks whether the window has to be slided,
-     * and slides the window when necessary by adjusting the training and generalization sets.
+     * and slides the window when necessary by adjusting the training and generalisation sets.
      * @param solution the weights representing a solution.
      * @return a new MinimizationFitness wrapping the MSE training error.
      */

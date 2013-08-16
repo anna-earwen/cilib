@@ -19,10 +19,10 @@ import net.sourceforge.cilib.type.types.Type;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
- * Calculates the MSE generalization error of the best solution of an algorithm
+ * Calculates the MSE generalisation error of the best solution of an algorithm
  * optimizing a {@link NNDataTrainingProblem}.
  */
-public class NNClassificationGeneralizationError implements Measurement {
+public class NNClassificationGeneralisationError implements Measurement {
 
     private static final long serialVersionUID = -1014032196750640716L;
 
@@ -43,7 +43,7 @@ public class NNClassificationGeneralizationError implements Measurement {
     public Type getValue(Algorithm algorithm) {
         Vector solution = (Vector) algorithm.getBestSolution().getPosition();
         NNTrainingProblem problem = (NNTrainingProblem) algorithm.getOptimisationProblem();
-        StandardPatternDataTable generalizationSet = problem.getGeneralisationSet();
+        StandardPatternDataTable generalisationSet = problem.getGeneralisationSet();
         NeuralNetwork neuralNetwork = problem.getNeuralNetwork();
         neuralNetwork.setWeights(solution);
 
@@ -51,7 +51,7 @@ public class NNClassificationGeneralizationError implements Measurement {
         int numberPatternsIncorrect = 0;
         OutputErrorVisitor visitor = new OutputErrorVisitor();
         Vector error = null;
-        for (StandardPattern pattern : generalizationSet) {
+        for (StandardPattern pattern : generalisationSet) {
             neuralNetwork.evaluatePattern(pattern);
             visitor.setInput(pattern);
             neuralNetwork.getArchitecture().accept(visitor);

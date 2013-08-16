@@ -12,7 +12,7 @@ import net.sourceforge.cilib.type.types.Type;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
- * Calculates the MSE generalization error of the best solution of an algorithm
+ * Calculates the MSE generalisation error of the best solution of an algorithm
  * optimizing a {@link NNDataTrainingProblem}.
  */
 public class NNWeights implements Measurement {

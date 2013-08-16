@@ -41,8 +41,8 @@ public class NNOutput implements Measurement {
         Vector solution = (Vector) algorithm.getBestSolution().getPosition();
         NNTrainingProblem problem = (NNTrainingProblem) algorithm.getOptimisationProblem();
         StandardPatternDataTable trainingSet = problem.getTrainingSet();
-        StandardPatternDataTable generalizationSet = problem.getGeneralisationSet();
-         StandardPatternDataTable validationSet = problem.getValidationSet();
+        StandardPatternDataTable generalisationSet = problem.getGeneralisationSet();
+        StandardPatternDataTable validationSet = problem.getValidationSet();
         NeuralNetwork neuralNetwork = problem.getNeuralNetwork();
         neuralNetwork.setWeights(solution);
 
@@ -53,7 +53,7 @@ public class NNOutput implements Measurement {
                 builder.add(out);
             }
         }
-        for (StandardPattern pattern : generalizationSet) {
+        for (StandardPattern pattern : generalisationSet) {
             Vector outs = neuralNetwork.evaluatePattern(pattern);
             for(Numeric out : outs) {
                 builder.add(out);
