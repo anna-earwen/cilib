@@ -10,7 +10,7 @@ import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
- * Elliott Function. An efficient alternative to TanH, works in the [-1,1] domain, has [-5,5] active range.
+ * Elliott Function. An efficient alternative to TanH, works in the [-1,1] domain, has [-2,2] active range.
  *
  */
 public class Elliott extends ActivationFunction {
@@ -58,7 +58,7 @@ public class Elliott extends ActivationFunction {
      */
     @Override
     public double getLowerActiveRange() {
-        return -5;
+        return -2;
     }
 
     /**
@@ -66,6 +66,6 @@ public class Elliott extends ActivationFunction {
      */
     @Override
     public double getUpperActiveRange() {
-        return 5;
+        return 2;
     }
 }

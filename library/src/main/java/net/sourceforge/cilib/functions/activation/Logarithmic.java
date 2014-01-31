@@ -10,15 +10,15 @@ import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
- * Elliott Function. An efficient alternative to TanH, works in the [-1,1] domain, has [-5,5] active range.
+ * Logarithmic Function. Supposed to aid with hidden unit saturation.
  *
  */
-public class Elliott extends ActivationFunction {
+public class Logarithmic extends ActivationFunction {
 
     private static final long serialVersionUID = -5843046986587459333L;
 
     @Override
-    public Elliott getClone() {
+    public Logarithmic getClone() {
         return this;
     }
     /**
@@ -35,7 +35,11 @@ public class Elliott extends ActivationFunction {
     
     @Override
     public double f(double input) {
-        return input / (1.0 + (Math.abs(input)));
+        if(input >=0 ) {
+            return Math.log(1 + input);
+        } else {
+            return -Math.log(1 - input);
+        }
     }
 
     @Override
@@ -48,8 +52,11 @@ public class Elliott extends ActivationFunction {
      */
     @Override
     public double getGradient(double number) {        
-    	double d = 1.0 + Math.abs(number);//Derivative is: 1/((1+|x|)*(1+|x|)).
-    	return  1.0/(d * d);
+    	if (number >= 0) {
+            return 1 / (1 + number);
+        } else {
+            return 1 / (1 - number);
+        }
     }
 
     /**
@@ -58,7 +65,7 @@ public class Elliott extends ActivationFunction {
      */
     @Override
     public double getLowerActiveRange() {
-        return -5;
+        return -2;
     }
 
     /**
@@ -66,6 +73,6 @@ public class Elliott extends ActivationFunction {
      */
     @Override
     public double getUpperActiveRange() {
-        return 5;
+        return 2;
     }
 }

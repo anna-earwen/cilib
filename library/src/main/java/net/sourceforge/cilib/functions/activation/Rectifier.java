@@ -35,7 +35,7 @@ public class Rectifier extends ActivationFunction {
      */
     @Override
     public double f(double input) {
-        return Math.max(0, input);
+        return Math.log(1 + Math.exp(input));
     }
 
     /**
