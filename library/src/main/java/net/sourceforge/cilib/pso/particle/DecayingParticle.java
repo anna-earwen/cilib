@@ -8,10 +8,9 @@ package net.sourceforge.cilib.pso.particle;
 
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
 import net.sourceforge.cilib.controlparameter.ControlParameter;
-import net.sourceforge.cilib.pso.dynamic.ChargedParticle;
 import net.sourceforge.cilib.pso.positionprovider.WeightDecayPositionProvider;
 
-public class DecayingParticle extends ChargedParticle {
+public class DecayingParticle extends StandardParticle {
     private ControlParameter lambda;
 
     public DecayingParticle() {
