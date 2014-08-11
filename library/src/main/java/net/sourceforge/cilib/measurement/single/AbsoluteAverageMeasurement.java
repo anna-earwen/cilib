@@ -4,23 +4,26 @@
  *  / /__/ / / / /_/ /   http://cilib.net
  *  \___/_/_/_/_.___/
  */
-package net.sourceforge.cilib.measurement.multiple;
+package net.sourceforge.cilib.measurement.single;
 
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.algorithm.population.MultiPopulationBasedAlgorithm;
-import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.measurement.Measurement;
+import net.sourceforge.cilib.type.types.Numeric;
+import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.Type;
-import net.sourceforge.cilib.type.types.container.TypeList;
+import net.sourceforge.cilib.type.types.container.Vector;
+import net.sourceforge.cilib.type.types.container.Vector.Builder;
 
 /**
  * Measurement to perform measurements on a set of contained {@code Algorithm}
- * instances. This type of measurement is generally only defined for
+ * instances, and return an average of the obtained values. 
+ * This type of measurement is generally only defined for
  * {@link net.sourceforge.cilib.algorithm.population.MultiPopulationBasedAlgorithm}.
  */
-public class CompositeMeasurement implements Measurement<TypeList> {
+public class AbsoluteAverageMeasurement implements Measurement {
 
     private static final long serialVersionUID = -7109719897119621328L;
     private List<Measurement<? extends Type>> measurements;
@@ -28,16 +31,16 @@ public class CompositeMeasurement implements Measurement<TypeList> {
     /**
      * Create a new instance with zero measurements.
      */
-    public CompositeMeasurement() {
-        this.measurements = new ArrayList<Measurement<? extends Type>>();
+    public AbsoluteAverageMeasurement() {
+        this.measurements = new ArrayList<>();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public CompositeMeasurement getClone() {
-        CompositeMeasurement newCM = new CompositeMeasurement();
+    public AbsoluteAverageMeasurement getClone() {
+        AbsoluteAverageMeasurement newCM = new AbsoluteAverageMeasurement();
 
         for(Measurement<? extends Type> m : this.measurements) {
             newCM.addMeasurement(m.getClone());
@@ -52,18 +55,22 @@ public class CompositeMeasurement implements Measurement<TypeList> {
      * @return The values of measurements applied to all contained algorithms.
      */
     @Override
-    public TypeList getValue(Algorithm algorithm) {
-        TypeList vector = new TypeList();
-
-        MultiPopulationBasedAlgorithm multi = (MultiPopulationBasedAlgorithm) algorithm;
-
-        for (SinglePopulationBasedAlgorithm single : multi.getPopulations()) {
-            for (Measurement<? extends Type> measurement : measurements) {
-                vector.add(measurement.getValue(single));
-            }
+    public Type getValue(Algorithm algorithm) {
+        
+        Builder mBuilder = Vector.newBuilder();
+        
+        for (Measurement measurement : measurements) {
+            mBuilder.addAll((Vector)measurement.getValue(algorithm));
+        }
+        
+        Vector ms = mBuilder.build();
+        
+        double average = 0;
+        for(Numeric element : ms) {
+            average += Math.abs(element.doubleValue());
         }
 
-        return vector;
+        return Real.valueOf(average / ms.size());
     }
 
     /**

@@ -4,22 +4,21 @@
  *  / /__/ / / / /_/ /   http://cilib.net
  *  \___/_/_/_/_.___/
  */
-package net.sourceforge.cilib.measurement.multiple;
+package net.sourceforge.cilib.measurement.single;
 
 import net.sourceforge.cilib.algorithm.Algorithm;
-import net.sourceforge.cilib.algorithm.population.MultiPopulationBasedAlgorithm;
 import net.sourceforge.cilib.algorithm.population.SinglePopulationBasedAlgorithm;
 import net.sourceforge.cilib.entity.Entity;
 import net.sourceforge.cilib.entity.EntityType;
 import net.sourceforge.cilib.measurement.Measurement;
-import net.sourceforge.cilib.type.types.Numeric;
+import net.sourceforge.cilib.type.types.Int;
 import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.type.types.container.Vector.Builder;
 
 /**
  * This measurement only works for PSO. Simply find the Entity with the Best person best fitness in the population without re-calculating the fitness.
  */
-public class CooperativeParticleVelocity implements Measurement {
+public class PBestStagnationCount implements Measurement {
 
     private static final long serialVersionUID = 6502384299554109943L;
 
@@ -27,7 +26,7 @@ public class CooperativeParticleVelocity implements Measurement {
      * {@inheritDoc}
      */
     @Override
-    public CooperativeParticleVelocity getClone() {
+    public PBestStagnationCount getClone() {
         return this;
     }
 
@@ -37,14 +36,10 @@ public class CooperativeParticleVelocity implements Measurement {
     @Override
     public Vector getValue(Algorithm algorithm) {
         Builder builder = Vector.newBuilder(); 
-        MultiPopulationBasedAlgorithm ca = (MultiPopulationBasedAlgorithm) algorithm;
-        for (SinglePopulationBasedAlgorithm<Entity> currentAlgorithm : ca) {
-            for (Entity e : currentAlgorithm.getTopology()) {
-                Vector velocity = (Vector)e.getProperties().get(EntityType.Particle.VELOCITY);
-                for(Numeric n : velocity) {
-                    builder.add(n);
-                }
-            }
+        SinglePopulationBasedAlgorithm<Entity> ca = (SinglePopulationBasedAlgorithm) algorithm;
+        for (Entity e : ca.getTopology()) {
+            Int counter = (Int)e.getProperties().get(EntityType.Particle.Count.PBEST_STAGNATION_COUNTER);
+            builder.add(counter);
         }
         return builder.build();
     }

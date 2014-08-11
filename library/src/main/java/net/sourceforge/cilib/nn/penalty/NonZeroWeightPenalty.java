@@ -7,9 +7,10 @@
 
 package net.sourceforge.cilib.nn.penalty;
 
+import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
 import net.sourceforge.cilib.math.Maths;
-import net.sourceforge.cilib.nn.NeuralNetwork;
 import net.sourceforge.cilib.type.types.Numeric;
+import net.sourceforge.cilib.type.types.Type;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
@@ -18,9 +19,13 @@ import net.sourceforge.cilib.type.types.container.Vector;
  */
 public class NonZeroWeightPenalty extends NNPenalty {
 
+    public NonZeroWeightPenalty() {
+        lambda = ConstantControlParameter.of(1e-5);
+    }
+    
     @Override
-    public double calculatePenalty(NeuralNetwork neuralNetwork) {
-        Vector weights = neuralNetwork.getWeights();
+    public double calculatePenalty(Type solution) {
+        Vector weights = (Vector) solution;
         int numNonZeroWeights = 0;
         for(Numeric weight : weights) {
             if(Math.abs(weight.doubleValue()) > Maths.EPSILON) {

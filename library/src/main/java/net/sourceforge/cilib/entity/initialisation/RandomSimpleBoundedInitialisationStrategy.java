@@ -18,7 +18,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  *
  * @param <E> The entity type.
  */
-public class RandomSimpleBoundedInitializationStrategy<E extends Entity> implements
+public class RandomSimpleBoundedInitialisationStrategy<E extends Entity> implements
         InitialisationStrategy<E> {
 
     private static final long serialVersionUID = -7926839076670354209L;
@@ -26,21 +26,21 @@ public class RandomSimpleBoundedInitializationStrategy<E extends Entity> impleme
     protected ControlParameter upperBound;
     private ProbabilityDistributionFunction random;
 
-    public RandomSimpleBoundedInitializationStrategy() {
+    public RandomSimpleBoundedInitialisationStrategy() {
         this.lowerBound = ConstantControlParameter.of(0.1);
         this.upperBound = ConstantControlParameter.of(0.1);
         this.random = new UniformDistribution();
     }
 
-    public RandomSimpleBoundedInitializationStrategy(RandomSimpleBoundedInitializationStrategy copy) {
+    public RandomSimpleBoundedInitialisationStrategy(RandomSimpleBoundedInitialisationStrategy copy) {
         this.lowerBound = copy.lowerBound;
         this.upperBound = copy.upperBound;
         this.random = copy.random;
     }
 
     @Override
-    public RandomSimpleBoundedInitializationStrategy getClone() {
-        return new RandomSimpleBoundedInitializationStrategy(this);
+    public RandomSimpleBoundedInitialisationStrategy getClone() {
+        return new RandomSimpleBoundedInitialisationStrategy(this);
     }
 
     @Override

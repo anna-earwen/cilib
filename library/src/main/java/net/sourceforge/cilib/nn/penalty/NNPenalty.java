@@ -8,7 +8,7 @@
 package net.sourceforge.cilib.nn.penalty;
 
 import net.sourceforge.cilib.controlparameter.ControlParameter;
-import net.sourceforge.cilib.nn.NeuralNetwork;
+import net.sourceforge.cilib.type.types.Type;
 
 /**
  *
@@ -22,7 +22,7 @@ public abstract class NNPenalty {
      */
     protected ControlParameter lambda;
     
-    public abstract double calculatePenalty(NeuralNetwork nn);
+    public abstract double calculatePenalty(Type solution);
     public abstract double calculatePenaltyDerivative(double weight);    
 
     public ControlParameter getLambda() {

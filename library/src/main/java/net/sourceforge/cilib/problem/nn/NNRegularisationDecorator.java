@@ -9,7 +9,7 @@ package net.sourceforge.cilib.problem.nn;
 import net.sourceforge.cilib.io.StandardPatternDataTable;
 import net.sourceforge.cilib.nn.NeuralNetwork;
 import net.sourceforge.cilib.nn.penalty.NNPenalty;
-import net.sourceforge.cilib.nn.penalty.NonZeroWeightPenalty;
+import net.sourceforge.cilib.nn.penalty.WeightDecayPenalty;
 import net.sourceforge.cilib.problem.AbstractProblem;
 import net.sourceforge.cilib.problem.solution.Fitness;
 import net.sourceforge.cilib.type.DomainRegistry;
@@ -29,7 +29,7 @@ public class NNRegularisationDecorator extends NNTrainingProblem {
     public NNRegularisationDecorator() {
         super();
         neuralNetworkProblem = new NNEmptyTrainingProblem();
-        penalty = new NonZeroWeightPenalty();
+        penalty = new WeightDecayPenalty();
     }
 
     @Override
@@ -41,7 +41,11 @@ public class NNRegularisationDecorator extends NNTrainingProblem {
     @Override
     protected Fitness calculateFitness(Type solution) {
         double nnFitness = neuralNetworkProblem.getFitness(solution).getValue().doubleValue();        
-        return objective.evaluate(nnFitness + penalty.calculatePenalty(neuralNetworkProblem.getNeuralNetwork()));
+        return objective.evaluate(nnFitness + penalty.calculatePenalty(solution));
+    }
+    
+    public double calculatePenalty(Type solution) {
+        return penalty.calculatePenalty(solution);
     }
     
     public NNTrainingProblem getNeuralNetworkProblem() {

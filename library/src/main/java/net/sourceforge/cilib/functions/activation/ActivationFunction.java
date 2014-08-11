@@ -10,13 +10,14 @@ import net.sourceforge.cilib.functions.Differentiable;
 import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.util.Cloneable;
 import fj.F;
+import net.sourceforge.cilib.type.types.Bounds;
 
 /**
  * Activation functions are functions that are typically used within Neurons. This class provides
  * an abstraction for all functions that can be used in this manner.
  */
 public abstract class ActivationFunction extends F<Real, Real> implements Differentiable, Cloneable {
-
+    
     /**
      * {@inheritDoc }
      */
@@ -49,4 +50,6 @@ public abstract class ActivationFunction extends F<Real, Real> implements Differ
      * @return the upperbound
      */
     public abstract double getUpperActiveRange();
+        
+    public abstract Bounds getBounds();
 }

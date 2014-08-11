@@ -15,40 +15,40 @@ import net.sourceforge.cilib.type.types.container.Vector;
 /**
  *
  */
-public class ClampingVelocityProvider implements VelocityProvider {
+public class NormalisedClampingVelocityProvider implements VelocityProvider {
 
     private static final long serialVersionUID = -5995116445841750100L;
 
     private ControlParameter vMax;
     private VelocityProvider delegate;
 
-    public ClampingVelocityProvider() {
+    public NormalisedClampingVelocityProvider() {
         this(ConstantControlParameter.of(Double.MAX_VALUE), new StandardVelocityProvider());
     }
 
-    public ClampingVelocityProvider(ControlParameter vMax, VelocityProvider delegate) {
+    public NormalisedClampingVelocityProvider(ControlParameter vMax, VelocityProvider delegate) {
         this.vMax = vMax;
         this.delegate = delegate;
     }
 
-    public ClampingVelocityProvider(ClampingVelocityProvider copy) {
+    public NormalisedClampingVelocityProvider(NormalisedClampingVelocityProvider copy) {
         this.vMax = copy.vMax.getClone();
         this.delegate = copy.delegate.getClone();
     }
 
     @Override
-    public ClampingVelocityProvider getClone() {
-        return new ClampingVelocityProvider(this);
+    public NormalisedClampingVelocityProvider getClone() {
+        return new NormalisedClampingVelocityProvider(this);
     }
 
     @Override
     public Vector get(Particle particle) {
         Vector velocity = this.delegate.get(particle);
-        Vector.Builder builder = Vector.newBuilder();
-        for (Numeric value : velocity) {
-            builder.add(Math.min(Math.max(-vMax.getParameter(), value.doubleValue()), vMax.getParameter()));
-        }
-        return builder.build();
+        if(velocity.norm() > vMax.getParameter()) {
+            System.out.println("Prev: " + velocity.norm() + ", new: "+ velocity.divide(velocity.norm()/vMax.getParameter()));
+            return velocity.divide(velocity.norm()/vMax.getParameter());
+        }//.normalize();
+        return velocity;
     }
 
     public void setVMax(ControlParameter vMax) {

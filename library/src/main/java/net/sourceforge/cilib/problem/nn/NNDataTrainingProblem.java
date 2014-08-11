@@ -34,8 +34,6 @@ public class NNDataTrainingProblem extends NNTrainingProblem {
     private static final long serialVersionUID = -8765101028460476990L;
 
     private DataTableBuilder dataTableBuilder;
-    private SolutionConversionStrategy solutionConversionStrategy;
-    private int previousShuffleIteration;
     private boolean initialised;
 
     /**
@@ -44,9 +42,8 @@ public class NNDataTrainingProblem extends NNTrainingProblem {
     public NNDataTrainingProblem() {
         super();
         dataTableBuilder = new DataTableBuilder(new DelimitedTextFileReader());
-        solutionConversionStrategy = new WeightSolutionConversionStrategy();
-        previousShuffleIteration = -1;
         initialised = false;
+        shuffler = new ShuffleOperator();
     }
 
     /**
@@ -118,9 +115,20 @@ public class NNDataTrainingProblem extends NNTrainingProblem {
         if (trainingSet == null) {
             this.initialise();
         }
+              
+        if (shuffle) {
+            try {
+                shuffler.operate(trainingSet);
+            } catch (CIlibIOException exception) {
+                exception.printStackTrace();
+            }
+        }
+
+        return fitnessCalculator.getNNFitness(this, solution);
         
-        int currentIteration = AbstractAlgorithm.get().getIterations();
-        if (currentIteration != previousShuffleIteration && shuffle) {
+        /*
+        
+        if (shuffle) {
             try {
                 shuffler.operate(trainingSet);
             } catch (CIlibIOException exception) {
@@ -145,6 +153,7 @@ public class NNDataTrainingProblem extends NNTrainingProblem {
         errorTraining /= trainingSet.getNumRows() * error.size();
 
         return objective.evaluate(errorTraining);
+        */
     }
 
     /**
@@ -194,13 +203,6 @@ public class NNDataTrainingProblem extends NNTrainingProblem {
         dataTableBuilder.setSourceURL(sourceURL);
     }
 
-    public SolutionConversionStrategy getSolutionConversionStrategy() {
-        return solutionConversionStrategy;
-    }
-
-    public void setSolutionConversionStrategy(SolutionConversionStrategy solutionConversionStrategy) {
-        this.solutionConversionStrategy = solutionConversionStrategy;
-    }
     
     /**
      * Typical NN data training problem does not modify the data set during training.

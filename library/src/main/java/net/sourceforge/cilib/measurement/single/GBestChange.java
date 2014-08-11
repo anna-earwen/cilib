@@ -9,68 +9,51 @@ package net.sourceforge.cilib.measurement.single;
 import net.sourceforge.cilib.algorithm.Algorithm;
 import net.sourceforge.cilib.measurement.Measurement;
 import net.sourceforge.cilib.type.types.Bit;
+import net.sourceforge.cilib.type.types.Int;
+import net.sourceforge.cilib.type.types.Type;
 
 /**
  * Calculates the average number of personal best positions in
  * the current swarm that violates boundary constraints.
  *
  */
-public class ThresholdedStagnationFlag implements Measurement<Bit> {
+public class GBestChange implements Measurement {
 
     private static final long serialVersionUID = 7547646366505677446L;
     private BestSolutionImprovement bestSolutionImprovement;
-    private int iterationThreshold = 5;
-    private int iterationCount;
-    private double epsilon = 0.00001;
+    private double epsilon = 0.000001;
 
-    public ThresholdedStagnationFlag() {
+    public GBestChange() {
         this.bestSolutionImprovement = new BestSolutionImprovement();
     }
     
-    public ThresholdedStagnationFlag(int iterationThreshold, double epsilon) {
-        this.iterationThreshold = iterationThreshold;
+    public GBestChange(int iterationThreshold, double epsilon) {
         this.epsilon = epsilon;
     }
 
-    public ThresholdedStagnationFlag(ThresholdedStagnationFlag copy) {
+    public GBestChange(GBestChange copy) {
         this.bestSolutionImprovement = copy.bestSolutionImprovement.getClone();
-        this.iterationThreshold = copy.iterationThreshold;
         this.epsilon = copy.epsilon;
     }
     /**
      * {@inheritDoc}
      */
     @Override
-    public ThresholdedStagnationFlag getClone() {
-        return new ThresholdedStagnationFlag(this);
+    public GBestChange getClone() {
+        return new GBestChange(this);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Bit getValue(Algorithm algorithm) {
-        if(bestSolutionImprovement.getValue(algorithm).doubleValue() < epsilon) {
-            iterationCount++;
+    public Type getValue(Algorithm algorithm) {
+        if(Math.abs(bestSolutionImprovement.getValue(algorithm).doubleValue()) > epsilon) {
+            return Int.valueOf(1);
         }
         else {
-            iterationCount = 0;
+            return Int.valueOf(0);
         }
-        if(iterationCount >= this.iterationThreshold) {
-            iterationCount = 0;
-            return Bit.valueOf(true);
-        }
-        else {
-            return Bit.valueOf(false);
-        }
-    }
-
-    public int getIterationThreshold() {
-        return iterationThreshold;
-    }
-
-    public void setIterationThreshold(int iterationThreshold) {
-        this.iterationThreshold = iterationThreshold;
     }
 
     public double getEpsilon() {

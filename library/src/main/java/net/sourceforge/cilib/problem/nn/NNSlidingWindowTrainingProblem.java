@@ -15,12 +15,10 @@ import net.sourceforge.cilib.io.exception.CIlibIOException;
 import net.sourceforge.cilib.io.pattern.StandardPattern;
 import net.sourceforge.cilib.io.transform.ShuffleOperator;
 import net.sourceforge.cilib.io.transform.TypeConversionOperator;
-import net.sourceforge.cilib.nn.NeuralNetworks;
 import net.sourceforge.cilib.nn.architecture.visitors.OutputErrorVisitor;
 import net.sourceforge.cilib.problem.AbstractProblem;
 import net.sourceforge.cilib.problem.solution.Fitness;
 import net.sourceforge.cilib.type.DomainRegistry;
-import net.sourceforge.cilib.type.StringBasedDomainRegistry;
 import net.sourceforge.cilib.type.types.Numeric;
 import net.sourceforge.cilib.type.types.Type;
 import net.sourceforge.cilib.type.types.container.Vector;
@@ -38,7 +36,6 @@ public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
 
     private DataTableBuilder dataTableBuilder;
     private DataTable dataTable; // stores the entire data set from which training & generalisation sets are sampled
-    private int previousShuffleIteration;
     private int previousIteration;
     private boolean initialised;
 
@@ -53,7 +50,6 @@ public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
     public NNSlidingWindowTrainingProblem() {
         super();
         dataTableBuilder = new DataTableBuilder(new DelimitedTextFileReader());
-        previousShuffleIteration = -1;
         previousIteration = -1;
         initialised = false;
     }
@@ -125,9 +121,8 @@ public class NNSlidingWindowTrainingProblem extends NNTrainingProblem {
         if (trainingSet == null) {
             this.initialise();
         }
-
-        int currentIteration = AbstractAlgorithm.get().getIterations();
-        if (currentIteration != previousShuffleIteration && shuffle) {
+        
+        if (shuffle) {
             try {
                 shuffler.operate(trainingSet);
             } catch (CIlibIOException exception) {

@@ -8,10 +8,13 @@ package net.sourceforge.cilib.problem.nn;
 
 import net.sourceforge.cilib.io.StandardPatternDataTable;
 import net.sourceforge.cilib.io.transform.DataOperator;
-import net.sourceforge.cilib.io.transform.DoNothingDataOperator;
 import net.sourceforge.cilib.io.transform.PatternConversionOperator;
 import net.sourceforge.cilib.io.transform.ShuffleOperator;
 import net.sourceforge.cilib.nn.NeuralNetwork;
+import net.sourceforge.cilib.nn.domain.SolutionConversionStrategy;
+import net.sourceforge.cilib.nn.domain.WeightSolutionConversionStrategy;
+import net.sourceforge.cilib.nn.fitness.MSEFitnessCalculator;
+import net.sourceforge.cilib.nn.fitness.NNFitnessCalculator;
 import net.sourceforge.cilib.problem.AbstractProblem;
 
 /**
@@ -21,6 +24,7 @@ import net.sourceforge.cilib.problem.AbstractProblem;
  */
 public abstract class NNTrainingProblem extends AbstractProblem {
     protected NeuralNetwork neuralNetwork;
+    protected NNFitnessCalculator fitnessCalculator;
     protected StandardPatternDataTable trainingSet;
     protected StandardPatternDataTable generalisationSet;
     protected StandardPatternDataTable validationSet;
@@ -30,6 +34,7 @@ public abstract class NNTrainingProblem extends AbstractProblem {
     protected DataOperator shuffler;
     protected boolean shuffle;
     protected DataOperator patternConversionOperator;
+    protected SolutionConversionStrategy solutionConversionStrategy;
 
     /**
      * Default constructor.
@@ -41,7 +46,9 @@ public abstract class NNTrainingProblem extends AbstractProblem {
         validationSetPercentage = 0.0;
         patternConversionOperator = new PatternConversionOperator();
         shuffle = true;
-        shuffler = new DoNothingDataOperator();
+        shuffler = new ShuffleOperator();
+        solutionConversionStrategy = new WeightSolutionConversionStrategy();
+        fitnessCalculator = new MSEFitnessCalculator();
     }
 
     public NNTrainingProblem(NNTrainingProblem rhs) {
@@ -218,4 +225,21 @@ public abstract class NNTrainingProblem extends AbstractProblem {
     public void setPatternConversionOperator(DataOperator patternConverstionOperator) {
         this.patternConversionOperator = patternConverstionOperator;
     }
+    
+    public SolutionConversionStrategy getSolutionConversionStrategy() {
+        return solutionConversionStrategy;
+    }
+
+    public void setSolutionConversionStrategy(SolutionConversionStrategy solutionConversionStrategy) {
+        this.solutionConversionStrategy = solutionConversionStrategy;
+    }
+
+    public NNFitnessCalculator getFitnessCalculator() {
+        return fitnessCalculator;
+    }
+
+    public void setFitnessCalculator(NNFitnessCalculator fitnessCalculator) {
+        this.fitnessCalculator = fitnessCalculator;
+    }
+    
 }

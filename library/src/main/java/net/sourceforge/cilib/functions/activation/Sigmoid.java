@@ -12,6 +12,7 @@ import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 import com.google.common.base.Objects;
+import net.sourceforge.cilib.type.types.Bounds;
 
 /**
  * The generalized sigmoid function. The function is the general case of the sigmoid function
@@ -168,4 +169,9 @@ public class Sigmoid extends ActivationFunction {
     public double getUpperActiveRange() {
         return 1.732050808;
     }
+    
+    @Override
+    public Bounds getBounds() {
+        return new Bounds(0,1);
+    }   
 }

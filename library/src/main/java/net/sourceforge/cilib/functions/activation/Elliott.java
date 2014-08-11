@@ -6,6 +6,7 @@
  */
 package net.sourceforge.cilib.functions.activation;
 
+import net.sourceforge.cilib.type.types.Bounds;
 import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
 
@@ -68,4 +69,10 @@ public class Elliott extends ActivationFunction {
     public double getUpperActiveRange() {
         return 2;
     }
+
+    @Override
+    public Bounds getBounds() {
+        return new Bounds(-1,1);
+    }   
+    
 }

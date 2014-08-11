@@ -8,8 +8,8 @@
 package net.sourceforge.cilib.nn.penalty;
 
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
-import net.sourceforge.cilib.nn.NeuralNetwork;
 import net.sourceforge.cilib.type.types.Numeric;
+import net.sourceforge.cilib.type.types.Type;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
@@ -23,8 +23,8 @@ public class WeightDecayPenalty extends NNPenalty {
     }
     
     @Override
-    public double calculatePenalty(NeuralNetwork neuralNetwork) {
-        Vector weights = neuralNetwork.getWeights();
+    public double calculatePenalty(Type solution) {
+        Vector weights = (Vector) solution;
         double weightSum = 0;
         for(Numeric weight : weights) {
             weightSum += Math.pow(weight.doubleValue(),2);

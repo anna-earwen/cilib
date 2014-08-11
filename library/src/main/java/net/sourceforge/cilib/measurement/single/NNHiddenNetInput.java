@@ -11,9 +11,12 @@ import net.sourceforge.cilib.io.StandardPatternDataTable;
 import net.sourceforge.cilib.io.pattern.StandardPattern;
 import net.sourceforge.cilib.measurement.Measurement;
 import net.sourceforge.cilib.nn.NeuralNetwork;
+import net.sourceforge.cilib.nn.architecture.Layer;
+import net.sourceforge.cilib.nn.components.Neuron;
 import net.sourceforge.cilib.problem.nn.NNDataTrainingProblem;
 import net.sourceforge.cilib.problem.nn.NNTrainingProblem;
 import net.sourceforge.cilib.type.types.Numeric;
+import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.Type;
 import net.sourceforge.cilib.type.types.container.Vector;
 import net.sourceforge.cilib.type.types.container.Vector.Builder;
@@ -22,9 +25,10 @@ import net.sourceforge.cilib.type.types.container.Vector.Builder;
  * Calculates the NN output of the best solution of an algorithm
  * optimizing a {@link NNDataTrainingProblem}, for the entire data set.
  */
-public class NNOutput implements Measurement {
+public class NNHiddenNetInput implements Measurement {
 
     private static final long serialVersionUID = -1014032196750640716L;
+    private int hiddenLayerNumber = 1;
     /**
      * {@inheritDoc }
      */
@@ -43,28 +47,42 @@ public class NNOutput implements Measurement {
         StandardPatternDataTable trainingSet = problem.getTrainingSet();
         StandardPatternDataTable generalisationSet = problem.getGeneralisationSet();
         StandardPatternDataTable validationSet = problem.getValidationSet();
-        NeuralNetwork neuralNetwork = problem.getNeuralNetwork();
-        neuralNetwork.setWeights(solution);
-
-        Builder builder = Vector.newBuilder();
+        StandardPatternDataTable dataSet = new StandardPatternDataTable();
         for (StandardPattern pattern : trainingSet) {
-            Vector outs = neuralNetwork.evaluatePattern(pattern);
-            for(Numeric out : outs) {
-                builder.add(out);
-            }
+            dataSet.addRow(pattern);
         }
         for (StandardPattern pattern : generalisationSet) {
-            Vector outs = neuralNetwork.evaluatePattern(pattern);
-            for(Numeric out : outs) {
-                builder.add(out);
-            }
+            dataSet.addRow(pattern);        
         }
         for (StandardPattern pattern : validationSet) {
-            Vector outs = neuralNetwork.evaluatePattern(pattern);
-            for(Numeric out : outs) {
-                builder.add(out);
+            dataSet.addRow(pattern);        
+        }
+        NeuralNetwork neuralNetwork = problem.getNeuralNetwork();
+        neuralNetwork.setWeights(solution);        
+
+        Builder builder = Vector.newBuilder();
+        for (StandardPattern pattern : dataSet) {
+            neuralNetwork.evaluatePattern(pattern);
+            Layer layer = neuralNetwork.getArchitecture().getLayers().get(hiddenLayerNumber);
+            Layer prevLayer = neuralNetwork.getArchitecture().getLayers().get(hiddenLayerNumber - 1);
+            for(Neuron neuron : layer) {
+                if(neuron.isBias()) continue;
+                else {
+                    Vector weights = neuron.getWeights();
+                    double netInput = 0;
+                    for (int i = 0; i < neuron.getNumWeights(); i++) {
+                        netInput += weights.doubleValueOf(i) * prevLayer.getNeuralInput(i);
+                    }
+                    builder.add(Real.valueOf(netInput));
+                }
             }
         }
+            
         return builder.build();
     }
+
+    public void setHiddenLayerNumber(int hiddenLayerNumber) {
+        this.hiddenLayerNumber = hiddenLayerNumber;
+    }
+    
 }

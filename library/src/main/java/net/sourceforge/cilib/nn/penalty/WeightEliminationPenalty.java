@@ -9,8 +9,8 @@ package net.sourceforge.cilib.nn.penalty;
 
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter;
 import net.sourceforge.cilib.controlparameter.ControlParameter;
-import net.sourceforge.cilib.nn.NeuralNetwork;
 import net.sourceforge.cilib.type.types.Numeric;
+import net.sourceforge.cilib.type.types.Type;
 import net.sourceforge.cilib.type.types.container.Vector;
 
 /**
@@ -22,17 +22,18 @@ public class WeightEliminationPenalty extends NNPenalty {
     protected ControlParameter c;
     
     public WeightEliminationPenalty() {
-        c = ConstantControlParameter.of(0.2);
-        lambda = ConstantControlParameter.of(1e-2);
+        c = ConstantControlParameter.of(1);
+        lambda = ConstantControlParameter.of(1e-4);
     }
     
     @Override
-    public double calculatePenalty(NeuralNetwork neuralNetwork) {
-        Vector weights = neuralNetwork.getWeights();
+    public double calculatePenalty(Type solution) {
+        Vector weights = (Vector) solution;
         double weightSum = 0;
         for(Numeric weight : weights) {
             double wSquared = Math.pow(weight.doubleValue(),2);
-            weightSum += wSquared / (wSquared + c.getParameter() * c.getParameter());
+            double cSquared = c.getParameter() * c.getParameter();
+            weightSum += wSquared / (wSquared + cSquared);
         }
         return lambda.getParameter() * weightSum;
     }

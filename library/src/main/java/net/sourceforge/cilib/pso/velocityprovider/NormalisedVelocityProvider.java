@@ -15,48 +15,33 @@ import net.sourceforge.cilib.type.types.container.Vector;
 /**
  *
  */
-public class ClampingVelocityProvider implements VelocityProvider {
+public class NormalisedVelocityProvider implements VelocityProvider {
 
     private static final long serialVersionUID = -5995116445841750100L;
 
-    private ControlParameter vMax;
     private VelocityProvider delegate;
 
-    public ClampingVelocityProvider() {
-        this(ConstantControlParameter.of(Double.MAX_VALUE), new StandardVelocityProvider());
+    public NormalisedVelocityProvider() {
+        this(new StandardVelocityProvider());
     }
 
-    public ClampingVelocityProvider(ControlParameter vMax, VelocityProvider delegate) {
-        this.vMax = vMax;
+    public NormalisedVelocityProvider(VelocityProvider delegate) {
         this.delegate = delegate;
     }
 
-    public ClampingVelocityProvider(ClampingVelocityProvider copy) {
-        this.vMax = copy.vMax.getClone();
+    public NormalisedVelocityProvider(NormalisedVelocityProvider copy) {
         this.delegate = copy.delegate.getClone();
     }
 
     @Override
-    public ClampingVelocityProvider getClone() {
-        return new ClampingVelocityProvider(this);
+    public NormalisedVelocityProvider getClone() {
+        return new NormalisedVelocityProvider(this);
     }
 
     @Override
     public Vector get(Particle particle) {
         Vector velocity = this.delegate.get(particle);
-        Vector.Builder builder = Vector.newBuilder();
-        for (Numeric value : velocity) {
-            builder.add(Math.min(Math.max(-vMax.getParameter(), value.doubleValue()), vMax.getParameter()));
-        }
-        return builder.build();
-    }
-
-    public void setVMax(ControlParameter vMax) {
-        this.vMax = vMax;
-    }
-
-    public ControlParameter getVMax() {
-        return this.vMax;
+        return velocity.normalize();
     }
 
     public void setDelegate(VelocityProvider delegate) {

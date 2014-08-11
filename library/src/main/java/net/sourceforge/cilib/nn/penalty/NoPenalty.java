@@ -4,7 +4,7 @@
  */
 package net.sourceforge.cilib.nn.penalty;
 
-import net.sourceforge.cilib.nn.NeuralNetwork;
+import net.sourceforge.cilib.type.types.Type;
 
 /**
  *
@@ -13,7 +13,7 @@ import net.sourceforge.cilib.nn.NeuralNetwork;
 public class NoPenalty extends NNPenalty {
 
     @Override
-    public double calculatePenalty(NeuralNetwork nn) {
+    public double calculatePenalty(Type solution) {
         return 0; // no penalty!
     }
 

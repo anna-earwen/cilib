@@ -6,6 +6,7 @@
  */
 package net.sourceforge.cilib.functions.activation;
 
+import net.sourceforge.cilib.type.types.Bounds;
 import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
 
@@ -67,4 +68,9 @@ public class Linear extends ActivationFunction {
     public Linear getClone() {
         return this;
     }
+    
+    @Override
+    public Bounds getBounds() {
+        return new Bounds(Double.MIN_VALUE,Double.MAX_VALUE);
+    }   
 }

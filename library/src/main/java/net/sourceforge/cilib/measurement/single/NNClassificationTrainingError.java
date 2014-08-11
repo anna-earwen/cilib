@@ -22,7 +22,7 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * Calculates the MSE generalisation error of the best solution of an algorithm
  * optimizing a {@link NNDataTrainingProblem}.
  */
-public class NNClassificationGeneralisationError implements Measurement {
+public class NNClassificationTrainingError implements Measurement {
 
     private static final long serialVersionUID = -1014032196750640716L;
 
@@ -43,7 +43,7 @@ public class NNClassificationGeneralisationError implements Measurement {
     public Type getValue(Algorithm algorithm) {
         Vector solution = (Vector) algorithm.getBestSolution().getPosition();
         NNTrainingProblem problem = (NNTrainingProblem) algorithm.getOptimisationProblem();
-        StandardPatternDataTable generalisationSet = problem.getGeneralisationSet();
+        StandardPatternDataTable generalisationSet = problem.getTrainingSet();
         NeuralNetwork neuralNetwork = problem.getNeuralNetwork();
         neuralNetwork.setWeights(solution);
 
@@ -74,7 +74,11 @@ public class NNClassificationGeneralisationError implements Measurement {
         //System.out.println("Num correct: "+numberPatternsCorrect);
         //System.out.println("Num incorrect: "+numberPatternsIncorrect);
         
-        double percentageIncorrect = (double) numberPatternsIncorrect / ((double) numberPatternsIncorrect + (double) numberPatternsCorrect) * 100;
+        double percentageIncorrect = ((double) numberPatternsIncorrect / ((double) numberPatternsIncorrect + (double) numberPatternsCorrect));
         return Real.valueOf(percentageIncorrect);
+    }
+
+    public void setOutputSensitivityThreshold(double outputSensitivityThreshold) {
+        this.outputSensitivityThreshold = outputSensitivityThreshold;
     }
 }

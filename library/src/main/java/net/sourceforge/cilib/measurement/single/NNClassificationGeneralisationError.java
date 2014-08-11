@@ -74,7 +74,11 @@ public class NNClassificationGeneralisationError implements Measurement {
         //System.out.println("Num correct: "+numberPatternsCorrect);
         //System.out.println("Num incorrect: "+numberPatternsIncorrect);
         
-        double percentageIncorrect = (double) numberPatternsIncorrect / ((double) numberPatternsIncorrect + (double) numberPatternsCorrect) * 100;
+        double percentageIncorrect = ((double) numberPatternsIncorrect / ((double) numberPatternsIncorrect + (double) numberPatternsCorrect));
         return Real.valueOf(percentageIncorrect);
+    }
+
+    public void setOutputSensitivityThreshold(double outputSensitivityThreshold) {
+        this.outputSensitivityThreshold = outputSensitivityThreshold;
     }
 }

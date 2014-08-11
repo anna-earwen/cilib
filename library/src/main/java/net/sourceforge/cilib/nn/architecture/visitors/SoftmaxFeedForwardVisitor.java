@@ -11,22 +11,25 @@ import net.sourceforge.cilib.nn.architecture.Architecture;
 import net.sourceforge.cilib.nn.architecture.ForwardingLayer;
 import net.sourceforge.cilib.nn.architecture.Layer;
 import net.sourceforge.cilib.nn.components.PatternInputSource;
+import net.sourceforge.cilib.type.types.Numeric;
+import net.sourceforge.cilib.type.types.container.Vector;
+import net.sourceforge.cilib.type.types.container.Vector.Builder;
 
 /**
  * Class implements an {@link ArchitectureOperationVisitor} that performs a feed-
  * forward through a neural network architecture as the visit operation.
  */
-public class FeedForwardVisitor extends ArchitectureOperationVisitor {
+public class SoftmaxFeedForwardVisitor extends ArchitectureOperationVisitor {
 
-    public FeedForwardVisitor() {}
+    public SoftmaxFeedForwardVisitor() {}
 
-    public FeedForwardVisitor(FeedForwardVisitor rhs) {
+    public SoftmaxFeedForwardVisitor(SoftmaxFeedForwardVisitor rhs) {
         super(rhs);
     }
 
     @Override
-    public FeedForwardVisitor getClone() {
-        return new FeedForwardVisitor(this);
+    public SoftmaxFeedForwardVisitor getClone() {
+        return new SoftmaxFeedForwardVisitor(this);
     }
 
     /**
@@ -48,8 +51,21 @@ public class FeedForwardVisitor extends ArchitectureOperationVisitor {
                 currentLayer.get(n).calculateActivation(layers.get(l - 1));
             }
         }
-
-        this.output = currentLayer.getActivations();
+        
+        Vector activations = currentLayer.getActivations(); // now softmax contains 
+        double activationSum = 0;
+        for(Numeric element : activations) {
+            activationSum += element.doubleValue();
+        }
+    
+        Builder softmaxBuilder = Vector.newBuilder();
+      
+        for(Numeric element : activations) {
+            softmaxBuilder.add(element.doubleValue() / activationSum );
+        }
+        
+        this.output = softmaxBuilder.build();
+        //System.out.println("Softmax out: " + this.output.toString());
     }
 
     /**

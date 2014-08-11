@@ -16,9 +16,9 @@ import net.sourceforge.cilib.functions.activation.Sigmoid;
  */
 public class LayerConfiguration {
 
-    private int size;
-    private ActivationFunction activationFunction;
-    private boolean bias;
+    protected int size;
+    protected ActivationFunction activationFunction;
+    protected boolean bias;
 
     /**
      * Default constructor. Default size is 0, default activation function is

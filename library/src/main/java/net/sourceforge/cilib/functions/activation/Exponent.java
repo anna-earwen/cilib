@@ -6,6 +6,7 @@
  */
 package net.sourceforge.cilib.functions.activation;
 
+import net.sourceforge.cilib.type.types.Bounds;
 import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
 
@@ -13,12 +14,12 @@ import net.sourceforge.cilib.type.types.container.Vector;
  * Hyperbolic Tangent Function.
  *
  */
-public class TanH extends ActivationFunction {
+public class Exponent extends ActivationFunction {
 
     private static final long serialVersionUID = -5843046986587459333L;
 
     @Override
-    public TanH getClone() {
+    public Exponent getClone() {
         return this;
     }
     /**
@@ -34,9 +35,7 @@ public class TanH extends ActivationFunction {
      */
 
     public double f(double input) {
-        double a = Math.exp(input);
-        double b = Math.exp(-input);
-        return ((a - b) / (a + b));
+        return Math.exp(input);
     }
 
     @Override
@@ -49,7 +48,7 @@ public class TanH extends ActivationFunction {
      */
     @Override
     public double getGradient(double number) {
-        return 1.0 - number * number;
+        return Math.exp(number);
     }
 
     /**
@@ -58,7 +57,7 @@ public class TanH extends ActivationFunction {
      */
     @Override
     public double getLowerActiveRange() {
-        return -1.732050808;
+        return Double.MIN_VALUE;
     }
 
     /**
@@ -66,6 +65,11 @@ public class TanH extends ActivationFunction {
      */
     @Override
     public double getUpperActiveRange() {
-        return 1.732050808;
+        return Double.MAX_VALUE;
     }
+    
+    @Override
+    public Bounds getBounds() {
+        return new Bounds(0,Double.MAX_VALUE);
+    }   
 }

@@ -6,6 +6,7 @@
  */
 package net.sourceforge.cilib.functions.activation;
 
+import net.sourceforge.cilib.type.types.Bounds;
 import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.container.Vector;
 
@@ -74,4 +75,9 @@ public class Rectifier extends ActivationFunction {
     public double getUpperActiveRange() {
         return Double.MAX_VALUE;
     }
+    
+    @Override
+    public Bounds getBounds() {
+        return new Bounds(0,Double.MAX_VALUE);
+    }   
 }
